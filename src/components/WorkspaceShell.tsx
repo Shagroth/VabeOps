@@ -31,15 +31,25 @@ function NavLink({
   );
 }
 
+const NAV_LABEL: Record<NavKey, string> = {
+  overview: "Обзор",
+  program: "Программа",
+  stream: "Поток",
+  admin: "Admin",
+};
+
 export function WorkspaceShell({
   active,
   email,
   isAdmin,
+  breadcrumb,
   children,
 }: {
   active: NavKey;
   email: string;
   isAdmin: boolean;
+  /** e.g. cohort name or "Неделя 2" — shown in the desktop top bar next to the section label */
+  breadcrumb?: string;
   children: React.ReactNode;
 }) {
   return (
@@ -50,8 +60,8 @@ export function WorkspaceShell({
           <Link href="/" className="flex items-center gap-2 px-2">
             <svg viewBox="0 0 24 24" className="h-5 w-5" aria-hidden="true">
               <circle cx="5" cy="19" r="2" fill="var(--system)" />
-              <path d="M7 18 L17 7" stroke="var(--accent-action)" strokeWidth="1.6" fill="none" />
-              <circle cx="19" cy="5" r="2" fill="var(--accent-action)" />
+              <path d="M7 18 L17 7" stroke="var(--system)" strokeWidth="1.6" fill="none" />
+              <circle cx="19" cy="5" r="2" fill="var(--system)" />
             </svg>
             <span className="font-medium">Vibe Ops</span>
           </Link>
@@ -103,8 +113,8 @@ export function WorkspaceShell({
         <Link href="/" className="flex items-center gap-2">
           <svg viewBox="0 0 24 24" className="h-5 w-5" aria-hidden="true">
             <circle cx="5" cy="19" r="2" fill="var(--system)" />
-            <path d="M7 18 L17 7" stroke="var(--accent-action)" strokeWidth="1.6" fill="none" />
-            <circle cx="19" cy="5" r="2" fill="var(--accent-action)" />
+            <path d="M7 18 L17 7" stroke="var(--system)" strokeWidth="1.6" fill="none" />
+            <circle cx="19" cy="5" r="2" fill="var(--system)" />
           </svg>
           <span className="text-sm font-medium">Vibe Ops</span>
         </Link>
@@ -120,7 +130,18 @@ export function WorkspaceShell({
         </nav>
       </div>
 
-      <main className="min-h-screen flex-1 px-5 pb-16 pt-20 lg:px-10 lg:pt-10">{children}</main>
+      <main className="min-h-screen flex-1 px-5 pb-16 pt-20 lg:px-10 lg:pt-0">
+        <div className="hidden items-center gap-2 border-b border-hairline py-4 text-sm text-graphite-muted lg:flex">
+          <span>{NAV_LABEL[active]}</span>
+          {breadcrumb && (
+            <>
+              <span aria-hidden="true">/</span>
+              <span className="text-graphite">{breadcrumb}</span>
+            </>
+          )}
+        </div>
+        <div className="lg:pt-8">{children}</div>
+      </main>
     </div>
   );
 }

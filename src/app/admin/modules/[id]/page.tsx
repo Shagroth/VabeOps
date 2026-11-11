@@ -112,7 +112,7 @@ export default async function EditModulePage({
           </label>
           <button
             type="submit"
-            className="self-start rounded-lg bg-accent-action px-4 py-2 text-sm font-medium text-white"
+            className="self-start rounded-lg bg-ink px-4 py-2 text-sm font-medium text-ink-foreground transition-transform duration-150 hover:scale-[1.02] active:scale-[0.98]"
           >
             Сохранить
           </button>
@@ -213,7 +213,7 @@ export default async function EditModulePage({
                       type="submit"
                       name="intent"
                       value="accept"
-                      className="rounded bg-accent-action px-3 py-1 text-sm text-white"
+                      className="rounded bg-ink px-3 py-1 text-sm text-ink-foreground transition-transform duration-150 hover:scale-[1.02] active:scale-[0.98]"
                     >
                       Принять
                     </button>

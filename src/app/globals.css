@@ -1,21 +1,13 @@
 @import "tailwindcss";
 @plugin "@tailwindcss/typography";
 
+/*
+ * SIGNAL / SYSTEM — the one Vibe Ops visual system, shared by the public
+ * landing and the workspace (see VIBE_OPS visual-first redesign mandate).
+ * `warn` is a semantic state color (needs-revision / changed-conditions),
+ * not a brand accent — kept separate from signal/system on purpose.
+ */
 :root {
-  --background: #faf7f1;
-  --foreground: #1a1a1a;
-
-  /* Decision Trails tokens — see VIBE_OPS_HANDOFF.md §3 (workspace, unchanged) */
-  --surface-hero: #14151a;
-  --surface-hero-foreground: #f2f0ec;
-  --accent-action: #1e54c7;
-  --accent-change: #e07a3f;
-
-  /*
-   * SIGNAL / SYSTEM — public landing v3 only (see VIBE_OPS redesign mandate).
-   * Scoped to its own names so the existing workspace tokens above are
-   * untouched until the workspace gets its own pass.
-   */
   --ink: #0a0f18;
   --ink-foreground: #f4f5f1;
   --ink-muted: #9aa3ad;
@@ -25,18 +17,12 @@
   --signal: #baf66b;
   --signal-ink: #10210a;
   --system: #8f9bff;
+  --warn: #e07a3f;
   --hairline: rgba(19, 26, 37, 0.1);
   --hairline-ink: rgba(244, 245, 241, 0.14);
 }
 
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --color-surface-hero: var(--surface-hero);
-  --color-surface-hero-foreground: var(--surface-hero-foreground);
-  --color-accent-action: var(--accent-action);
-  --color-accent-change: var(--accent-change);
-
   --color-ink: var(--ink);
   --color-ink-foreground: var(--ink-foreground);
   --color-ink-muted: var(--ink-muted);
@@ -46,6 +32,7 @@
   --color-signal: var(--signal);
   --color-signal-ink: var(--signal-ink);
   --color-system: var(--system);
+  --color-accent-change: var(--warn);
   --color-hairline: var(--hairline);
   --color-hairline-ink: var(--hairline-ink);
 
@@ -54,26 +41,19 @@
 }
 
 /*
- * No global prefers-color-scheme switch on purpose: Decision Trails is a
- * deliberate two-zone design (dark hero / warm light workspace), not a
- * system dark-mode toggle. The `dark:` utilities that used to cover this
- * gap elsewhere have been removed — the whole workspace is the warm light
- * surface now, consistently.
+ * No system prefers-color-scheme switch: this is a deliberate two-zone
+ * design (dark hero/CTA sections, warm-cool light everywhere else), not a
+ * user-togglable dark mode.
  */
 
 body {
-  background: var(--background);
-  color: var(--foreground);
+  background: var(--paper);
+  color: var(--graphite);
   font-family: var(--font-sans), ui-sans-serif, system-ui, sans-serif;
 }
 
-.surface-hero {
-  background: var(--surface-hero);
-  color: var(--surface-hero-foreground);
-}
-
 :focus-visible {
-  outline: 2px solid var(--accent-action);
+  outline: 2px solid var(--system);
   outline-offset: 2px;
 }
 

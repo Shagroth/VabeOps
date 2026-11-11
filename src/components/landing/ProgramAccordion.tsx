@@ -29,7 +29,7 @@ export function ProgramAccordion({ weeks }: { weeks: Week[] }) {
                 {String(w.n).padStart(2, "0")}
               </span>
               <div className="flex-1">
-                <h3 className="text-lg font-medium">{w.title}</h3>
+                <h3 className="text-xl font-medium">{w.title}</h3>
                 <p className="mt-1 max-w-[60ch] text-sm text-graphite-muted">{w.detail}</p>
               </div>
               <svg

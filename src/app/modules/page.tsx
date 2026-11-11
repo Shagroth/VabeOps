@@ -43,7 +43,12 @@ export default async function ModulesPage() {
   const statusByModule = new Map(submissions.map((s) => [s.moduleId, s.status]));
 
   return (
-    <WorkspaceShell active="program" email={session.user.email ?? ""} isAdmin={isAdmin}>
+    <WorkspaceShell
+      active="program"
+      email={session.user.email ?? ""}
+      isAdmin={isAdmin}
+      breadcrumb={enrollment.cohort.name}
+    >
       <div className="mx-auto flex max-w-[860px] flex-col gap-6">
         <h1 className="text-2xl font-semibold">{enrollment.cohort.name}</h1>
         <ul className="flex flex-col gap-2">

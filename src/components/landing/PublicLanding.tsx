@@ -143,7 +143,7 @@ export function PublicLanding() {
 
       {/* Section 1 — weak vs robust */}
       <section className="mx-auto w-full max-w-[1280px] px-6 py-20 lg:px-10">
-        <h2 className="max-w-[26ch] text-3xl font-semibold tracking-tight text-graphite sm:text-4xl">
+        <h2 className="max-w-[26ch] text-[2.375rem] font-semibold tracking-tight text-graphite sm:text-[3rem]">
           От промптов к инженерным решениям
         </h2>
         <p className="mt-4 max-w-[62ch] text-graphite-muted">
@@ -180,13 +180,13 @@ export function PublicLanding() {
 
       {/* Section 2 — what you'll build */}
       <section className="mx-auto w-full max-w-[1280px] px-6 py-20 lg:px-10">
-        <h2 className="max-w-[26ch] text-3xl font-semibold tracking-tight sm:text-4xl">
+        <h2 className="max-w-[26ch] text-[2.375rem] font-semibold tracking-tight sm:text-[3rem]">
           Что ты реально соберёшь
         </h2>
         <div className="mt-12 grid gap-px overflow-hidden rounded-2xl border border-hairline bg-hairline md:grid-cols-3">
           {ARTIFACTS.map((a) => (
             <div key={a.title} className="flex flex-col gap-3 bg-paper p-7">
-              <h3 className="text-lg font-medium">{a.title}</h3>
+              <h3 className="text-xl font-medium">{a.title}</h3>
               <p className="text-sm text-graphite-muted">{a.detail}</p>
             </div>
           ))}
@@ -196,7 +196,7 @@ export function PublicLanding() {
       {/* Section 3 — program by weeks */}
       <section id="program" className="mx-auto w-full max-w-[1280px] px-6 py-20 lg:px-10">
         <div className="flex flex-wrap items-baseline justify-between gap-4">
-          <h2 className="text-3xl font-semibold tracking-tight sm:text-4xl">Программа по неделям</h2>
+          <h2 className="text-[2.375rem] font-semibold tracking-tight sm:text-[3rem]">Программа по неделям</h2>
           <span className="rounded-full border border-hairline px-3 py-1 font-mono text-xs text-graphite-muted">
             черновик — число недель и даты уточняются
           </span>
@@ -219,7 +219,7 @@ export function PublicLanding() {
       {/* Section 4 — workspace preview (contrasting dark panel) */}
       <section className="bg-ink py-20 text-ink-foreground">
         <div className="mx-auto max-w-[1280px] px-6 lg:px-10">
-          <h2 className="max-w-[26ch] text-3xl font-semibold tracking-tight sm:text-4xl">
+          <h2 className="max-w-[26ch] text-[2.375rem] font-semibold tracking-tight sm:text-[3rem]">
             Внутри рабочего пространства
           </h2>
           <p className="mt-4 max-w-[60ch] text-ink-muted">
@@ -274,7 +274,7 @@ export function PublicLanding() {
 
       {/* Section 5 — how cohort works */}
       <section id="how-it-works" className="mx-auto w-full max-w-[1280px] px-6 py-20 lg:px-10">
-        <h2 className="max-w-[26ch] text-3xl font-semibold tracking-tight sm:text-4xl">
+        <h2 className="max-w-[26ch] text-[2.375rem] font-semibold tracking-tight sm:text-[3rem]">
           Как устроен поток
         </h2>
         <ol className="mt-12 grid gap-8 md:grid-cols-5">
@@ -309,7 +309,7 @@ export function PublicLanding() {
 
       {/* Section 7 — FAQ */}
       <section id="faq" className="mx-auto w-full max-w-[1280px] px-6 py-20 lg:px-10">
-        <h2 className="text-3xl font-semibold tracking-tight sm:text-4xl">Частые вопросы</h2>
+        <h2 className="text-[2.375rem] font-semibold tracking-tight sm:text-[3rem]">Частые вопросы</h2>
         <div className="mt-10 grid gap-x-10 gap-y-8 md:grid-cols-2">
           {FAQ.map((item) => (
             <div key={item.q} className="border-t border-hairline pt-5">
@@ -327,7 +327,7 @@ export function PublicLanding() {
             <span className="font-mono text-xs uppercase tracking-[0.2em] text-system">
               Заявка
             </span>
-            <h2 className="text-3xl font-semibold tracking-tight sm:text-4xl">
+            <h2 className="text-[2.375rem] font-semibold tracking-tight sm:text-[3rem]">
               Подай заявку на бесплатный пилот
             </h2>
             <p className="max-w-[46ch] text-ink-muted">

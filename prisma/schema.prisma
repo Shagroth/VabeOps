@@ -156,6 +156,9 @@ model Submission {
   userId    String
   status    SubmissionStatus @default(SUBMITTED)
   createdAt DateTime         @default(now())
+  // Private to student + instructor by default. True only by the
+  // student's explicit opt-in on submit/resubmit — never auto-published.
+  publishedToCohort Boolean  @default(false)
 
   module   Module               @relation(fields: [moduleId], references: [id], onDelete: Cascade)
   user     User                 @relation(fields: [userId], references: [id], onDelete: Cascade)

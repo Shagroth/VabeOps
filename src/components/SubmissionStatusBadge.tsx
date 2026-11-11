@@ -7,7 +7,7 @@ const LABEL: Record<string, string> = {
 const STYLE: Record<string, string> = {
   SUBMITTED: "bg-black/10",
   NEEDS_REVISION: "bg-accent-change/15 text-accent-change",
-  ACCEPTED: "bg-accent-action/15 text-accent-action",
+  ACCEPTED: "bg-signal/25 text-graphite",
 };
 
 export function SubmissionStatusBadge({ status }: { status: string }) {

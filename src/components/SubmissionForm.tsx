@@ -32,10 +32,12 @@ export function SubmissionForm({
   moduleId,
   initial,
   conditionsChangedMd,
+  initialPublished = false,
 }: {
   moduleId: string;
   initial: Partial<DecisionBreakdown>;
   conditionsChangedMd?: string | null;
+  initialPublished?: boolean;
 }) {
   const [values, setValues] = useState<DecisionBreakdown>({
     content: initial.content ?? "",
@@ -47,6 +49,7 @@ export function SubmissionForm({
     revisitCondition: initial.revisitCondition ?? "",
     conditionsResponse: initial.conditionsResponse ?? "",
   });
+  const [publish, setPublish] = useState(initialPublished);
   const [saved, setSaved] = useState(false);
   const [isPending, startTransition] = useTransition();
 
@@ -60,7 +63,7 @@ export function SubmissionForm({
       onSubmit={(e) => {
         e.preventDefault();
         startTransition(async () => {
-          await submitAssignment(moduleId, values);
+          await submitAssignment(moduleId, values, publish);
           setSaved(true);
         });
       }}
@@ -87,7 +90,7 @@ export function SubmissionForm({
                 <div className="relative flex w-[15px] flex-shrink-0 flex-col items-center">
                   <span
                     className={`z-10 mt-1.5 h-[13px] w-[13px] rounded-full border-2 transition-colors duration-200 ${
-                      filled ? "border-accent-action bg-accent-action" : "border-hairline bg-paper"
+                      filled ? "border-ink bg-ink" : "border-hairline bg-paper"
                     }`}
                   />
                   {i < STEPS.length - 1 && (
@@ -123,10 +126,26 @@ export function SubmissionForm({
         </label>
       )}
 
+      <label className="flex items-start gap-2 text-sm text-graphite-muted">
+        <input
+          type="checkbox"
+          checked={publish}
+          onChange={(e) => {
+            setPublish(e.target.checked);
+            setSaved(false);
+          }}
+          className="mt-0.5"
+        />
+        <span>
+          Поделиться этим решением в «Потоке» когорты. По умолчанию сдача видна только тебе и
+          автору — не публикуй здесь секреты или закрытый рабочий код.
+        </span>
+      </label>
+
       <button
         type="submit"
         disabled={isPending || !values.content.trim()}
-        className="self-start rounded-lg bg-accent-action px-4 py-2 text-sm font-medium text-white transition-transform duration-150 hover:scale-[1.02] active:scale-[0.98] disabled:opacity-50 disabled:hover:scale-100"
+        className="self-start rounded-lg bg-ink px-4 py-2 text-sm font-medium text-ink-foreground transition-transform duration-150 hover:scale-[1.02] active:scale-[0.98] disabled:opacity-50 disabled:hover:scale-100"
       >
         {isPending ? "Сохраняю..." : saved ? "Сохранено ✓" : "Отправить"}
       </button>

@@ -72,7 +72,7 @@ export default async function NewModulePage({
         </label>
         <button
           type="submit"
-          className="self-start rounded-lg bg-accent-action px-4 py-2 text-sm font-medium text-white"
+          className="self-start rounded-lg bg-ink px-4 py-2 text-sm font-medium text-ink-foreground transition-transform duration-150 hover:scale-[1.02] active:scale-[0.98]"
         >
           Создать
         </button>

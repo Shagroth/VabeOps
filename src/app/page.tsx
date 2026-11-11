@@ -38,10 +38,10 @@ export default async function Home() {
         <div className="flex min-h-[70vh] flex-col items-center justify-center gap-6 rounded-2xl border border-hairline bg-white/40 px-6 py-16 text-center">
           <svg viewBox="0 0 160 80" className="h-14 w-28 opacity-70" fill="none" aria-hidden="true">
             <path d="M10 70 L60 40" stroke="currentColor" strokeWidth="2" opacity="0.3" />
-            <path d="M60 40 L140 12" stroke="var(--accent-action)" strokeWidth="2.5" />
+            <path d="M60 40 L140 12" stroke="var(--system)" strokeWidth="2.5" />
             <path d="M60 40 L120 66" stroke="currentColor" strokeWidth="2" opacity="0.25" strokeDasharray="4 4" />
             <circle cx="60" cy="40" r="4" fill="currentColor" opacity="0.5" />
-            <circle cx="140" cy="12" r="5" fill="var(--accent-action)" />
+            <circle cx="140" cy="12" r="5" fill="var(--system)" />
           </svg>
           <h1 className="text-2xl font-semibold">Пока нет активной когорты</h1>
           <p className="max-w-[48ch] text-graphite-muted">
@@ -52,7 +52,7 @@ export default async function Home() {
           {isAdmin && (
             <Link
               href="/admin"
-              className="rounded-lg bg-accent-action px-5 py-2.5 text-sm font-medium text-white"
+              className="rounded-lg bg-ink px-5 py-2.5 text-sm font-medium text-ink-foreground transition-transform duration-150 hover:scale-[1.02] active:scale-[0.98]"
             >
               Управлять пилотом
             </Link>
@@ -76,7 +76,12 @@ export default async function Home() {
   const nextSession = enrollment.cohort.liveSessions.find((ls) => ls.scheduledAt > now);
 
   return (
-    <WorkspaceShell active="overview" email={session.user.email ?? ""} isAdmin={isAdmin}>
+    <WorkspaceShell
+      active="overview"
+      email={session.user.email ?? ""}
+      isAdmin={isAdmin}
+      breadcrumb={enrollment.cohort.name}
+    >
       <div className="mx-auto flex max-w-[860px] flex-col gap-8">
         <div>
           <h1 className="text-2xl font-semibold">{enrollment.cohort.name}</h1>
@@ -103,7 +108,7 @@ export default async function Home() {
             </div>
           </Link>
         ) : (
-          <p className="rounded-xl border border-accent-action/30 bg-accent-action/5 p-6 text-sm">
+          <p className="rounded-xl border border-signal/40 bg-signal/10 p-6 text-sm text-graphite">
             Все открытые недели сданы. Ждём, когда откроется следующая.
           </p>
         )}
@@ -159,7 +164,7 @@ export default async function Home() {
               <span>
                 {TYPE_LABEL[nextSession.type]} — {nextSession.scheduledAt.toLocaleString("ru-RU")}
               </span>
-              <a href={nextSession.link} className="font-medium text-accent-action underline">
+              <a href={nextSession.link} className="font-medium text-ink underline">
                 Присоединиться
               </a>
             </div>

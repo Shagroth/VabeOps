@@ -51,8 +51,24 @@ export default async function StreamPage() {
     take: 10,
   });
 
+  const sharedSubmissions = await prisma.submission.findMany({
+    where: { publishedToCohort: true, module: { cohortId: enrollment.cohortId } },
+    include: {
+      user: true,
+      module: true,
+      versions: { orderBy: { createdAt: "desc" }, take: 1 },
+    },
+    orderBy: { createdAt: "desc" },
+    take: 10,
+  });
+
   return (
-    <WorkspaceShell active="stream" email={session.user.email ?? ""} isAdmin={isAdmin}>
+    <WorkspaceShell
+      active="stream"
+      email={session.user.email ?? ""}
+      isAdmin={isAdmin}
+      breadcrumb={enrollment.cohort.name}
+    >
       <div className="mx-auto flex max-w-[860px] flex-col gap-8">
         <h1 className="text-2xl font-semibold">Поток · {enrollment.cohort.name}</h1>
 
@@ -71,7 +87,7 @@ export default async function StreamPage() {
                   </span>
                 </span>
                 {ls.scheduledAt > now && (
-                  <a href={ls.link} className="font-medium text-accent-action underline">
+                  <a href={ls.link} className="font-medium text-ink underline">
                     Присоединиться
                   </a>
                 )}
@@ -109,6 +125,26 @@ export default async function StreamPage() {
             canHelpWith: myEnrollment.canHelpWith ?? "",
           }}
         />
+
+        <section>
+          <h2 className="mb-3 text-sm font-medium text-graphite-muted">Поделились решением</h2>
+          <ul className="flex flex-col gap-2">
+            {sharedSubmissions.map((s) => (
+              <li key={s.id} className="rounded-xl border border-hairline bg-white/40 p-3 text-sm">
+                <div className="mb-1 text-xs text-graphite-muted">
+                  Неделя {s.module.weekNumber} · {s.module.title}
+                </div>
+                <span className="text-graphite-muted">{s.user.email}: </span>
+                {s.versions[0]?.content}
+              </li>
+            ))}
+            {sharedSubmissions.length === 0 && (
+              <p className="text-sm text-graphite-muted">
+                Пока никто не поделился решением — это по желанию, сдачи приватны по умолчанию.
+              </p>
+            )}
+          </ul>
+        </section>
 
         <section>
           <h2 className="mb-3 text-sm font-medium text-graphite-muted">Недавние обсуждения</h2>

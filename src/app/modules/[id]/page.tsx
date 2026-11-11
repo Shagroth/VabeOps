@@ -58,7 +58,12 @@ export default async function ModulePage({
 
   if (!mod.isOpen) {
     return (
-      <WorkspaceShell active="program" email={session.user.email ?? ""} isAdmin={session.user.role === "ADMIN"}>
+      <WorkspaceShell
+        active="program"
+        email={session.user.email ?? ""}
+        isAdmin={session.user.role === "ADMIN"}
+        breadcrumb={`Неделя ${mod.weekNumber}`}
+      >
         <div className="mx-auto max-w-[820px]">
           <span className="text-sm text-graphite-muted">Неделя {mod.weekNumber}</span>
           <h1 className="mb-2 text-2xl font-semibold">{mod.title}</h1>
@@ -88,7 +93,12 @@ export default async function ModulePage({
     : {};
 
   return (
-    <WorkspaceShell active="program" email={session.user.email ?? ""} isAdmin={session.user.role === "ADMIN"}>
+    <WorkspaceShell
+      active="program"
+      email={session.user.email ?? ""}
+      isAdmin={session.user.role === "ADMIN"}
+      breadcrumb={`Неделя ${mod.weekNumber} · ${mod.title}`}
+    >
     <div className="mx-auto flex max-w-[820px] flex-col gap-8">
       <div>
         <span className="text-sm text-graphite-muted">
@@ -116,6 +126,7 @@ export default async function ModulePage({
           moduleId={mod.id}
           initial={initialBreakdown}
           conditionsChangedMd={mod.conditionsChangedMd}
+          initialPublished={submission?.publishedToCohort ?? false}
         />
 
         {submission && submission.feedback.length > 0 && (
