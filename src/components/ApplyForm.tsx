@@ -85,7 +85,7 @@ export function ApplyForm({ variant = "light" }: { variant?: "light" | "dark" })
       <button
         type="submit"
         disabled={isPending}
-        className={`self-start rounded-lg px-5 py-2.5 text-sm font-medium disabled:opacity-50 ${s.button}`}
+        className={`self-start rounded-lg px-5 py-2.5 text-sm font-medium transition-transform duration-150 hover:scale-[1.02] active:scale-[0.98] disabled:opacity-50 disabled:hover:scale-100 ${s.button}`}
       >
         {isPending ? "Отправляю..." : "Подать заявку на пилот"}
       </button>

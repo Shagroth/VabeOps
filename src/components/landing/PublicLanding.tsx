@@ -1,39 +1,44 @@
 import { DecisionTraceVisual } from "./DecisionTraceVisual";
+import { Header } from "./Header";
+import { ProgramAccordion } from "./ProgramAccordion";
 import { ApplyForm } from "@/components/ApplyForm";
 import { signIn } from "@/auth";
-
-const NAV_LINKS = [
-  { href: "#program", label: "Программа" },
-  { href: "#how-it-works", label: "Как это работает" },
-  { href: "#about", label: "Об авторе" },
-  { href: "#faq", label: "FAQ" },
-];
 
 const WEEKS = [
   {
     n: 1,
     title: "Agentic mindset",
     detail: "Чат vs агент, где агент врёт и почему, гибкость мышления как рамка на весь курс.",
+    outcome: "Отличаешь задачу для чата от задачи для агента и понимаешь, где агент может соврать.",
+    assignment: "Разобрать свой реальный рабочий кейс: чат или агент, и почему.",
   },
   {
     n: 2,
     title: "Context engineering, skills и sub-agents",
     detail: "Как собрать контекст под задачу и когда декомпозиция на под-агентов оправдана.",
+    outcome: "Умеешь собрать минимальный достаточный контекст и решить, нужен ли под-агент.",
+    assignment: "Написать свой первый skill под конкретную повторяющуюся задачу.",
   },
   {
     n: 3,
     title: "MCP и плагины",
     detail: "Подключение внешних систем агенту — и где проходит граница его ответственности.",
+    outcome: "Можешь подключить агенту внешний источник данных с минимальными правами.",
+    assignment: "Настроить MCP-интеграцию для одной реальной системы из своей работы.",
   },
   {
     n: 4,
     title: "Guardrails и безопасность",
     detail: "Permission rails, review-гейты, что агенту нельзя доверять по умолчанию.",
+    outcome: "Знаешь, какие действия агента требуют подтверждения человеком, а какие — нет.",
+    assignment: "Описать guardrails для своего текущего агентного workflow.",
   },
   {
     n: 5,
     title: "Мультиагентные системы",
     detail: "Когда несколько агентов — это мощь, а когда — сложность ради сложности.",
+    outcome: "Можешь обосновать архитектурное решение: один агент или несколько.",
+    assignment: "Спроектировать (не обязательно реализовать) мультиагентную схему для своей задачи.",
   },
 ];
 
@@ -90,37 +95,7 @@ const FAQ = [
 export function PublicLanding() {
   return (
     <div className="flex flex-1 flex-col bg-paper text-graphite">
-      {/* Header */}
-      <header className="sticky top-0 z-30 border-b border-hairline-ink bg-ink/95 backdrop-blur">
-        <div className="mx-auto flex max-w-[1280px] items-center justify-between px-6 py-4 lg:px-10">
-          <div className="flex items-center gap-2">
-            <svg viewBox="0 0 24 24" className="h-5 w-5" aria-hidden="true">
-              <circle cx="5" cy="19" r="2" fill="var(--system)" />
-              <path d="M7 18 L17 7" stroke="var(--signal)" strokeWidth="1.6" fill="none" />
-              <circle cx="19" cy="5" r="2" fill="var(--signal)" />
-            </svg>
-            <span className="font-medium text-ink-foreground">Vibe Ops</span>
-          </div>
-          <nav className="hidden items-center gap-7 text-sm text-ink-muted md:flex">
-            {NAV_LINKS.map((l) => (
-              <a key={l.href} href={l.href} className="hover:text-ink-foreground">
-                {l.label}
-              </a>
-            ))}
-          </nav>
-          <div className="flex items-center gap-3">
-            <a href="#signin" className="hidden text-sm text-ink-muted hover:text-ink-foreground sm:inline">
-              Войти
-            </a>
-            <a
-              href="#apply"
-              className="rounded-lg bg-signal px-4 py-2 text-sm font-medium text-signal-ink"
-            >
-              Подать заявку
-            </a>
-          </div>
-        </div>
-      </header>
+      <Header />
 
       {/* Hero */}
       <section className="bg-ink text-ink-foreground">
@@ -141,13 +116,13 @@ export function PublicLanding() {
             <div className="flex flex-wrap items-center gap-4">
               <a
                 href="#apply"
-                className="rounded-lg bg-signal px-6 py-3 text-sm font-medium text-signal-ink"
+                className="rounded-lg bg-signal px-6 py-3 text-sm font-medium text-signal-ink transition-transform duration-150 hover:scale-[1.03] active:scale-[0.98]"
               >
                 Подать заявку на пилот
               </a>
               <a
                 href="#program"
-                className="rounded-lg border border-hairline-ink px-6 py-3 text-sm font-medium text-ink-foreground hover:bg-white/5"
+                className="rounded-lg border border-hairline-ink px-6 py-3 text-sm font-medium text-ink-foreground transition-colors duration-200 hover:bg-white/5"
               >
                 Смотреть программу
               </a>
@@ -227,19 +202,7 @@ export function PublicLanding() {
           </span>
         </div>
 
-        <ol className="mt-10 flex flex-col">
-          {WEEKS.map((w) => (
-            <li key={w.n} className="flex gap-6 border-t border-hairline py-6 first:border-t-0">
-              <span className="font-mono text-sm text-graphite-muted">
-                {String(w.n).padStart(2, "0")}
-              </span>
-              <div>
-                <h3 className="text-lg font-medium">{w.title}</h3>
-                <p className="mt-1 max-w-[60ch] text-sm text-graphite-muted">{w.detail}</p>
-              </div>
-            </li>
-          ))}
-        </ol>
+        <ProgramAccordion weeks={WEEKS} />
 
         <div className="mt-10 flex flex-wrap gap-3">
           {["Кикофф", "Мидпоинт", "Финал"].map((label) => (
@@ -398,7 +361,7 @@ export function PublicLanding() {
             />
             <button
               type="submit"
-              className="rounded-lg border border-hairline-ink px-4 py-2.5 text-sm font-medium text-ink-foreground hover:bg-white/5"
+              className="rounded-lg border border-hairline-ink px-4 py-2.5 text-sm font-medium text-ink-foreground transition-colors duration-200 hover:bg-white/5"
             >
               Войти
             </button>
