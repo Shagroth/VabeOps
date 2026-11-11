@@ -1,8 +1,19 @@
 import { DecisionTraceVisual } from "./DecisionTraceVisual";
 import { Header } from "./Header";
+import { Footer } from "./Footer";
 import { ProgramAccordion } from "./ProgramAccordion";
 import { ApplyForm } from "@/components/ApplyForm";
+import { ScrollReveal } from "@/components/ScrollReveal";
+import { CourseCard } from "@/components/cards/CourseCard";
+import { EventCard } from "@/components/cards/EventCard";
+import { RecordingCard } from "@/components/cards/RecordingCard";
+import { JournalCard } from "@/components/cards/JournalCard";
+import { MINI_COURSES } from "@/content/courses";
+import { EVENTS } from "@/content/events";
+import { RECORDINGS } from "@/content/recordings";
+import { JOURNAL, getFeaturedJournal } from "@/content/journal";
 import { signIn } from "@/auth";
+import Link from "next/link";
 
 const WEEKS = [
   {
@@ -80,7 +91,7 @@ const FAQ = [
   },
   {
     q: "Сколько времени занимает в неделю?",
-    a: "Точная нагрузка ещё уточняется (TBD) — ориентируйся на несколько часов в неделю на материалы и практику.",
+    a: "Точная нагрузка ещё уточняется — ориентируйся на несколько часов в неделю на материалы и практику.",
   },
   {
     q: "Это точно бесплатно?",
@@ -93,16 +104,23 @@ const FAQ = [
 ];
 
 export function PublicLanding() {
+  const homeCourses = MINI_COURSES.slice(0, 4);
+  const homeEvents = EVENTS.slice(0, 3);
+  const homeRecordings = RECORDINGS.slice(0, 2);
+  const featured = getFeaturedJournal();
+  const secondaryJournal = JOURNAL.filter((j) => j.slug !== featured.slug).slice(0, 3);
+
   return (
     <div className="flex flex-1 flex-col bg-paper text-graphite">
       <Header />
 
       {/* Hero */}
-      <section className="bg-ink text-ink-foreground">
-        <div className="mx-auto grid max-w-[1280px] gap-14 px-6 py-20 lg:grid-cols-2 lg:items-center lg:px-10 lg:py-28">
+      <section className="relative overflow-hidden bg-ink text-ink-foreground">
+        <div className="signal-field" />
+        <div className="relative mx-auto grid max-w-[1280px] gap-14 px-6 py-20 lg:grid-cols-2 lg:items-center lg:px-10 lg:py-28">
           <div className="animate-hero-rise flex flex-col gap-7">
             <span className="font-mono text-xs uppercase tracking-[0.2em] text-system">
-              Vibe Ops / Engineering Cohort
+              Vibe Ops / Field Notes from Agentic Engineering
             </span>
             <h1 className="text-[2.75rem] font-semibold leading-[1.08] tracking-tight sm:text-[3.5rem] lg:text-[4.25rem]">
               Работай с AI-агентами.
@@ -110,8 +128,8 @@ export function PublicLanding() {
               Думай как инженер.
             </h1>
             <p className="max-w-[46ch] text-lg text-ink-muted">
-              Когортный пилот для разработчиков, которые уже пишут код и хотят осмысленно
-              встраивать агентов в реальную работу — без потери контроля над качеством и рисками.
+              Флагманский когортный курс, плюс бесплатные мини-курсы, мероприятия и журнал —
+              пространство для инженеров, которые встраивают агентов в реальную работу осознанно.
             </p>
             <div className="flex flex-wrap items-center gap-4">
               <a
@@ -120,12 +138,12 @@ export function PublicLanding() {
               >
                 Подать заявку на пилот
               </a>
-              <a
-                href="#program"
+              <Link
+                href="/courses"
                 className="rounded-lg border border-hairline-ink px-6 py-3 text-sm font-medium text-ink-foreground transition-colors duration-200 hover:bg-white/5"
               >
-                Смотреть программу
-              </a>
+                Бесплатные мини-курсы
+              </Link>
             </div>
             <p className="text-sm text-ink-muted">
               Бесплатный пилот · 5–10 мест · предзаписанные материалы + три живых созвона
@@ -141,8 +159,8 @@ export function PublicLanding() {
         </div>
       </section>
 
-      {/* Section 1 — weak vs robust */}
-      <section className="mx-auto w-full max-w-[1280px] px-6 py-20 lg:px-10">
+      {/* B — editorial positioning: weak vs robust */}
+      <ScrollReveal className="mx-auto w-full max-w-[1280px] px-6 py-20 lg:px-10">
         <h2 className="max-w-[26ch] text-[2.375rem] font-semibold tracking-tight text-graphite sm:text-[3rem]">
           От промптов к инженерным решениям
         </h2>
@@ -176,55 +194,139 @@ export function PublicLanding() {
             </ul>
           </div>
         </div>
-      </section>
+      </ScrollReveal>
 
-      {/* Section 2 — what you'll build */}
-      <section className="mx-auto w-full max-w-[1280px] px-6 py-20 lg:px-10">
-        <h2 className="max-w-[26ch] text-[2.375rem] font-semibold tracking-tight sm:text-[3rem]">
-          Что ты реально соберёшь
-        </h2>
-        <div className="mt-12 grid gap-px overflow-hidden rounded-2xl border border-hairline bg-hairline md:grid-cols-3">
-          {ARTIFACTS.map((a) => (
-            <div key={a.title} className="flex flex-col gap-3 bg-paper p-7">
-              <h3 className="text-xl font-medium">{a.title}</h3>
-              <p className="text-sm text-graphite-muted">{a.detail}</p>
+      {/* C — flagship cohort course, grouped as one generously-sized feature */}
+      <ScrollReveal className="mx-auto w-full max-w-[1280px] px-6 py-20 lg:px-10">
+        <div className="rounded-[28px] border border-hairline bg-white/40 p-7 lg:p-12">
+          <div className="flex flex-wrap items-baseline justify-between gap-4">
+            <span className="font-mono text-xs uppercase tracking-[0.2em] text-system">
+              Флагманский курс
+            </span>
+            <span className="rounded-full border border-hairline px-3 py-1 font-mono text-xs text-graphite-muted">
+              черновик — число недель и даты уточняются
+            </span>
+          </div>
+          <h2 className="mt-4 max-w-[30ch] text-[2.375rem] font-semibold tracking-tight sm:text-[3rem]">
+            Vibe Ops Cohort — не мини-курс, а полный разбор работы с агентами
+          </h2>
+
+          <div className="mt-10 grid gap-px overflow-hidden rounded-2xl border border-hairline bg-hairline md:grid-cols-3">
+            {ARTIFACTS.map((a) => (
+              <div key={a.title} className="flex flex-col gap-3 bg-paper p-7">
+                <h3 className="text-xl font-medium">{a.title}</h3>
+                <p className="text-sm text-graphite-muted">{a.detail}</p>
+              </div>
+            ))}
+          </div>
+
+          <div id="program" className="mt-12">
+            <ProgramAccordion weeks={WEEKS} />
+            <div className="mt-10 flex flex-wrap gap-3">
+              {["Кикофф", "Мидпоинт", "Финал"].map((label) => (
+                <span
+                  key={label}
+                  className="rounded-full border border-hairline bg-white/60 px-4 py-1.5 text-xs text-graphite-muted"
+                >
+                  {label} · живой созвон когорты
+                </span>
+              ))}
+            </div>
+          </div>
+        </div>
+      </ScrollReveal>
+
+      {/* D — free mini-courses, horizontal browsable row */}
+      <ScrollReveal className="w-full py-20">
+        <div className="mx-auto flex max-w-[1280px] flex-wrap items-end justify-between gap-4 px-6 lg:px-10">
+          <div>
+            <span className="font-mono text-xs uppercase tracking-[0.2em] text-graphite-muted">
+              Free lessons
+            </span>
+            <h2 className="mt-2 text-[2.375rem] font-semibold tracking-tight sm:text-[3rem]">
+              Бесплатные мини-курсы
+            </h2>
+          </div>
+          <Link href="/courses" className="text-sm font-medium text-ink underline underline-offset-4">
+            Все мини-курсы →
+          </Link>
+        </div>
+        <div className="mt-10 flex gap-5 overflow-x-auto px-6 pb-4 [scrollbar-width:thin] lg:px-10">
+          {homeCourses.map((c) => (
+            <div key={c.slug} className="w-[280px] flex-shrink-0 sm:w-[320px]">
+              <CourseCard course={c} />
             </div>
           ))}
         </div>
-      </section>
+      </ScrollReveal>
 
-      {/* Section 3 — program by weeks */}
-      <section id="program" className="mx-auto w-full max-w-[1280px] px-6 py-20 lg:px-10">
-        <div className="flex flex-wrap items-baseline justify-between gap-4">
-          <h2 className="text-[2.375rem] font-semibold tracking-tight sm:text-[3rem]">Программа по неделям</h2>
-          <span className="rounded-full border border-hairline px-3 py-1 font-mono text-xs text-graphite-muted">
-            черновик — число недель и даты уточняются
-          </span>
-        </div>
-
-        <ProgramAccordion weeks={WEEKS} />
-
-        <div className="mt-10 flex flex-wrap gap-3">
-          {["Кикофф", "Мидпоинт", "Финал"].map((label) => (
-            <span
-              key={label}
-              className="rounded-full border border-hairline bg-white/60 px-4 py-1.5 text-xs text-graphite-muted"
-            >
-              {label} · живой созвон потока
+      {/* E — events & workshops, compact list */}
+      <ScrollReveal className="mx-auto w-full max-w-[1280px] px-6 py-20 lg:px-10">
+        <div className="flex flex-wrap items-end justify-between gap-4">
+          <div>
+            <span className="font-mono text-xs uppercase tracking-[0.2em] text-graphite-muted">
+              Events
             </span>
+            <h2 className="mt-2 text-[2.375rem] font-semibold tracking-tight sm:text-[3rem]">
+              Мероприятия и воркшопы
+            </h2>
+          </div>
+          <Link href="/events" className="text-sm font-medium text-ink underline underline-offset-4">
+            Все мероприятия →
+          </Link>
+        </div>
+        <div className="mt-10 grid gap-5 md:grid-cols-3">
+          {homeEvents.map((e) => (
+            <EventCard key={e.slug} event={e} />
           ))}
         </div>
-      </section>
 
-      {/* Section 4 — workspace preview (contrasting dark panel) */}
-      <section className="bg-ink py-20 text-ink-foreground">
+        <div className="mt-10 rounded-2xl border border-hairline bg-white/40 p-6">
+          <span className="font-mono text-xs uppercase tracking-wide text-graphite-muted">
+            Архив записей — скоро
+          </span>
+          <div className="mt-5 grid gap-5 sm:grid-cols-2">
+            {homeRecordings.map((r) => (
+              <RecordingCard key={r.slug} recording={r} />
+            ))}
+          </div>
+        </div>
+      </ScrollReveal>
+
+      {/* F — journal, featured + secondary */}
+      <ScrollReveal className="mx-auto w-full max-w-[1280px] px-6 py-20 lg:px-10">
+        <div className="flex flex-wrap items-end justify-between gap-4">
+          <div>
+            <span className="font-mono text-xs uppercase tracking-[0.2em] text-copper">
+              Journal
+            </span>
+            <h2 className="mt-2 text-[2.375rem] font-semibold tracking-tight sm:text-[3rem]">
+              Полевые заметки
+            </h2>
+          </div>
+          <Link href="/journal" className="text-sm font-medium text-ink underline underline-offset-4">
+            Все статьи →
+          </Link>
+        </div>
+        <div className="mt-10">
+          <JournalCard entry={featured} large />
+        </div>
+        <div className="mt-6 grid gap-5 md:grid-cols-3">
+          {secondaryJournal.map((j) => (
+            <JournalCard key={j.slug} entry={j} />
+          ))}
+        </div>
+      </ScrollReveal>
+
+      {/* G — workspace preview (contrasting dark panel) */}
+      <ScrollReveal className="bg-ink py-20 text-ink-foreground">
         <div className="mx-auto max-w-[1280px] px-6 lg:px-10">
           <h2 className="max-w-[26ch] text-[2.375rem] font-semibold tracking-tight sm:text-[3rem]">
             Внутри рабочего пространства
           </h2>
           <p className="mt-4 max-w-[60ch] text-ink-muted">
             Не очередная LMS — компактное пространство для маленькой когорты: что делать дальше,
-            текущая неделя и открытая практика в одном месте.
+            текущая неделя, смежная заметка из журнала и открытая практика в одном месте.
           </p>
 
           <div className="mt-12 overflow-hidden rounded-2xl border border-hairline-ink bg-[#0E1420]">
@@ -263,6 +365,12 @@ export function PublicLanding() {
                     <p className="text-ink-muted">скоро откроется</p>
                   </div>
                 </div>
+                <div className="rounded-xl border border-hairline-ink bg-white/[0.03] p-4 text-sm">
+                  <span className="font-mono text-[10px] uppercase tracking-wide text-copper">
+                    Из журнала
+                  </span>
+                  <p className="mt-1 text-ink-muted">«{featured.title}» — связано с текущей неделей</p>
+                </div>
               </div>
             </div>
           </div>
@@ -270,10 +378,10 @@ export function PublicLanding() {
             Иллюстративный макет интерфейса — не скриншот живых данных.
           </p>
         </div>
-      </section>
+      </ScrollReveal>
 
-      {/* Section 5 — how cohort works */}
-      <section id="how-it-works" className="mx-auto w-full max-w-[1280px] px-6 py-20 lg:px-10">
+      {/* H — how cohort works */}
+      <ScrollReveal id="how-it-works" className="mx-auto w-full max-w-[1280px] px-6 py-20 lg:px-10">
         <h2 className="max-w-[26ch] text-[2.375rem] font-semibold tracking-tight sm:text-[3rem]">
           Как устроен поток
         </h2>
@@ -288,10 +396,10 @@ export function PublicLanding() {
             </li>
           ))}
         </ol>
-      </section>
+      </ScrollReveal>
 
-      {/* Section 6 — instructor */}
-      <section id="about" className="mx-auto w-full max-w-[1280px] px-6 py-20 lg:px-10">
+      {/* instructor */}
+      <ScrollReveal id="about" className="mx-auto w-full max-w-[1280px] px-6 py-20 lg:px-10">
         <div className="grid gap-10 rounded-2xl border border-hairline bg-white/50 p-10 lg:grid-cols-[auto_1fr] lg:items-center">
           <div className="flex h-20 w-20 items-center justify-center rounded-full bg-ink font-mono text-lg text-ink-foreground">
             VO
@@ -305,10 +413,10 @@ export function PublicLanding() {
             </p>
           </div>
         </div>
-      </section>
+      </ScrollReveal>
 
-      {/* Section 7 — FAQ */}
-      <section id="faq" className="mx-auto w-full max-w-[1280px] px-6 py-20 lg:px-10">
+      {/* FAQ */}
+      <ScrollReveal id="faq" className="mx-auto w-full max-w-[1280px] px-6 py-20 lg:px-10">
         <h2 className="text-[2.375rem] font-semibold tracking-tight sm:text-[3rem]">Частые вопросы</h2>
         <div className="mt-10 grid gap-x-10 gap-y-8 md:grid-cols-2">
           {FAQ.map((item) => (
@@ -318,9 +426,9 @@ export function PublicLanding() {
             </div>
           ))}
         </div>
-      </section>
+      </ScrollReveal>
 
-      {/* Section 8 — apply */}
+      {/* apply */}
       <section id="apply" className="bg-ink py-20 text-ink-foreground">
         <div className="mx-auto grid max-w-[1280px] gap-14 px-6 lg:grid-cols-2 lg:px-10">
           <div className="flex flex-col justify-center gap-5">
@@ -369,12 +477,7 @@ export function PublicLanding() {
         </div>
       </section>
 
-      <footer className="border-t border-hairline px-6 py-8 text-xs text-graphite-muted lg:px-10">
-        <div className="mx-auto flex max-w-[1280px] items-center justify-between">
-          <span>Vibe Ops · когортный пилот</span>
-          <span>© {new Date().getFullYear()}</span>
-        </div>
-      </footer>
+      <Footer />
     </div>
   );
 }

@@ -3,6 +3,7 @@ import { requirePreviewEnv } from "../guard";
 import { WorkspaceShell } from "@/components/WorkspaceShell";
 import { SubmissionStatusBadge } from "@/components/SubmissionStatusBadge";
 import { PreviewBanner } from "@/components/PreviewBanner";
+import { getFeaturedJournal } from "@/content/journal";
 
 const WEEKS = [
   { n: 1, title: "Agentic mindset", state: "open" as const, status: "ACCEPTED" },
@@ -68,6 +69,30 @@ export default function PreviewDashboardPage() {
           <div className="mt-1 flex items-center justify-between">
             <span>Мидпоинт — 25.11.2026, 19:00</span>
             <span className="font-medium text-ink">Присоединиться</span>
+          </div>
+        </section>
+
+        <section className="grid gap-3 sm:grid-cols-2">
+          <Link
+            href={`/journal/${getFeaturedJournal().slug}`}
+            className="card-hover rounded-xl border border-hairline bg-white/50 p-4"
+          >
+            <span className="font-mono text-[10px] uppercase tracking-wide text-copper">
+              Из журнала
+            </span>
+            <p className="mt-1 text-sm font-medium">{getFeaturedJournal().title}</p>
+            <p className="mt-1 text-xs text-graphite-muted">{getFeaturedJournal().dek}</p>
+          </Link>
+          <div className="rounded-xl border border-hairline bg-white/20 p-4 text-sm">
+            <span className="font-mono text-[10px] uppercase tracking-wide text-graphite-muted">
+              Записи
+            </span>
+            <p className="mt-1 text-graphite-muted">
+              Пока нет доступных записей воркшопов.{" "}
+              <Link href="/events" className="text-ink underline">
+                Концепты в архиве →
+              </Link>
+            </p>
           </div>
         </section>
 
