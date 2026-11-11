@@ -6,6 +6,7 @@ import { getVideoUrl } from "@/lib/r2";
 import { SubmissionForm } from "@/components/SubmissionForm";
 import { FeedbackForm } from "@/components/FeedbackForm";
 import { SubmissionStatusBadge } from "@/components/SubmissionStatusBadge";
+import { CommentThread } from "@/components/CommentThread";
 
 const DECISION_FIELD_LABELS: Record<string, string> = {
   task: "Задача",
@@ -30,7 +31,7 @@ export default async function ModulePage({
   });
   if (!enrollment) notFound();
 
-  const [mod, submission, feedbackForm] = await Promise.all([
+  const [mod, submission, feedbackForm, comments] = await Promise.all([
     prisma.module.findUnique({ where: { id } }),
     prisma.submission.findUnique({
       where: { moduleId_userId: { moduleId: id, userId: session.user.id } },
@@ -44,6 +45,11 @@ export default async function ModulePage({
       include: {
         responses: { where: { userId: session.user.id } },
       },
+    }),
+    prisma.moduleComment.findMany({
+      where: { moduleId: id },
+      include: { user: true },
+      orderBy: { createdAt: "asc" },
     }),
   ]);
 
@@ -158,6 +164,11 @@ export default async function ModulePage({
           />
         </section>
       )}
+
+      <section className="flex flex-col gap-3 border-t border-black/10 pt-6 dark:border-white/15">
+        <h2 className="text-lg font-semibold">Обсуждение недели</h2>
+        <CommentThread moduleId={mod.id} comments={comments} />
+      </section>
     </main>
   );
 }

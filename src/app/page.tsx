@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { auth, signIn, signOut } from "@/auth";
 import { prisma } from "@/lib/prisma";
+import { WorkspaceNav } from "@/components/WorkspaceNav";
 
 const TYPE_LABEL: Record<string, string> = {
   KICKOFF: "Кикофф",
@@ -117,16 +118,7 @@ export default async function Home() {
         </form>
       </div>
 
-      <div className="flex gap-4">
-        <Link href="/modules" className="rounded-lg border border-black/15 px-4 py-2 text-sm dark:border-white/20">
-          Модули курса
-        </Link>
-        {session.user.role === "ADMIN" && (
-          <Link href="/admin" className="rounded-lg border border-black/15 px-4 py-2 text-sm dark:border-white/20">
-            Admin
-          </Link>
-        )}
-      </div>
+      <WorkspaceNav isAdmin={session.user.role === "ADMIN"} />
 
       {!enrollment ? (
         <p className="rounded-xl border border-black/10 p-5 text-sm dark:border-white/15">
@@ -169,22 +161,10 @@ export default async function Home() {
         </section>
       )}
 
-      {enrollment && enrollment.cohort.liveSessions.length > 0 && (
-        <details className="text-sm text-black/60 dark:text-white/60">
-          <summary className="cursor-pointer">Все созвоны потока</summary>
-          <ul className="mt-2 flex flex-col gap-1">
-            {enrollment.cohort.liveSessions.map((ls) => (
-              <li key={ls.id} className="flex items-center justify-between">
-                <span>
-                  {TYPE_LABEL[ls.type]} — {ls.scheduledAt.toLocaleString("ru-RU")}
-                </span>
-                <a href={ls.link} className="underline">
-                  ссылка
-                </a>
-              </li>
-            ))}
-          </ul>
-        </details>
+      {enrollment && (
+        <Link href="/stream" className="text-sm underline">
+          Все созвоны и обсуждения потока →
+        </Link>
       )}
     </main>
   );

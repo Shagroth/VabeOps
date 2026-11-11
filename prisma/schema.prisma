@@ -48,6 +48,7 @@ model User {
   submissions        Submission[]
   feedback           FeedbackResponse[]
   submissionFeedback SubmissionFeedback[]
+  moduleComments     ModuleComment[]
 
   createdAt DateTime @default(now())
 }
@@ -106,6 +107,12 @@ model Enrollment {
   cohortId String
   level    Level
 
+  // Self-written "Поток" profile — what I'm doing/exploring/can help with.
+  // No activity rating by design (handoff doc §5.5).
+  doingNow    String? @db.Text
+  exploring   String? @db.Text
+  canHelpWith String? @db.Text
+
   user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
   cohort Cohort @relation(fields: [cohortId], references: [id], onDelete: Cascade)
 
@@ -126,8 +133,21 @@ model Module {
   cohort       Cohort             @relation(fields: [cohortId], references: [id], onDelete: Cascade)
   submissions  Submission[]
   feedbackForms FeedbackForm[]
+  comments     ModuleComment[]
 
   @@unique([cohortId, weekNumber])
+}
+
+// Contextual discussion attached to a week, not a standalone forum feed.
+model ModuleComment {
+  id        String   @id @default(cuid())
+  moduleId  String
+  userId    String
+  content   String   @db.Text
+  createdAt DateTime @default(now())
+
+  module Module @relation(fields: [moduleId], references: [id], onDelete: Cascade)
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
 model Submission {
