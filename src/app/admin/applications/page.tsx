@@ -1,5 +1,6 @@
 import { requireAdmin } from "@/lib/require-admin";
 import { prisma } from "@/lib/prisma";
+import { WorkspaceShell } from "@/components/WorkspaceShell";
 import { setApplicationStatus } from "../actions";
 
 const STATUS_LABEL: Record<string, string> = {
@@ -9,14 +10,15 @@ const STATUS_LABEL: Record<string, string> = {
 };
 
 export default async function ApplicationsPage() {
-  await requireAdmin();
+  const session = await requireAdmin();
 
   const applications = await prisma.application.findMany({
     orderBy: { createdAt: "desc" },
   });
 
   return (
-    <main className="mx-auto max-w-2xl p-8">
+    <WorkspaceShell active="admin" email={session.user.email ?? ""} isAdmin>
+    <div className="mx-auto max-w-[860px]">
       <h1 className="mb-6 text-2xl font-semibold">Заявки</h1>
       <ul className="flex flex-col gap-4">
         {applications.map((a) => {
@@ -68,6 +70,7 @@ export default async function ApplicationsPage() {
           <p className="text-sm text-black/50">Заявок пока нет.</p>
         )}
       </ul>
-    </main>
+    </div>
+    </WorkspaceShell>
   );
 }

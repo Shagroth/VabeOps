@@ -3,6 +3,7 @@ import { requireAdmin } from "@/lib/require-admin";
 import { prisma } from "@/lib/prisma";
 import { updateModule, setFeedbackQuestions, reviewSubmission } from "../../actions";
 import { SubmissionStatusBadge } from "@/components/SubmissionStatusBadge";
+import { WorkspaceShell } from "@/components/WorkspaceShell";
 
 const DECISION_FIELD_LABELS: Record<string, string> = {
   task: "Задача",
@@ -19,7 +20,7 @@ export default async function EditModulePage({
 }: {
   params: Promise<{ id: string }>;
 }) {
-  await requireAdmin();
+  const session = await requireAdmin();
   const { id } = await params;
 
   const mod = await prisma.module.findUnique({
@@ -44,7 +45,8 @@ export default async function EditModulePage({
   const boundUpdate = updateModule.bind(null, mod.id);
 
   return (
-    <main className="mx-auto max-w-2xl p-8 flex flex-col gap-10">
+    <WorkspaceShell active="admin" email={session.user.email ?? ""} isAdmin>
+    <div className="mx-auto flex max-w-[860px] flex-col gap-10">
       <section>
         <h1 className="mb-6 text-2xl font-semibold">Неделя {mod.weekNumber} · {mod.title}</h1>
         <form action={boundUpdate} className="flex flex-col gap-4">
@@ -251,6 +253,7 @@ export default async function EditModulePage({
           </div>
         ))}
       </section>
-    </main>
+    </div>
+    </WorkspaceShell>
   );
 }

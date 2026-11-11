@@ -1,10 +1,11 @@
 import Link from "next/link";
 import { requireAdmin } from "@/lib/require-admin";
 import { prisma } from "@/lib/prisma";
+import { WorkspaceShell } from "@/components/WorkspaceShell";
 import { createCohort, createLiveSession } from "./actions";
 
 export default async function AdminPage() {
-  await requireAdmin();
+  const session = await requireAdmin();
 
   const pendingApplications = await prisma.application.count({ where: { status: "PENDING" } });
 
@@ -21,7 +22,8 @@ export default async function AdminPage() {
   });
 
   return (
-    <main className="mx-auto max-w-3xl p-8 flex flex-col gap-10">
+    <WorkspaceShell active="admin" email={session.user.email ?? ""} isAdmin>
+    <div className="mx-auto flex max-w-[860px] flex-col gap-10">
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-semibold">Admin</h1>
         <Link href="/admin/applications" className="text-sm underline">
@@ -126,6 +128,7 @@ export default async function AdminPage() {
           </button>
         </form>
       </section>
-    </main>
+    </div>
+    </WorkspaceShell>
   );
 }

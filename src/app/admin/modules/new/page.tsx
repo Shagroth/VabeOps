@@ -1,4 +1,5 @@
 import { requireAdmin } from "@/lib/require-admin";
+import { WorkspaceShell } from "@/components/WorkspaceShell";
 import { createModule } from "../../actions";
 
 export default async function NewModulePage({
@@ -6,11 +7,12 @@ export default async function NewModulePage({
 }: {
   searchParams: Promise<{ cohortId?: string }>;
 }) {
-  await requireAdmin();
+  const session = await requireAdmin();
   const { cohortId } = await searchParams;
 
   return (
-    <main className="mx-auto max-w-2xl p-8">
+    <WorkspaceShell active="admin" email={session.user.email ?? ""} isAdmin>
+    <div className="mx-auto max-w-[760px]">
       <h1 className="mb-6 text-2xl font-semibold">Новый модуль</h1>
       <form action={createModule} className="flex flex-col gap-4">
         <input type="hidden" name="cohortId" value={cohortId ?? ""} />
@@ -75,6 +77,7 @@ export default async function NewModulePage({
           Создать
         </button>
       </form>
-    </main>
+    </div>
+    </WorkspaceShell>
   );
 }

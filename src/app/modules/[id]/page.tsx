@@ -7,6 +7,7 @@ import { SubmissionForm } from "@/components/SubmissionForm";
 import { FeedbackForm } from "@/components/FeedbackForm";
 import { SubmissionStatusBadge } from "@/components/SubmissionStatusBadge";
 import { CommentThread } from "@/components/CommentThread";
+import { WorkspaceShell } from "@/components/WorkspaceShell";
 
 const DECISION_FIELD_LABELS: Record<string, string> = {
   task: "Задача",
@@ -57,11 +58,13 @@ export default async function ModulePage({
 
   if (!mod.isOpen) {
     return (
-      <main className="mx-auto max-w-2xl p-8">
-        <span className="text-sm text-black/50">Неделя {mod.weekNumber}</span>
-        <h1 className="mb-2 text-2xl font-semibold">{mod.title}</h1>
-        <p className="text-black/60">Эта неделя ещё не открыта.</p>
-      </main>
+      <WorkspaceShell active="program" email={session.user.email ?? ""} isAdmin={session.user.role === "ADMIN"}>
+        <div className="mx-auto max-w-[820px]">
+          <span className="text-sm text-graphite-muted">Неделя {mod.weekNumber}</span>
+          <h1 className="mb-2 text-2xl font-semibold">{mod.title}</h1>
+          <p className="text-graphite-muted">Эта неделя ещё не открыта.</p>
+        </div>
+      </WorkspaceShell>
     );
   }
 
@@ -85,9 +88,10 @@ export default async function ModulePage({
     : {};
 
   return (
-    <main className="mx-auto max-w-2xl p-8 flex flex-col gap-8">
+    <WorkspaceShell active="program" email={session.user.email ?? ""} isAdmin={session.user.role === "ADMIN"}>
+    <div className="mx-auto flex max-w-[820px] flex-col gap-8">
       <div>
-        <span className="text-sm text-black/50">
+        <span className="text-sm text-graphite-muted">
           Неделя {mod.weekNumber}
         </span>
         <h1 className="text-2xl font-semibold">{mod.title}</h1>
@@ -95,7 +99,7 @@ export default async function ModulePage({
 
       {videoUrl && <video controls className="w-full rounded-lg" src={videoUrl} />}
 
-      <section className="prose max-w-none">
+      <section className="prose prose-sm max-w-none prose-headings:font-semibold prose-h1:text-xl prose-h2:text-lg prose-h3:text-base">
         <ReactMarkdown>{mod.notesMd}</ReactMarkdown>
       </section>
 
@@ -104,7 +108,7 @@ export default async function ModulePage({
           <h2 className="text-lg font-semibold">Задание</h2>
           {submission && <SubmissionStatusBadge status={submission.status} />}
         </div>
-        <div className="prose max-w-none">
+        <div className="prose prose-sm max-w-none prose-headings:font-semibold prose-h1:text-xl prose-h2:text-lg prose-h3:text-base">
           <ReactMarkdown>{mod.assignmentMd}</ReactMarkdown>
         </div>
 
@@ -115,11 +119,11 @@ export default async function ModulePage({
         />
 
         {submission && submission.feedback.length > 0 && (
-          <div className="flex flex-col gap-2 rounded-lg border border-black/10 p-4 text-sm">
+          <div className="flex flex-col gap-2 rounded-lg border border-hairline p-4 text-sm">
             <span className="font-medium">Фидбек по сдаче</span>
             {submission.feedback.map((f) => (
               <p key={f.id}>
-                <span className="text-black/50">{f.author.email}: </span>
+                <span className="text-graphite-muted">{f.author.email}: </span>
                 {f.content}
               </p>
             ))}
@@ -127,14 +131,14 @@ export default async function ModulePage({
         )}
 
         {olderVersions.length > 0 && (
-          <details className="text-sm text-black/60">
+          <details className="text-sm text-graphite-muted">
             <summary className="cursor-pointer">
               Предыдущие версии ({olderVersions.length})
             </summary>
             <ul className="mt-2 flex flex-col gap-3">
               {olderVersions.map((v) => (
-                <li key={v.id} className="rounded-lg border border-black/10 p-3">
-                  <div className="mb-1 text-xs text-black/40">
+                <li key={v.id} className="rounded-lg border border-hairline p-3">
+                  <div className="mb-1 text-xs text-graphite-muted">
                     {v.createdAt.toLocaleString("ru-RU")}
                   </div>
                   <p className="whitespace-pre-wrap">{v.content}</p>
@@ -142,7 +146,7 @@ export default async function ModulePage({
                     const value = (v as unknown as Record<string, string | null>)[key];
                     return value ? (
                       <p key={key} className="mt-1">
-                        <span className="text-black/50">{label}: </span>
+                        <span className="text-graphite-muted">{label}: </span>
                         {value}
                       </p>
                     ) : null;
@@ -155,7 +159,7 @@ export default async function ModulePage({
       </section>
 
       {feedbackForm && questions.length > 0 && (
-        <section className="flex flex-col gap-3 border-t border-black/10 pt-6">
+        <section className="flex flex-col gap-3 border-t border-hairline pt-6">
           <h2 className="text-lg font-semibold">Фидбек по неделе</h2>
           <FeedbackForm
             formId={feedbackForm.id}
@@ -165,10 +169,11 @@ export default async function ModulePage({
         </section>
       )}
 
-      <section className="flex flex-col gap-3 border-t border-black/10 pt-6">
+      <section className="flex flex-col gap-3 border-t border-hairline pt-6">
         <h2 className="text-lg font-semibold">Обсуждение недели</h2>
         <CommentThread moduleId={mod.id} comments={comments} />
       </section>
-    </main>
+    </div>
+    </WorkspaceShell>
   );
 }
