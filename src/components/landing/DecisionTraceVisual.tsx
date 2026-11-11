@@ -27,7 +27,7 @@ export function DecisionTraceVisual() {
               <span
                 className={`h-[18px] w-[18px] rounded-full border-2 ${
                   s.active
-                    ? "border-signal bg-signal"
+                    ? "pulse-signal border-signal bg-signal"
                     : "border-ink-muted bg-[#0E1420]"
                 }`}
               />

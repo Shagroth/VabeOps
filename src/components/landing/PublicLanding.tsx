@@ -125,7 +125,7 @@ export function PublicLanding() {
       {/* Hero */}
       <section className="bg-ink text-ink-foreground">
         <div className="mx-auto grid max-w-[1280px] gap-14 px-6 py-20 lg:grid-cols-2 lg:items-center lg:px-10 lg:py-28">
-          <div className="flex flex-col gap-7">
+          <div className="animate-hero-rise flex flex-col gap-7">
             <span className="font-mono text-xs uppercase tracking-[0.2em] text-system">
               Vibe Ops / Engineering Cohort
             </span>
@@ -157,7 +157,10 @@ export function PublicLanding() {
             </p>
           </div>
 
-          <div className="flex justify-center lg:justify-end">
+          <div
+            className="animate-hero-rise flex justify-center lg:justify-end"
+            style={{ animationDelay: "120ms" }}
+          >
             <DecisionTraceVisual />
           </div>
         </div>
