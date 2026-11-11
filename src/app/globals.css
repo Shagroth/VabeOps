@@ -2,26 +2,42 @@
 @plugin "@tailwindcss/typography";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --background: #faf7f1;
+  --foreground: #1a1a1a;
+
+  /* Decision Trails tokens — see VIBE_OPS_HANDOFF.md §3 */
+  --surface-hero: #14151a;
+  --surface-hero-foreground: #f2f0ec;
+  --accent-action: #1e54c7;
+  --accent-change: #e07a3f;
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --color-surface-hero: var(--surface-hero);
+  --color-surface-hero-foreground: var(--surface-hero-foreground);
+  --color-accent-action: var(--accent-action);
+  --color-accent-change: var(--accent-change);
+  --font-sans: var(--font-sans);
+  --font-mono: var(--font-mono);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
-}
+/*
+ * No global prefers-color-scheme switch on purpose: Decision Trails is a
+ * deliberate two-zone design (dark hero / warm light workspace), not a
+ * system dark-mode toggle. Existing `dark:` utilities elsewhere in the
+ * codebase still respond to system preference until that's revisited —
+ * flagged in VIBE_OPS_HANDOFF.md as a follow-up, not silently removed here.
+ */
 
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-sans), ui-sans-serif, system-ui, sans-serif;
+}
+
+.surface-hero {
+  background: var(--surface-hero);
+  color: var(--surface-hero-foreground);
 }

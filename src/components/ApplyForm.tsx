@@ -74,7 +74,7 @@ export function ApplyForm() {
       <button
         type="submit"
         disabled={isPending}
-        className="self-start rounded-lg bg-foreground px-4 py-2 text-sm font-medium text-background disabled:opacity-50"
+        className="self-start rounded-lg bg-accent-action px-4 py-2 text-sm font-medium text-white disabled:opacity-50"
       >
         {isPending ? "Отправляю..." : "Подать заявку на пилот"}
       </button>
