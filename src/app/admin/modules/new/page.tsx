@@ -59,6 +59,15 @@ export default async function NewModulePage({
             className="rounded border border-black/15 p-2 font-mono text-xs dark:border-white/20"
           />
         </label>
+        <label className="flex flex-col gap-1 text-sm">
+          «Изменились условия» (опционально)
+          <textarea
+            name="conditionsChangedMd"
+            rows={3}
+            placeholder="Например: инструмент теперь read-only. Как это меняет подход?"
+            className="rounded border border-black/15 p-2 text-sm dark:border-white/20"
+          />
+        </label>
         <button
           type="submit"
           className="self-start rounded-lg bg-foreground px-4 py-2 text-sm font-medium text-background"

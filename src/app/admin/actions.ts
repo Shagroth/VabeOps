@@ -14,6 +14,7 @@ function readModuleFields(formData: FormData) {
     notesMd: String(formData.get("notesMd") || ""),
     assignmentMd: String(formData.get("assignmentMd") || ""),
     isOpen: formData.get("isOpen") === "on",
+    conditionsChangedMd: String(formData.get("conditionsChangedMd") || "") || null,
   };
 }
 
@@ -75,6 +76,25 @@ export async function createLiveSession(formData: FormData) {
   await prisma.liveSession.create({ data: { cohortId, type, scheduledAt, link } });
   revalidatePath("/admin");
   revalidatePath("/");
+}
+
+export async function reviewSubmission(
+  submissionId: string,
+  status: "ACCEPTED" | "NEEDS_REVISION",
+  feedbackText: string
+) {
+  const session = await requireAdmin();
+
+  await prisma.submission.update({ where: { id: submissionId }, data: { status } });
+
+  if (feedbackText.trim()) {
+    await prisma.submissionFeedback.create({
+      data: { submissionId, authorId: session.user.id, content: feedbackText.trim() },
+    });
+  }
+
+  const submission = await prisma.submission.findUnique({ where: { id: submissionId } });
+  if (submission) revalidatePath(`/admin/modules/${submission.moduleId}`);
 }
 
 export async function setApplicationStatus(

@@ -28,6 +28,12 @@ enum ApplicationStatus {
   REJECTED
 }
 
+enum SubmissionStatus {
+  SUBMITTED
+  NEEDS_REVISION
+  ACCEPTED
+}
+
 model User {
   id            String    @id @default(cuid())
   email         String    @unique
@@ -36,11 +42,12 @@ model User {
   image         String?
   role          Role      @default(STUDENT)
 
-  accounts    Account[]
-  sessions    Session[]
-  enrollments Enrollment[]
-  submissions Submission[]
-  feedback    FeedbackResponse[]
+  accounts           Account[]
+  sessions           Session[]
+  enrollments        Enrollment[]
+  submissions        Submission[]
+  feedback           FeedbackResponse[]
+  submissionFeedback SubmissionFeedback[]
 
   createdAt DateTime @default(now())
 }
@@ -106,14 +113,15 @@ model Enrollment {
 }
 
 model Module {
-  id            String  @id @default(cuid())
-  cohortId      String
-  weekNumber    Int
-  title         String
-  videoKey      String? // object key in R2, not a full URL
-  notesMd       String  @db.Text
-  assignmentMd  String  @db.Text
-  isOpen        Boolean @default(true) // manual admin toggle, not a date lock
+  id                 String  @id @default(cuid())
+  cohortId           String
+  weekNumber         Int
+  title              String
+  videoKey           String? // object key in R2, not a full URL
+  notesMd            String  @db.Text
+  assignmentMd       String  @db.Text
+  isOpen             Boolean @default(true) // manual admin toggle, not a date lock
+  conditionsChangedMd String? @db.Text // author-authored "conditions changed" follow-up prompt
 
   cohort       Cohort             @relation(fields: [cohortId], references: [id], onDelete: Cascade)
   submissions  Submission[]
@@ -123,16 +131,51 @@ model Module {
 }
 
 model Submission {
-  id          String   @id @default(cuid())
-  moduleId    String
-  userId      String
-  content     String   @db.Text
-  submittedAt DateTime @default(now())
+  id        String           @id @default(cuid())
+  moduleId  String
+  userId    String
+  status    SubmissionStatus @default(SUBMITTED)
+  createdAt DateTime         @default(now())
 
-  module Module @relation(fields: [moduleId], references: [id], onDelete: Cascade)
-  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  module   Module               @relation(fields: [moduleId], references: [id], onDelete: Cascade)
+  user     User                 @relation(fields: [userId], references: [id], onDelete: Cascade)
+  versions SubmissionVersion[]
+  feedback SubmissionFeedback[]
 
   @@unique([moduleId, userId])
+}
+
+// One entry per (re)submission — keeps the "Разбор решения" the student
+// wrote for that attempt, and the history survives a new version.
+model SubmissionVersion {
+  id          String   @id @default(cuid())
+  submissionId String
+  content     String   @db.Text // link to the result / free-form description
+  createdAt   DateTime @default(now())
+
+  // "Разбор решения" — handoff doc §5.4 component A
+  task               String? @db.Text
+  approach           String? @db.Text
+  rejectedAlternative String? @db.Text
+  verification       String? @db.Text
+  riskOrLimit        String? @db.Text
+  revisitCondition   String? @db.Text
+
+  // Response to the module's "Изменились условия" prompt, if any
+  conditionsResponse String? @db.Text
+
+  submission Submission @relation(fields: [submissionId], references: [id], onDelete: Cascade)
+}
+
+model SubmissionFeedback {
+  id           String   @id @default(cuid())
+  submissionId String
+  authorId     String
+  content      String   @db.Text
+  createdAt    DateTime @default(now())
+
+  submission Submission @relation(fields: [submissionId], references: [id], onDelete: Cascade)
+  author     User       @relation(fields: [authorId], references: [id], onDelete: Cascade)
 }
 
 model FeedbackForm {
