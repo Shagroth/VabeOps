@@ -5,11 +5,28 @@
   --background: #faf7f1;
   --foreground: #1a1a1a;
 
-  /* Decision Trails tokens — see VIBE_OPS_HANDOFF.md §3 */
+  /* Decision Trails tokens — see VIBE_OPS_HANDOFF.md §3 (workspace, unchanged) */
   --surface-hero: #14151a;
   --surface-hero-foreground: #f2f0ec;
   --accent-action: #1e54c7;
   --accent-change: #e07a3f;
+
+  /*
+   * SIGNAL / SYSTEM — public landing v3 only (see VIBE_OPS redesign mandate).
+   * Scoped to its own names so the existing workspace tokens above are
+   * untouched until the workspace gets its own pass.
+   */
+  --ink: #0a0f18;
+  --ink-foreground: #f4f5f1;
+  --ink-muted: #9aa3ad;
+  --paper: #f7f8f5;
+  --graphite: #131a25;
+  --graphite-muted: #5b6672;
+  --signal: #baf66b;
+  --signal-ink: #10210a;
+  --system: #8f9bff;
+  --hairline: rgba(19, 26, 37, 0.1);
+  --hairline-ink: rgba(244, 245, 241, 0.14);
 }
 
 @theme inline {
@@ -19,6 +36,19 @@
   --color-surface-hero-foreground: var(--surface-hero-foreground);
   --color-accent-action: var(--accent-action);
   --color-accent-change: var(--accent-change);
+
+  --color-ink: var(--ink);
+  --color-ink-foreground: var(--ink-foreground);
+  --color-ink-muted: var(--ink-muted);
+  --color-paper: var(--paper);
+  --color-graphite: var(--graphite);
+  --color-graphite-muted: var(--graphite-muted);
+  --color-signal: var(--signal);
+  --color-signal-ink: var(--signal-ink);
+  --color-system: var(--system);
+  --color-hairline: var(--hairline);
+  --color-hairline-ink: var(--hairline-ink);
+
   --font-sans: var(--font-sans);
   --font-mono: var(--font-mono);
 }
