@@ -75,8 +75,31 @@ export default async function Home() {
 
   const enrollment = await prisma.enrollment.findFirst({
     where: { userId: session.user.id },
-    include: { cohort: { include: { liveSessions: { orderBy: { scheduledAt: "asc" } } } } },
+    include: {
+      cohort: {
+        include: {
+          liveSessions: { orderBy: { scheduledAt: "asc" } },
+          modules: { where: { isOpen: true }, orderBy: { weekNumber: "asc" } },
+        },
+      },
+    },
   });
+
+  const openModules = enrollment?.cohort.modules ?? [];
+  const submittedModuleIds = enrollment
+    ? new Set(
+        (
+          await prisma.submission.findMany({
+            where: { userId: session.user.id, moduleId: { in: openModules.map((m) => m.id) } },
+            select: { moduleId: true },
+          })
+        ).map((s) => s.moduleId)
+      )
+    : new Set<string>();
+
+  const nextModule = openModules.find((m) => !submittedModuleIds.has(m.id));
+  const now = new Date();
+  const nextSession = enrollment?.cohort.liveSessions.find((ls) => ls.scheduledAt > now);
 
   return (
     <main className="mx-auto flex max-w-2xl flex-1 flex-col gap-8 p-8">
@@ -105,25 +128,63 @@ export default async function Home() {
         )}
       </div>
 
+      {!enrollment ? (
+        <p className="rounded-xl border border-black/10 p-5 text-sm dark:border-white/15">
+          Ты пока не записан(а) ни в одну когорту. Напиши админу.
+        </p>
+      ) : openModules.length === 0 ? (
+        <p className="rounded-xl border border-black/10 p-5 text-sm dark:border-white/15">
+          Курс скоро начнётся — пока нет открытых недель.
+        </p>
+      ) : nextModule ? (
+        <Link
+          href={`/modules/${nextModule.id}`}
+          className="rounded-xl border border-black/10 p-5 hover:bg-black/5 dark:border-white/15 dark:hover:bg-white/5"
+        >
+          <span className="text-xs text-black/50 dark:text-white/50">Следующий шаг</span>
+          <div className="mt-1 font-medium">
+            Неделя {nextModule.weekNumber} · {nextModule.title}
+          </div>
+          <div className="text-sm text-black/60 dark:text-white/60">
+            Открыта, но ты ещё не сдал(а) практику — продолжить →
+          </div>
+        </Link>
+      ) : (
+        <p className="rounded-xl border border-accent-action/30 bg-accent-action/5 p-5 text-sm">
+          Все открытые недели сданы. Ждём, когда откроется следующая.
+        </p>
+      )}
+
+      {nextSession && (
+        <section className="rounded-xl border border-black/10 p-4 text-sm dark:border-white/15">
+          <span className="text-xs text-black/50 dark:text-white/50">Ближайшая встреча</span>
+          <div className="mt-1 flex items-center justify-between">
+            <span>
+              {TYPE_LABEL[nextSession.type]} — {nextSession.scheduledAt.toLocaleString("ru-RU")}
+            </span>
+            <a href={nextSession.link} className="underline">
+              Присоединиться
+            </a>
+          </div>
+        </section>
+      )}
+
       {enrollment && enrollment.cohort.liveSessions.length > 0 && (
-        <section>
-          <h2 className="mb-3 text-lg font-semibold">Живые созвоны</h2>
-          <ul className="flex flex-col gap-2">
+        <details className="text-sm text-black/60 dark:text-white/60">
+          <summary className="cursor-pointer">Все созвоны потока</summary>
+          <ul className="mt-2 flex flex-col gap-1">
             {enrollment.cohort.liveSessions.map((ls) => (
-              <li
-                key={ls.id}
-                className="flex items-center justify-between rounded-lg border border-black/10 p-3 text-sm dark:border-white/15"
-              >
+              <li key={ls.id} className="flex items-center justify-between">
                 <span>
                   {TYPE_LABEL[ls.type]} — {ls.scheduledAt.toLocaleString("ru-RU")}
                 </span>
                 <a href={ls.link} className="underline">
-                  Присоединиться
+                  ссылка
                 </a>
               </li>
             ))}
           </ul>
-        </section>
+        </details>
       )}
     </main>
   );
