@@ -35,6 +35,16 @@ export default async function ModulePage({
 
   if (!mod || mod.cohortId !== enrollment.cohortId) notFound();
 
+  if (!mod.isOpen) {
+    return (
+      <main className="mx-auto max-w-2xl p-8">
+        <span className="text-sm text-black/50 dark:text-white/50">Неделя {mod.weekNumber}</span>
+        <h1 className="mb-2 text-2xl font-semibold">{mod.title}</h1>
+        <p className="text-black/60 dark:text-white/60">Эта неделя ещё не открыта.</p>
+      </main>
+    );
+  }
+
   const videoUrl = mod.videoKey ? await getVideoUrl(mod.videoKey) : null;
   const questions = (feedbackForm?.questions as string[] | undefined) ?? [];
   const initialAnswers =

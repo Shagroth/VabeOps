@@ -31,6 +31,10 @@ export default async function NewModulePage({
             className="rounded border border-black/15 p-2 dark:border-white/20"
           />
         </label>
+        <label className="flex items-center gap-2 text-sm">
+          <input type="checkbox" name="isOpen" defaultChecked />
+          Открыт для участников
+        </label>
         <label className="flex flex-col gap-1 text-sm">
           R2 video key (опционально)
           <input

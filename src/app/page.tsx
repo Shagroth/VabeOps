@@ -16,29 +16,41 @@ export default async function Home() {
       <main className="mx-auto flex max-w-md flex-1 flex-col items-center justify-center gap-6 p-8 text-center">
         <h1 className="text-2xl font-semibold">Vibe Ops</h1>
         <p className="text-black/60 dark:text-white/60">
-          Когортный курс для инженеров про агентность, MCP и гибкость мышления.
+          Работай с AI-агентами. Думай как инженер.
+          <br />
+          Когортный пилот для разработчиков — бесплатно, 5–10 мест.
         </p>
-        <form
-          action={async (formData) => {
-            "use server";
-            await signIn("resend", { email: formData.get("email") });
-          }}
-          className="flex w-full gap-2"
+        <Link
+          href="/apply"
+          className="rounded-lg bg-foreground px-6 py-2.5 text-sm font-medium text-background"
         >
-          <input
-            type="email"
-            name="email"
-            required
-            placeholder="you@example.com"
-            className="flex-1 rounded-lg border border-black/15 p-2 dark:border-white/20 dark:bg-transparent"
-          />
-          <button
-            type="submit"
-            className="rounded-lg bg-foreground px-4 py-2 text-sm font-medium text-background"
+          Подать заявку на пилот
+        </Link>
+
+        <div className="w-full border-t border-black/10 pt-6 dark:border-white/15">
+          <p className="mb-2 text-xs text-black/50 dark:text-white/50">Уже приглашён(а)?</p>
+          <form
+            action={async (formData) => {
+              "use server";
+              await signIn("resend", { email: formData.get("email") });
+            }}
+            className="flex w-full gap-2"
           >
-            Войти
-          </button>
-        </form>
+            <input
+              type="email"
+              name="email"
+              required
+              placeholder="you@example.com"
+              className="flex-1 rounded-lg border border-black/15 p-2 dark:border-white/20 dark:bg-transparent"
+            />
+            <button
+              type="submit"
+              className="rounded-lg border border-black/15 px-4 py-2 text-sm font-medium dark:border-white/20"
+            >
+              Войти
+            </button>
+          </form>
+        </div>
       </main>
     );
   }

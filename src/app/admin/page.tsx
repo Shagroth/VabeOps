@@ -6,6 +6,8 @@ import { createCohort, createLiveSession } from "./actions";
 export default async function AdminPage() {
   await requireAdmin();
 
+  const pendingApplications = await prisma.application.count({ where: { status: "PENDING" } });
+
   const cohorts = await prisma.cohort.findMany({
     orderBy: { startDate: "desc" },
     include: {
@@ -20,7 +22,12 @@ export default async function AdminPage() {
 
   return (
     <main className="mx-auto max-w-3xl p-8 flex flex-col gap-10">
-      <h1 className="text-2xl font-semibold">Admin</h1>
+      <div className="flex items-center justify-between">
+        <h1 className="text-2xl font-semibold">Admin</h1>
+        <Link href="/admin/applications" className="text-sm underline">
+          Заявки{pendingApplications > 0 ? ` (${pendingApplications} новых)` : ""}
+        </Link>
+      </div>
 
       {cohorts.map((cohort) => (
         <section key={cohort.id} className="flex flex-col gap-4">
@@ -45,6 +52,11 @@ export default async function AdminPage() {
                 >
                   <span>
                     Неделя {m.weekNumber} · {m.title}
+                    {!m.isOpen && (
+                      <span className="ml-2 rounded bg-black/10 px-1.5 py-0.5 text-xs dark:bg-white/10">
+                        закрыт
+                      </span>
+                    )}
                   </span>
                   <span className="text-sm text-black/50 dark:text-white/50">
                     {m._count.submissions} сдач

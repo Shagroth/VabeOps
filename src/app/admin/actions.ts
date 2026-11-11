@@ -13,6 +13,7 @@ function readModuleFields(formData: FormData) {
     videoKey: String(formData.get("videoKey") || "") || null,
     notesMd: String(formData.get("notesMd") || ""),
     assignmentMd: String(formData.get("assignmentMd") || ""),
+    isOpen: formData.get("isOpen") === "on",
   };
 }
 
@@ -74,4 +75,13 @@ export async function createLiveSession(formData: FormData) {
   await prisma.liveSession.create({ data: { cohortId, type, scheduledAt, link } });
   revalidatePath("/admin");
   revalidatePath("/");
+}
+
+export async function setApplicationStatus(
+  applicationId: string,
+  status: "ACCEPTED" | "REJECTED"
+) {
+  await requireAdmin();
+  await prisma.application.update({ where: { id: applicationId }, data: { status } });
+  revalidatePath("/admin/applications");
 }

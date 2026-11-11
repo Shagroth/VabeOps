@@ -22,6 +22,12 @@ enum LiveSessionType {
   FINAL
 }
 
+enum ApplicationStatus {
+  PENDING
+  ACCEPTED
+  REJECTED
+}
+
 model User {
   id            String    @id @default(cuid())
   email         String    @unique
@@ -107,6 +113,7 @@ model Module {
   videoKey      String? // object key in R2, not a full URL
   notesMd       String  @db.Text
   assignmentMd  String  @db.Text
+  isOpen        Boolean @default(true) // manual admin toggle, not a date lock
 
   cohort       Cohort             @relation(fields: [cohortId], references: [id], onDelete: Cascade)
   submissions  Submission[]
@@ -151,6 +158,16 @@ model FeedbackResponse {
   user User         @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([formId, userId])
+}
+
+model Application {
+  id         String             @id @default(cuid())
+  name       String
+  email      String
+  experience String             @db.Text
+  workGoal   String             @db.Text
+  status     ApplicationStatus  @default(PENDING)
+  createdAt  DateTime           @default(now())
 }
 
 model LiveSession {

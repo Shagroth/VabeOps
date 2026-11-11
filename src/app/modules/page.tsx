@@ -28,19 +28,32 @@ export default async function ModulesPage() {
     <main className="mx-auto max-w-2xl p-8 flex flex-col gap-4">
       <h1 className="text-2xl font-semibold">{enrollment.cohort.name}</h1>
       <ul className="flex flex-col gap-2">
-        {enrollment.cohort.modules.map((m) => (
-          <li key={m.id}>
-            <Link
-              href={`/modules/${m.id}`}
-              className="block rounded-lg border border-black/10 p-4 hover:bg-black/5 dark:border-white/15 dark:hover:bg-white/5"
+        {enrollment.cohort.modules.map((m) =>
+          m.isOpen ? (
+            <li key={m.id}>
+              <Link
+                href={`/modules/${m.id}`}
+                className="block rounded-lg border border-black/10 p-4 hover:bg-black/5 dark:border-white/15 dark:hover:bg-white/5"
+              >
+                <span className="text-sm text-black/50 dark:text-white/50">
+                  Неделя {m.weekNumber}
+                </span>
+                <div className="font-medium">{m.title}</div>
+              </Link>
+            </li>
+          ) : (
+            <li
+              key={m.id}
+              className="rounded-lg border border-black/10 p-4 opacity-50 dark:border-white/15"
             >
               <span className="text-sm text-black/50 dark:text-white/50">
                 Неделя {m.weekNumber}
               </span>
               <div className="font-medium">{m.title}</div>
-            </Link>
-          </li>
-        ))}
+              <div className="text-xs text-black/40 dark:text-white/40">Скоро откроется</div>
+            </li>
+          )
+        )}
       </ul>
     </main>
   );
