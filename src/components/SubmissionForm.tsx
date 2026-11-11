@@ -57,11 +57,11 @@ export function SubmissionForm({
           onChange={(e) => set("content", e.target.value)}
           placeholder="Ссылка на репозиторий, описание решения..."
           rows={4}
-          className="w-full rounded-lg border border-black/10 p-3 dark:border-white/15 dark:bg-transparent"
+          className="w-full rounded-lg border border-black/10 p-3"
         />
       </label>
 
-      <fieldset className="flex flex-col gap-3 rounded-lg border border-black/10 p-4 dark:border-white/15">
+      <fieldset className="flex flex-col gap-3 rounded-lg border border-black/10 p-4">
         <legend className="px-1 text-sm font-medium">Разбор решения</legend>
         {(Object.keys(FIELD_LABELS) as Array<keyof typeof FIELD_LABELS>).map((key) => (
           <label key={key} className="flex flex-col gap-1 text-sm">
@@ -70,7 +70,7 @@ export function SubmissionForm({
               value={values[key]}
               onChange={(e) => set(key, e.target.value)}
               rows={2}
-              className="rounded-lg border border-black/10 p-2 text-sm dark:border-white/15 dark:bg-transparent"
+              className="rounded-lg border border-black/10 p-2 text-sm"
             />
           </label>
         ))}
@@ -79,12 +79,12 @@ export function SubmissionForm({
       {conditionsChangedMd && (
         <label className="flex flex-col gap-1 rounded-lg border border-accent-change/40 p-4 text-sm">
           <span className="font-medium">Изменились условия</span>
-          <span className="mb-1 text-black/70 dark:text-white/70">{conditionsChangedMd}</span>
+          <span className="mb-1 text-black/70">{conditionsChangedMd}</span>
           <textarea
             value={values.conditionsResponse}
             onChange={(e) => set("conditionsResponse", e.target.value)}
             rows={3}
-            className="rounded-lg border border-black/10 p-2 dark:border-white/15 dark:bg-transparent"
+            className="rounded-lg border border-black/10 p-2"
           />
         </label>
       )}

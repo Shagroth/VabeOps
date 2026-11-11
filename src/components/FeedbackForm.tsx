@@ -37,14 +37,14 @@ export function FeedbackForm({
               setSaved(false);
             }}
             rows={3}
-            className="rounded-lg border border-black/10 p-2 dark:border-white/15 dark:bg-transparent"
+            className="rounded-lg border border-black/10 p-2"
           />
         </label>
       ))}
       <button
         type="submit"
         disabled={isPending}
-        className="self-start rounded-lg border border-black/15 px-4 py-2 text-sm font-medium disabled:opacity-50 dark:border-white/20"
+        className="self-start rounded-lg border border-black/15 px-4 py-2 text-sm font-medium disabled:opacity-50"
       >
         {isPending ? "Сохраняю..." : saved ? "Отправлено ✓" : "Отправить фидбек"}
       </button>

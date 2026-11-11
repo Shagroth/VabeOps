@@ -26,9 +26,9 @@
 /*
  * No global prefers-color-scheme switch on purpose: Decision Trails is a
  * deliberate two-zone design (dark hero / warm light workspace), not a
- * system dark-mode toggle. Existing `dark:` utilities elsewhere in the
- * codebase still respond to system preference until that's revisited —
- * flagged in VIBE_OPS_HANDOFF.md as a follow-up, not silently removed here.
+ * system dark-mode toggle. The `dark:` utilities that used to cover this
+ * gap elsewhere have been removed — the whole workspace is the warm light
+ * surface now, consistently.
  */
 
 body {

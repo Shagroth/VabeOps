@@ -19,7 +19,7 @@ export function ParticipantProfileForm({
           setSaved(true);
         });
       }}
-      className="flex flex-col gap-2 rounded-lg border border-black/10 p-4 text-sm dark:border-white/15"
+      className="flex flex-col gap-2 rounded-lg border border-black/10 p-4 text-sm"
     >
       <span className="font-medium">Твой профиль в потоке</span>
       <label className="flex flex-col gap-1">
@@ -28,7 +28,7 @@ export function ParticipantProfileForm({
           name="doingNow"
           defaultValue={initial.doingNow}
           onChange={() => setSaved(false)}
-          className="rounded border border-black/15 p-1.5 dark:border-white/20 dark:bg-transparent"
+          className="rounded border border-black/15 p-1.5"
         />
       </label>
       <label className="flex flex-col gap-1">
@@ -37,7 +37,7 @@ export function ParticipantProfileForm({
           name="exploring"
           defaultValue={initial.exploring}
           onChange={() => setSaved(false)}
-          className="rounded border border-black/15 p-1.5 dark:border-white/20 dark:bg-transparent"
+          className="rounded border border-black/15 p-1.5"
         />
       </label>
       <label className="flex flex-col gap-1">
@@ -46,13 +46,13 @@ export function ParticipantProfileForm({
           name="canHelpWith"
           defaultValue={initial.canHelpWith}
           onChange={() => setSaved(false)}
-          className="rounded border border-black/15 p-1.5 dark:border-white/20 dark:bg-transparent"
+          className="rounded border border-black/15 p-1.5"
         />
       </label>
       <button
         type="submit"
         disabled={isPending}
-        className="self-start rounded border border-black/15 px-3 py-1 dark:border-white/20"
+        className="self-start rounded border border-black/15 px-3 py-1"
       >
         {isPending ? "Сохраняю..." : saved ? "Сохранено ✓" : "Сохранить"}
       </button>

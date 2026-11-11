@@ -20,7 +20,7 @@ export default async function NewModulePage({
             type="number"
             name="weekNumber"
             required
-            className="rounded border border-black/15 p-2 dark:border-white/20"
+            className="rounded border border-black/15 p-2"
           />
         </label>
         <label className="flex flex-col gap-1 text-sm">
@@ -28,7 +28,7 @@ export default async function NewModulePage({
           <input
             name="title"
             required
-            className="rounded border border-black/15 p-2 dark:border-white/20"
+            className="rounded border border-black/15 p-2"
           />
         </label>
         <label className="flex items-center gap-2 text-sm">
@@ -40,7 +40,7 @@ export default async function NewModulePage({
           <input
             name="videoKey"
             placeholder="cohort-1/week-1.mp4"
-            className="rounded border border-black/15 p-2 dark:border-white/20"
+            className="rounded border border-black/15 p-2"
           />
         </label>
         <label className="flex flex-col gap-1 text-sm">
@@ -48,7 +48,7 @@ export default async function NewModulePage({
           <textarea
             name="notesMd"
             rows={8}
-            className="rounded border border-black/15 p-2 font-mono text-xs dark:border-white/20"
+            className="rounded border border-black/15 p-2 font-mono text-xs"
           />
         </label>
         <label className="flex flex-col gap-1 text-sm">
@@ -56,7 +56,7 @@ export default async function NewModulePage({
           <textarea
             name="assignmentMd"
             rows={6}
-            className="rounded border border-black/15 p-2 font-mono text-xs dark:border-white/20"
+            className="rounded border border-black/15 p-2 font-mono text-xs"
           />
         </label>
         <label className="flex flex-col gap-1 text-sm">
@@ -65,12 +65,12 @@ export default async function NewModulePage({
             name="conditionsChangedMd"
             rows={3}
             placeholder="Например: инструмент теперь read-only. Как это меняет подход?"
-            className="rounded border border-black/15 p-2 text-sm dark:border-white/20"
+            className="rounded border border-black/15 p-2 text-sm"
           />
         </label>
         <button
           type="submit"
-          className="self-start rounded-lg bg-foreground px-4 py-2 text-sm font-medium text-background"
+          className="self-start rounded-lg bg-accent-action px-4 py-2 text-sm font-medium text-white"
         >
           Создать
         </button>

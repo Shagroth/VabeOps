@@ -45,10 +45,10 @@ export default async function ModulesPage() {
             <li key={m.id}>
               <Link
                 href={`/modules/${m.id}`}
-                className="flex items-center justify-between rounded-lg border border-black/10 p-4 hover:bg-black/5 dark:border-white/15 dark:hover:bg-white/5"
+                className="flex items-center justify-between rounded-lg border border-black/10 p-4 hover:bg-black/5"
               >
                 <div>
-                  <span className="text-sm text-black/50 dark:text-white/50">
+                  <span className="text-sm text-black/50">
                     Неделя {m.weekNumber}
                   </span>
                   <div className="font-medium">{m.title}</div>
@@ -61,13 +61,13 @@ export default async function ModulesPage() {
           ) : (
             <li
               key={m.id}
-              className="rounded-lg border border-black/10 p-4 opacity-50 dark:border-white/15"
+              className="rounded-lg border border-black/10 p-4 opacity-50"
             >
-              <span className="text-sm text-black/50 dark:text-white/50">
+              <span className="text-sm text-black/50">
                 Неделя {m.weekNumber}
               </span>
               <div className="font-medium">{m.title}</div>
-              <div className="text-xs text-black/40 dark:text-white/40">Скоро откроется</div>
+              <div className="text-xs text-black/40">Скоро откроется</div>
             </li>
           )
         )}

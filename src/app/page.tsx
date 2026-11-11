@@ -121,23 +121,23 @@ export default async function Home() {
       <WorkspaceNav isAdmin={session.user.role === "ADMIN"} />
 
       {!enrollment ? (
-        <p className="rounded-xl border border-black/10 p-5 text-sm dark:border-white/15">
+        <p className="rounded-xl border border-black/10 p-5 text-sm">
           Ты пока не записан(а) ни в одну когорту. Напиши админу.
         </p>
       ) : openModules.length === 0 ? (
-        <p className="rounded-xl border border-black/10 p-5 text-sm dark:border-white/15">
+        <p className="rounded-xl border border-black/10 p-5 text-sm">
           Курс скоро начнётся — пока нет открытых недель.
         </p>
       ) : nextModule ? (
         <Link
           href={`/modules/${nextModule.id}`}
-          className="rounded-xl border border-black/10 p-5 hover:bg-black/5 dark:border-white/15 dark:hover:bg-white/5"
+          className="rounded-xl border border-black/10 p-5 hover:bg-black/5"
         >
-          <span className="text-xs text-black/50 dark:text-white/50">Следующий шаг</span>
+          <span className="text-xs text-black/50">Следующий шаг</span>
           <div className="mt-1 font-medium">
             Неделя {nextModule.weekNumber} · {nextModule.title}
           </div>
-          <div className="text-sm text-black/60 dark:text-white/60">
+          <div className="text-sm text-black/60">
             Открыта, но ты ещё не сдал(а) практику — продолжить →
           </div>
         </Link>
@@ -148,8 +148,8 @@ export default async function Home() {
       )}
 
       {nextSession && (
-        <section className="rounded-xl border border-black/10 p-4 text-sm dark:border-white/15">
-          <span className="text-xs text-black/50 dark:text-white/50">Ближайшая встреча</span>
+        <section className="rounded-xl border border-black/10 p-4 text-sm">
+          <span className="text-xs text-black/50">Ближайшая встреча</span>
           <div className="mt-1 flex items-center justify-between">
             <span>
               {TYPE_LABEL[nextSession.type]} — {nextSession.scheduledAt.toLocaleString("ru-RU")}

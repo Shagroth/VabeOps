@@ -48,17 +48,17 @@ export default async function AdminPage() {
               <li key={m.id}>
                 <Link
                   href={`/admin/modules/${m.id}`}
-                  className="flex items-center justify-between rounded-lg border border-black/10 p-3 hover:bg-black/5 dark:border-white/15 dark:hover:bg-white/5"
+                  className="flex items-center justify-between rounded-lg border border-black/10 p-3 hover:bg-black/5"
                 >
                   <span>
                     Неделя {m.weekNumber} · {m.title}
                     {!m.isOpen && (
-                      <span className="ml-2 rounded bg-black/10 px-1.5 py-0.5 text-xs dark:bg-white/10">
+                      <span className="ml-2 rounded bg-black/10 px-1.5 py-0.5 text-xs">
                         закрыт
                       </span>
                     )}
                   </span>
-                  <span className="text-sm text-black/50 dark:text-white/50">
+                  <span className="text-sm text-black/50">
                     {m._count.submissions} сдач
                   </span>
                 </Link>
@@ -66,7 +66,7 @@ export default async function AdminPage() {
             ))}
           </ul>
 
-          <div className="rounded-lg border border-black/10 p-4 dark:border-white/15">
+          <div className="rounded-lg border border-black/10 p-4">
             <h3 className="mb-2 text-sm font-semibold">Живые созвоны</h3>
             <ul className="mb-3 flex flex-col gap-1 text-sm">
               {cohort.liveSessions.map((ls) => (
@@ -80,7 +80,7 @@ export default async function AdminPage() {
             </ul>
             <form action={createLiveSession} className="flex flex-wrap gap-2 text-sm">
               <input type="hidden" name="cohortId" value={cohort.id} />
-              <select name="type" className="rounded border border-black/15 p-1 dark:border-white/20">
+              <select name="type" className="rounded border border-black/15 p-1">
                 <option value="KICKOFF">kickoff</option>
                 <option value="MIDPOINT">midpoint</option>
                 <option value="FINAL">final</option>
@@ -89,16 +89,16 @@ export default async function AdminPage() {
                 type="datetime-local"
                 name="scheduledAt"
                 required
-                className="rounded border border-black/15 p-1 dark:border-white/20"
+                className="rounded border border-black/15 p-1"
               />
               <input
                 type="url"
                 name="link"
                 placeholder="https://meet.google.com/..."
                 required
-                className="flex-1 min-w-40 rounded border border-black/15 p-1 dark:border-white/20"
+                className="flex-1 min-w-40 rounded border border-black/15 p-1"
               />
-              <button type="submit" className="rounded border border-black/15 px-3 dark:border-white/20">
+              <button type="submit" className="rounded border border-black/15 px-3">
                 добавить
               </button>
             </form>
@@ -106,22 +106,22 @@ export default async function AdminPage() {
         </section>
       ))}
 
-      <section className="flex flex-col gap-2 border-t border-black/10 pt-6 dark:border-white/15">
+      <section className="flex flex-col gap-2 border-t border-black/10 pt-6">
         <h2 className="text-lg font-semibold">Новая когорта</h2>
         <form action={createCohort} className="flex flex-wrap gap-2 text-sm">
           <input
             name="name"
             placeholder="Название когорты"
             required
-            className="rounded border border-black/15 p-1 dark:border-white/20"
+            className="rounded border border-black/15 p-1"
           />
           <input
             type="date"
             name="startDate"
             required
-            className="rounded border border-black/15 p-1 dark:border-white/20"
+            className="rounded border border-black/15 p-1"
           />
-          <button type="submit" className="rounded border border-black/15 px-3 dark:border-white/20">
+          <button type="submit" className="rounded border border-black/15 px-3">
             создать
           </button>
         </form>

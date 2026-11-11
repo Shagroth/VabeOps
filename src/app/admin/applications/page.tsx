@@ -23,22 +23,22 @@ export default async function ApplicationsPage() {
           const accept = setApplicationStatus.bind(null, a.id, "ACCEPTED");
           const reject = setApplicationStatus.bind(null, a.id, "REJECTED");
           return (
-            <li key={a.id} className="rounded-lg border border-black/10 p-4 dark:border-white/15">
+            <li key={a.id} className="rounded-lg border border-black/10 p-4">
               <div className="mb-2 flex items-center justify-between">
                 <div>
                   <span className="font-medium">{a.name}</span>{" "}
-                  <span className="text-sm text-black/50 dark:text-white/50">{a.email}</span>
+                  <span className="text-sm text-black/50">{a.email}</span>
                 </div>
-                <span className="text-xs text-black/50 dark:text-white/50">
+                <span className="text-xs text-black/50">
                   {STATUS_LABEL[a.status]}
                 </span>
               </div>
               <p className="mb-1 text-sm">
-                <span className="text-black/50 dark:text-white/50">Опыт: </span>
+                <span className="text-black/50">Опыт: </span>
                 {a.experience}
               </p>
               <p className="mb-3 text-sm">
-                <span className="text-black/50 dark:text-white/50">Цель: </span>
+                <span className="text-black/50">Цель: </span>
                 {a.workGoal}
               </p>
               {a.status === "PENDING" && (
@@ -46,7 +46,7 @@ export default async function ApplicationsPage() {
                   <form action={accept}>
                     <button
                       type="submit"
-                      className="rounded border border-black/15 px-3 py-1 text-sm dark:border-white/20"
+                      className="rounded border border-black/15 px-3 py-1 text-sm"
                     >
                       Принять
                     </button>
@@ -54,7 +54,7 @@ export default async function ApplicationsPage() {
                   <form action={reject}>
                     <button
                       type="submit"
-                      className="rounded border border-black/15 px-3 py-1 text-sm dark:border-white/20"
+                      className="rounded border border-black/15 px-3 py-1 text-sm"
                     >
                       Отклонить
                     </button>
@@ -65,7 +65,7 @@ export default async function ApplicationsPage() {
           );
         })}
         {applications.length === 0 && (
-          <p className="text-sm text-black/50 dark:text-white/50">Заявок пока нет.</p>
+          <p className="text-sm text-black/50">Заявок пока нет.</p>
         )}
       </ul>
     </main>

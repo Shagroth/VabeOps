@@ -55,11 +55,11 @@ export default async function StreamPage() {
           {enrollment.cohort.liveSessions.map((ls) => (
             <li
               key={ls.id}
-              className="flex items-center justify-between rounded-lg border border-black/10 p-3 text-sm dark:border-white/15"
+              className="flex items-center justify-between rounded-lg border border-black/10 p-3 text-sm"
             >
               <span>
                 {TYPE_LABEL[ls.type]} — {ls.scheduledAt.toLocaleString("ru-RU")}
-                <span className="ml-2 text-xs text-black/40 dark:text-white/40">
+                <span className="ml-2 text-xs text-black/40">
                   {ls.scheduledAt > now ? "предстоит" : "прошла"}
                 </span>
               </span>
@@ -71,7 +71,7 @@ export default async function StreamPage() {
             </li>
           ))}
           {enrollment.cohort.liveSessions.length === 0 && (
-            <p className="text-sm text-black/40 dark:text-white/40">Созвоны ещё не назначены.</p>
+            <p className="text-sm text-black/40">Созвоны ещё не назначены.</p>
           )}
         </ul>
       </section>
@@ -80,17 +80,17 @@ export default async function StreamPage() {
         <h2 className="mb-3 text-lg font-semibold">Участники</h2>
         <ul className="grid grid-cols-1 gap-2 sm:grid-cols-2">
           {enrollment.cohort.enrollments.map((e) => (
-            <li key={e.id} className="rounded-lg border border-black/10 p-3 text-sm dark:border-white/15">
+            <li key={e.id} className="rounded-lg border border-black/10 p-3 text-sm">
               <div className="font-medium">{e.user.email}</div>
-              {e.doingNow && <div className="text-black/60 dark:text-white/60">Делает: {e.doingNow}</div>}
+              {e.doingNow && <div className="text-black/60">Делает: {e.doingNow}</div>}
               {e.exploring && (
-                <div className="text-black/60 dark:text-white/60">Исследует: {e.exploring}</div>
+                <div className="text-black/60">Исследует: {e.exploring}</div>
               )}
               {e.canHelpWith && (
-                <div className="text-black/60 dark:text-white/60">Поможет с: {e.canHelpWith}</div>
+                <div className="text-black/60">Поможет с: {e.canHelpWith}</div>
               )}
               {!e.doingNow && !e.exploring && !e.canHelpWith && (
-                <div className="text-black/40 dark:text-white/40">Профиль ещё не заполнен</div>
+                <div className="text-black/40">Профиль ещё не заполнен</div>
               )}
             </li>
           ))}
@@ -109,16 +109,16 @@ export default async function StreamPage() {
         <h2 className="mb-3 text-lg font-semibold">Недавние обсуждения</h2>
         <ul className="flex flex-col gap-2">
           {recentComments.map((c) => (
-            <li key={c.id} className="rounded-lg border border-black/10 p-3 text-sm dark:border-white/15">
-              <div className="mb-1 text-xs text-black/40 dark:text-white/40">
+            <li key={c.id} className="rounded-lg border border-black/10 p-3 text-sm">
+              <div className="mb-1 text-xs text-black/40">
                 Неделя {c.module.weekNumber} · {c.module.title}
               </div>
-              <span className="text-black/50 dark:text-white/50">{c.user.email}: </span>
+              <span className="text-black/50">{c.user.email}: </span>
               {c.content}
             </li>
           ))}
           {recentComments.length === 0 && (
-            <p className="text-sm text-black/40 dark:text-white/40">
+            <p className="text-sm text-black/40">
               Обсуждений пока нет — они появляются на странице урока.
             </p>
           )}

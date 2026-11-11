@@ -56,7 +56,7 @@ export default async function EditModulePage({
               name="weekNumber"
               defaultValue={mod.weekNumber}
               required
-              className="rounded border border-black/15 p-2 dark:border-white/20"
+              className="rounded border border-black/15 p-2"
             />
           </label>
           <label className="flex flex-col gap-1 text-sm">
@@ -65,7 +65,7 @@ export default async function EditModulePage({
               name="title"
               defaultValue={mod.title}
               required
-              className="rounded border border-black/15 p-2 dark:border-white/20"
+              className="rounded border border-black/15 p-2"
             />
           </label>
           <label className="flex items-center gap-2 text-sm">
@@ -77,7 +77,7 @@ export default async function EditModulePage({
             <input
               name="videoKey"
               defaultValue={mod.videoKey ?? ""}
-              className="rounded border border-black/15 p-2 dark:border-white/20"
+              className="rounded border border-black/15 p-2"
             />
           </label>
           <label className="flex flex-col gap-1 text-sm">
@@ -86,7 +86,7 @@ export default async function EditModulePage({
               name="notesMd"
               defaultValue={mod.notesMd}
               rows={8}
-              className="rounded border border-black/15 p-2 font-mono text-xs dark:border-white/20"
+              className="rounded border border-black/15 p-2 font-mono text-xs"
             />
           </label>
           <label className="flex flex-col gap-1 text-sm">
@@ -95,7 +95,7 @@ export default async function EditModulePage({
               name="assignmentMd"
               defaultValue={mod.assignmentMd}
               rows={6}
-              className="rounded border border-black/15 p-2 font-mono text-xs dark:border-white/20"
+              className="rounded border border-black/15 p-2 font-mono text-xs"
             />
           </label>
           <label className="flex flex-col gap-1 text-sm">
@@ -105,19 +105,19 @@ export default async function EditModulePage({
               defaultValue={mod.conditionsChangedMd ?? ""}
               rows={3}
               placeholder="Например: инструмент теперь read-only. Как это меняет подход?"
-              className="rounded border border-black/15 p-2 text-sm dark:border-white/20"
+              className="rounded border border-black/15 p-2 text-sm"
             />
           </label>
           <button
             type="submit"
-            className="self-start rounded-lg bg-foreground px-4 py-2 text-sm font-medium text-background"
+            className="self-start rounded-lg bg-accent-action px-4 py-2 text-sm font-medium text-white"
           >
             Сохранить
           </button>
         </form>
       </section>
 
-      <section className="flex flex-col gap-4 border-t border-black/10 pt-6 dark:border-white/15">
+      <section className="flex flex-col gap-4 border-t border-black/10 pt-6">
         <h2 className="text-lg font-semibold">Вопросы фидбека</h2>
         {(["NOVICE", "STRONG"] as const).map((level) => {
           const form = level === "NOVICE" ? noviceForm : strongForm;
@@ -130,11 +130,11 @@ export default async function EditModulePage({
                 defaultValue={(form?.questions as string[] | undefined)?.join("\n") ?? ""}
                 placeholder={"Один вопрос на строку"}
                 rows={3}
-                className="rounded border border-black/15 p-2 text-sm dark:border-white/20"
+                className="rounded border border-black/15 p-2 text-sm"
               />
               <button
                 type="submit"
-                className="self-start rounded border border-black/15 px-3 py-1 text-sm dark:border-white/20"
+                className="self-start rounded border border-black/15 px-3 py-1 text-sm"
               >
                 Сохранить вопросы
               </button>
@@ -143,7 +143,7 @@ export default async function EditModulePage({
         })}
       </section>
 
-      <section className="flex flex-col gap-4 border-t border-black/10 pt-6 dark:border-white/15">
+      <section className="flex flex-col gap-4 border-t border-black/10 pt-6">
         <h2 className="text-lg font-semibold">Сдачи ({mod.submissions.length})</h2>
         <ul className="flex flex-col gap-4">
           {mod.submissions.map((s) => {
@@ -151,7 +151,7 @@ export default async function EditModulePage({
             const accept = reviewSubmission.bind(null, s.id, "ACCEPTED");
             const requestRevision = reviewSubmission.bind(null, s.id, "NEEDS_REVISION");
             return (
-              <li key={s.id} className="rounded-lg border border-black/10 p-4 text-sm dark:border-white/15">
+              <li key={s.id} className="rounded-lg border border-black/10 p-4 text-sm">
                 <div className="mb-2 flex items-center justify-between">
                   <span className="font-medium">{s.user.email}</span>
                   <SubmissionStatusBadge status={s.status} />
@@ -164,7 +164,7 @@ export default async function EditModulePage({
                       const value = (latest as unknown as Record<string, string | null>)[key];
                       return value ? (
                         <p key={key}>
-                          <span className="text-black/50 dark:text-white/50">{label}: </span>
+                          <span className="text-black/50">{label}: </span>
                           {value}
                         </p>
                       ) : null;
@@ -173,10 +173,10 @@ export default async function EditModulePage({
                 )}
 
                 {s.feedback.length > 0 && (
-                  <div className="mb-3 flex flex-col gap-1 rounded bg-black/5 p-2 text-xs dark:bg-white/5">
+                  <div className="mb-3 flex flex-col gap-1 rounded bg-black/5 p-2 text-xs">
                     {s.feedback.map((f) => (
                       <p key={f.id}>
-                        <span className="text-black/50 dark:text-white/50">{f.author.email}: </span>
+                        <span className="text-black/50">{f.author.email}: </span>
                         {f.content}
                       </p>
                     ))}
@@ -184,7 +184,7 @@ export default async function EditModulePage({
                 )}
 
                 {s.versions.length > 1 && (
-                  <details className="mb-3 text-xs text-black/50 dark:text-white/50">
+                  <details className="mb-3 text-xs text-black/50">
                     <summary className="cursor-pointer">
                       Предыдущие версии ({s.versions.length - 1})
                     </summary>
@@ -204,7 +204,7 @@ export default async function EditModulePage({
                     name="comment"
                     placeholder="Комментарий (опционально)"
                     rows={2}
-                    className="rounded border border-black/15 p-2 text-sm dark:border-white/20"
+                    className="rounded border border-black/15 p-2 text-sm"
                   />
                   <div className="flex gap-2">
                     <button
@@ -231,18 +231,18 @@ export default async function EditModulePage({
         </ul>
       </section>
 
-      <section className="flex flex-col gap-4 border-t border-black/10 pt-6 dark:border-white/15">
+      <section className="flex flex-col gap-4 border-t border-black/10 pt-6">
         <h2 className="text-lg font-semibold">Фидбек по неделе</h2>
         {mod.feedbackForms.map((f) => (
           <div key={f.id}>
             <h3 className="mb-2 text-sm font-semibold">{f.level}</h3>
             <ul className="flex flex-col gap-3">
               {f.responses.map((r) => (
-                <li key={r.id} className="rounded-lg border border-black/10 p-3 text-sm dark:border-white/15">
+                <li key={r.id} className="rounded-lg border border-black/10 p-3 text-sm">
                   <div className="mb-1 font-medium">{r.user.email}</div>
                   {Object.entries(r.answers as Record<string, string>).map(([q, a]) => (
                     <p key={q} className="mb-1">
-                      <span className="text-black/50 dark:text-white/50">{q}</span> {a}
+                      <span className="text-black/50">{q}</span> {a}
                     </p>
                   ))}
                 </li>

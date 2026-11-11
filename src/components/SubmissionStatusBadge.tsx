@@ -5,7 +5,7 @@ const LABEL: Record<string, string> = {
 };
 
 const STYLE: Record<string, string> = {
-  SUBMITTED: "bg-black/10 dark:bg-white/10",
+  SUBMITTED: "bg-black/10",
   NEEDS_REVISION: "bg-accent-change/15 text-accent-change",
   ACCEPTED: "bg-accent-action/15 text-accent-action",
 };
