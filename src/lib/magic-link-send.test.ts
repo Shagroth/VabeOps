@@ -51,7 +51,18 @@ test("sendMagicLinkEmail is bounded by its timeout and doesn't hang forever", as
   const neverResolves: typeof fetch = (_url, init) =>
     new Promise((_resolve, reject) => {
       const signal = (init as RequestInit)?.signal;
-      signal?.addEventListener("abort", () => reject(new DOMException("timed out", "TimeoutError")));
+      // AbortSignal.timeout() deliberately uses an unref'd timer in Node.
+      // A real fetch keeps the event loop alive through its socket; this
+      // referenced timer gives the fake request the same lifecycle in CI.
+      const inFlightRequest = setTimeout(() => {}, 1000);
+      signal?.addEventListener(
+        "abort",
+        () => {
+          clearTimeout(inFlightRequest);
+          reject(new DOMException("timed out", "TimeoutError"));
+        },
+        { once: true }
+      );
     });
 
   const start = Date.now();
