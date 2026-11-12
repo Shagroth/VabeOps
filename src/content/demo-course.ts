@@ -1,193 +1,188 @@
-// Content for the one fully walkable free demo course (brief §6):
-// "Первый агентный workflow в существующем репозитории: от постановки
-// задачи до проверенного патча". Pure data — no component logic here so
-// the copy can be reviewed/edited without touching DemoCourseFlow.tsx.
+// Module 01 is intentionally stored as reviewable data. The interactive client
+// renders it, but course editors can change the teaching copy without touching
+// state transitions or browser APIs.
 
 export const DEMO_COURSE_META = {
-  slug: "first-agentic-workflow",
-  title: "Первый агентный workflow в существующем репозитории",
-  dek: "От постановки задачи до проверенного патча — на компактном реалистичном кейсе с существующим TypeScript-сервисом скидок.",
+  slug: "contract-before-agent",
+  eyebrow: "Модуль 01 · Agentic mindset",
+  title: "Сначала контракт, потом агент",
+  dek: "Научись ставить агенту инженерную задачу так, чтобы скорость не превращалась в потерю контроля.",
+  duration: "45–60 минут",
+  level: "любой инженер",
+  result: "Agent Task Contract для реальной рабочей задачи",
   totalSteps: 7,
 };
 
-export const EXISTING_CONTRACT = `// src/services/discount.ts
-export function calculateDiscount(customer: Customer, order: Order): number {
-  if (customer.tier === "enterprise") return order.total * 0.15;
-  if (customer.tier === "pro") return order.total * 0.08;
-  return 0;
-}`;
+export const MODULE_STEPS = [
+  { id: "incident", index: "00", label: "Инцидент", short: "Почему «готово» не значит «верно»" },
+  { id: "modes", index: "01", label: "Три режима", short: "Чат, copilot или агент" },
+  { id: "anatomy", index: "02", label: "Анатомия", short: "Семь полей контракта" },
+  { id: "lab", index: "03", label: "Лаборатория", short: "Собери свой контракт" },
+  { id: "review", index: "04", label: "Красная команда", short: "Найди скрытые риски" },
+  { id: "gate", index: "05", label: "Review gate", short: "Разрешить, остановить, уточнить" },
+  { id: "artifact", index: "06", label: "Артефакт", short: "Забери контракт в работу" },
+] as const;
 
-export const TASK_GOAL =
-  "Добавить лояльность enterprise-клиентам: если enterprise-клиент с нами 2+ года, скидка увеличивается ещё на 5%.";
-
-export const TASK_CONSTRAINTS = [
-  "Сигнатура calculateDiscount(customer, order): number не меняется — это публичный контракт, вызывающий код трогать нельзя.",
-  "Не вводить новую архитектуру (классы, реестры правил) ради одной дополнительной строки логики.",
-  "Существующее поведение для pro и обычных клиентов не меняется.",
-];
-
-export const TASK_DONE_CRITERIA = [
-  "Все существующие тесты calculateDiscount проходят без изменений.",
-  "Новый тест на enterprise-клиента с yearsActive >= 2 проходит.",
-  "Сигнатура функции и путь импорта не изменились.",
-];
-
-export type ContextFileChoice = {
-  path: string;
-  description: string;
-  shouldInclude: boolean;
-  why: string;
+export const INCIDENT = {
+  ticket: "Добавить enterprise-клиентам бонус +5% после двух лет с нами.",
+  agentReport: "Готово. Обновил расчёт скидки, поправил типы и тесты. 42/42 теста проходят.",
+  damage: [
+    "Агент заменил денежный результат discountCents на процент discountRate.",
+    "Все внутренние тесты были переписаны под новую сигнатуру — поэтому они зелёные.",
+    "Существующий TypeScript-сервис счетов продолжил ожидать сумму в центах.",
+  ],
+  lesson:
+    "Агент оптимизировал задачу, которую увидел. Инженер не зафиксировал контракт, который нельзя было менять.",
 };
 
-export const CONTEXT_FILES: ContextFileChoice[] = [
+export const WORK_MODES = [
   {
-    path: "src/services/discount.ts",
-    description: "Сама функция, которую нужно менять",
-    shouldInclude: true,
-    why: "Без этого файла агент физически не может предложить патч.",
+    id: "chat",
+    title: "Чат",
+    command: "объясни / сравни / придумай",
+    autonomy: "Нет доступа к среде",
+    useWhen: "Нужно прояснить мысль, исследовать варианты или подготовить черновик.",
   },
   {
-    path: "src/services/discount.test.ts",
-    description: "Существующие тесты контракта",
-    shouldInclude: true,
-    why: "Показывает агенту, какое поведение уже зафиксировано и не должно сломаться.",
+    id: "copilot",
+    title: "Copilot",
+    command: "предложи рядом со мной",
+    autonomy: "Локальная помощь",
+    useWhen: "Ты ведёшь работу сам, а модель ускоряет отдельный шаг.",
   },
   {
-    path: "src/types/customer.ts",
-    description: "Тип Customer (tier, yearsActive, ...)",
-    shouldInclude: true,
-    why: "Нужен, чтобы агент не угадывал форму входных данных.",
+    id: "agent",
+    title: "Агент",
+    command: "исследуй → измени → проверь",
+    autonomy: "Действует в среде",
+    useWhen: "Есть проверяемый результат, ясные границы и право выполнить несколько шагов.",
   },
-  {
-    path: "src/services/billing-invoice-pdf.ts",
-    description: "Генерация PDF-счетов — не связано со скидками",
-    shouldInclude: false,
-    why: "Не имеет отношения к задаче — только увеличивает контекстное окно и шанс, что агент зацепится за что-то постороннее.",
-  },
-  {
-    path: "вся папка src/ целиком",
-    description: "'На всякий случай пусть видит весь репозиторий'",
-    shouldInclude: false,
-    why: "Главная ошибка контекст-инжиниринга: избыток контекста без структуры не помогает агенту, а размывает, что из этого действительно ограничение задачи.",
-  },
-  {
-    path: "src/services/auth.ts",
-    description: "Аутентификация пользователей",
-    shouldInclude: false,
-    why: "Другой домен, другой контракт — агенту сюда не нужно и, тем более, не нужно туда писать.",
-  },
-];
+] as const;
 
-export type BoundaryOption = {
-  id: "read" | "propose" | "write" | "execute";
-  label: string;
-  detail: string;
-  recommended: boolean;
+export const MODE_SCENARIO =
+  "Нужно найти причину падения трёх интеграционных тестов, предложить минимальный патч и остановиться перед записью в файлы.";
+
+export const CONTRACT_FIELDS = [
+  {
+    key: "goal",
+    number: "01",
+    title: "Цель",
+    prompt: "Какое изменение должно появиться для пользователя или системы?",
+    antiPattern: "«Разберись со скидками»",
+  },
+  {
+    key: "state",
+    number: "02",
+    title: "Текущее состояние",
+    prompt: "Что уже существует и какой контракт действует сейчас?",
+    antiPattern: "Заставить агента угадывать архитектуру",
+  },
+  {
+    key: "scope",
+    number: "03",
+    title: "Scope",
+    prompt: "Что можно читать и менять — и что явно вне задачи?",
+    antiPattern: "«Весь репозиторий, если понадобится»",
+  },
+  {
+    key: "constraints",
+    number: "04",
+    title: "Ограничения",
+    prompt: "Какие совместимости, правила и свойства нельзя нарушить?",
+    antiPattern: "Описать только желаемое новое поведение",
+  },
+  {
+    key: "permissions",
+    number: "05",
+    title: "Права",
+    prompt: "Что агент делает сам, а перед чем обязан остановиться?",
+    antiPattern: "Дать право записи и запуска команд по умолчанию",
+  },
+  {
+    key: "done",
+    number: "06",
+    title: "Definition of Done",
+    prompt: "Какие наблюдаемые проверки доказывают готовность?",
+    antiPattern: "«Код выглядит хорошо»",
+  },
+  {
+    key: "stop",
+    number: "07",
+    title: "Stop conditions",
+    prompt: "При какой неопределённости или опасности агент прекращает работу?",
+    antiPattern: "Надеяться, что агент сам почувствует риск",
+  },
+] as const;
+
+export type ContractKey = (typeof CONTRACT_FIELDS)[number]["key"];
+export type AgentContract = Record<ContractKey, string>;
+
+export const CONTRACT_TEMPLATE: AgentContract = {
+  goal:
+    "Добавить enterprise-клиентам, активным 2+ года, дополнительные 5% скидки при расчёте заказа.",
+  state:
+    "calculateDiscount(customer, order) возвращает сумму скидки в центах. Базовая enterprise-скидка — 15%. Сигнатура публичная и используется сервисом счетов.",
+  scope:
+    "Можно читать discount.ts, discount.test.ts и тип Customer. Изменять — только discount.ts и его тесты. Billing и публичные типы вне scope.",
+  constraints:
+    "Не менять сигнатуру и единицы измерения результата. Не менять поведение pro/обычных клиентов. Не вводить новую архитектуру ради одного правила.",
+  permissions:
+    "Можно читать файлы и запускать целевые тесты. Сначала показать план и diff; запись в файлы — только после подтверждения.",
+  done:
+    "Существующие тесты проходят без изменений; добавлены кейсы для 1, 2 и 3 лет; публичная сигнатура и импорт не изменились.",
+  stop:
+    "Остановиться, если yearsActive отсутствует в типе, требуется миграция данных, ломается существующий тест или нужен файл вне scope.",
 };
 
-export const BOUNDARY_OPTIONS: BoundaryOption[] = [
-  {
-    id: "read",
-    label: "Только читать",
-    detail: "Агент может открывать файлы, но не предлагает изменений — слишком узко для этой задачи.",
-    recommended: false,
-  },
-  {
-    id: "propose",
-    label: "Читать + предлагать патч",
-    detail: "Агент готовит diff и объяснение, но не применяет его сам — ты проверяешь перед записью.",
-    recommended: true,
-  },
-  {
-    id: "write",
-    label: "Читать + писать без подтверждения",
-    detail: "Агент сразу применяет изменения к файлу. Для этой задачи подтверждение перед записью важнее скорости.",
-    recommended: false,
-  },
-  {
-    id: "execute",
-    label: "Писать + самостоятельно выполнять команды",
-    detail: "Агент и меняет код, и сам решает, что запускать в терминале — избыточно для одной точечной правки.",
-    recommended: false,
-  },
+export const WEAK_REQUEST = `Исправь скидки для старых enterprise-клиентов.
+Посмотри репозиторий, внеси нужные изменения и убедись, что всё работает.`;
+
+export const REVIEW_RISKS = [
+  { id: "contract", label: "Не зафиксирован публичный контракт и единица измерения", correct: true },
+  { id: "scope", label: "Нет границы файлов и систем, которые можно менять", correct: true },
+  { id: "permissions", label: "Агенту не сказано, где остановиться перед записью", correct: true },
+  { id: "done", label: "«Всё работает» нельзя независимо проверить", correct: true },
+  { id: "persona", label: "Не назначена ролевая персона senior-разработчика", correct: false },
+] as const;
+
+export const AGENT_PLAN = [
+  "Открыть реализацию calculateDiscount и существующие тесты.",
+  "Проверить тип Customer и наличие yearsActive.",
+  "Подготовить минимальный diff без изменения сигнатуры.",
+  "Показать diff и дождаться подтверждения перед записью.",
+  "После подтверждения применить патч и запустить только целевые тесты.",
 ];
 
-export const TEST_COMMAND = "npm test -- discount.test.ts";
+export const RUBRIC = [
+  "Цель описывает результат, а не активность",
+  "Текущий контракт назван явно",
+  "Scope содержит границы «можно / нельзя»",
+  "Права отделяют чтение, запись и выполнение",
+  "Definition of Done можно проверить",
+  "Есть конкретные условия остановки",
+];
 
-export const ACCEPTED_PATCH = `function calculateDiscount(customer: Customer, order: Order): number {
-  if (customer.tier === "enterprise") {
-    const loyaltyBonus = customer.yearsActive >= 2 ? 0.05 : 0;
-    return order.total * (0.15 + loyaltyBonus);
-  }
-  if (customer.tier === "pro") return order.total * 0.08;
-  return 0;
-}`;
+export function formatContract(contract: AgentContract) {
+  return `# Agent Task Contract
 
-export const REJECTED_PATCH = `// Отвергнутая альтернатива: DiscountResolver
-class DiscountResolver {
-  private rules: DiscountRule[] = [
-    new EnterpriseLoyaltyRule(),
-    new EnterpriseBaseRule(),
-    new ProRule(),
-  ];
-  resolve(customer: Customer, order: Order): number {
-    for (const rule of this.rules) {
-      if (rule.applies(customer)) return rule.apply(customer, order);
-    }
-    return 0;
-  }
+## 1. Цель
+${contract.goal}
+
+## 2. Текущее состояние и контракт
+${contract.state}
+
+## 3. Scope
+${contract.scope}
+
+## 4. Ограничения
+${contract.constraints}
+
+## 5. Права и review gates
+${contract.permissions}
+
+## 6. Definition of Done
+${contract.done}
+
+## 7. Stop conditions
+${contract.stop}`;
 }
-// calculateDiscount(customer, order) {
-//   return new DiscountResolver().resolve(customer, order);
-// }`;
-
-export const REJECTED_REASON =
-  "Решает ту же задачу, но вводит реестр правил и три новых класса ради одной дополнительной строки логики. Сигнатура formально сохраняется, но растёт площадь ревью и тестирования без реального выигрыша — пока в правилах нет комбинаторной сложности, которая оправдывала бы абстракцию.";
-
-export const TEST_OUTPUT = `$ npm test -- discount.test.ts
-
- PASS  src/services/discount.test.ts
-  calculateDiscount
-    ✓ enterprise tier gets base 15% (3 ms)
-    ✓ pro tier gets 8% (1 ms)
-    ✓ unknown tier gets 0% (1 ms)
-    ✓ enterprise + 2+ years gets 20% total (1 ms)
-    ✓ enterprise + <2 years stays at 15% (1 ms)
-
-Test Suites: 1 passed, 1 total
-Tests:       5 passed, 5 total`;
-
-export const CONDITIONS_CHANGED_PROMPT =
-  "Условия изменились: скидка теперь должна также зависеть от региона клиента (EU/US/other) и от даты заключения контракта (старые контракты сохраняют прежние условия). Веток станет не 2-3, а больше десятка комбинаций.";
-
-export type ConditionsChoice = {
-  id: "keep-branching" | "introduce-structure";
-  label: string;
-  consequence: string;
-};
-
-export const CONDITIONS_CHOICES: ConditionsChoice[] = [
-  {
-    id: "keep-branching",
-    label: "Продолжать расширять if/else в той же функции",
-    consequence:
-      "Работает ещё один шаг, но вложенность и число комбинаций tier×регион×дата контракта уже плохо читается и почти не тестируется по отдельности. Риск регрессии в необновлённой ветке растёт с каждым новым условием.",
-  },
-  {
-    id: "introduce-structure",
-    label: "Теперь ввести структуру (таблицу правил или аналог отклонённого DiscountResolver)",
-    consequence:
-      "Это именно условие пересмотра, зафиксированное на шаге 4: комбинаторная сложность, которой раньше не было, появилась. Абстракция, отклонённая для одной строки, теперь окупает себя — но контракт calculateDiscount всё ещё не меняется, меняется только то, что происходит внутри.",
-  },
-];
-
-export const DEMO_SUBMISSION_SUMMARY =
-  "Ссылка на патч: enterprise-клиенты 2+ года получают +5% к базовой скидке, сигнатура calculateDiscount не изменена, 5/5 тестов зелёные.";
-
-export const DEMO_MENTOR_FEEDBACK =
-  "Демо-фидбек ментора: подход верный — минимальное расширение существующей ветки, а не преждевременная абстракция. Один момент на доработку: добавь тест на граничное значение yearsActive === 2 явно (сейчас оно покрыто неявно через >= 2) — так следующий инженер увидит границу, не читая реализацию.";
-
-export const DEMO_REVISION_NOTE =
-  "Доработка: добавлен отдельный тест-кейс 'enterprise + ровно 2 года получает бонус' с явным именем, подтверждающим границу.";
-
-export const DEMO_FINAL_STATE = "Принято. Финальная версия патча и тестов — в истории версий этой сдачи.";
