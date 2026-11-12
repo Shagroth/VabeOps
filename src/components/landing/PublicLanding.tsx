@@ -268,12 +268,14 @@ export function PublicLanding() {
               Весь каталог →
             </Link>
           </div>
-          <div className="mt-10 flex gap-5 overflow-x-auto px-6 pb-4 [scrollbar-width:thin] lg:px-10">
-            {homeCourses.map((c) => (
-              <div key={c.slug} className="w-[280px] flex-shrink-0 sm:w-[320px]">
-                <CourseCard course={c} />
-              </div>
-            ))}
+          <div className="mx-auto mt-10 max-w-[1280px] px-6 lg:px-10">
+            <div className="flex gap-5 overflow-x-auto pb-4 [scrollbar-width:thin]">
+              {homeCourses.map((c) => (
+                <div key={c.slug} className="w-[280px] flex-shrink-0 sm:w-[320px]">
+                  <CourseCard course={c} />
+                </div>
+              ))}
+            </div>
           </div>
         </ScrollReveal>
 
