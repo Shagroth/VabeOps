@@ -43,6 +43,11 @@ export default function SignalsPage() {
                     <span className={s.kind === "original" ? "text-copper" : "text-system"}>
                       {s.kind === "original" ? "Оригинал" : "Внешний источник"}
                     </span>
+                    {s.sourceIsPlaceholder && (
+                      <span className="rounded-full border border-warn/40 bg-warn/10 px-2 py-0.5 text-warn">
+                        Демо / плейсхолдер
+                      </span>
+                    )}
                     <span>· {s.publishedAt}</span>
                     {s.tags.map((t) => (
                       <span key={t}>· {t}</span>

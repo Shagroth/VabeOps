@@ -91,7 +91,7 @@ export async function submitArticleForReview(id: string) {
 }
 
 export async function publishArticle(id: string) {
-  const session = await requireRole(["ADMIN", "EDITOR", "AUTHOR", "MENTOR"]);
+  const session = await requireRole(["ADMIN", "EDITOR"]);
   assertCanPublish(session.user.role);
 
   await prisma.article.update({
@@ -104,7 +104,7 @@ export async function publishArticle(id: string) {
 }
 
 export async function archiveArticle(id: string) {
-  const session = await requireRole(["ADMIN", "EDITOR", "AUTHOR", "MENTOR"]);
+  const session = await requireRole(["ADMIN", "EDITOR"]);
   assertCanPublish(session.user.role);
 
   await prisma.article.update({ where: { id }, data: { status: "ARCHIVED" } });
@@ -169,7 +169,7 @@ export async function submitSignalForReview(id: string) {
 }
 
 export async function publishSignal(id: string) {
-  const session = await requireRole(["ADMIN", "EDITOR", "AUTHOR", "MENTOR"]);
+  const session = await requireRole(["ADMIN", "EDITOR"]);
   assertCanPublish(session.user.role);
 
   await prisma.signal.update({
@@ -182,7 +182,7 @@ export async function publishSignal(id: string) {
 }
 
 export async function archiveSignal(id: string) {
-  const session = await requireRole(["ADMIN", "EDITOR", "AUTHOR", "MENTOR"]);
+  const session = await requireRole(["ADMIN", "EDITOR"]);
   assertCanPublish(session.user.role);
 
   await prisma.signal.update({ where: { id }, data: { status: "ARCHIVED" } });

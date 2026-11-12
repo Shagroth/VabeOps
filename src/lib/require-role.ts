@@ -4,7 +4,9 @@ import { canAccessStudio } from "@/lib/studio-permissions";
 
 export { canAccessStudio };
 
-export const STUDIO_ROLES = ["ADMIN", "EDITOR", "AUTHOR", "MENTOR"];
+// Mentor is intentionally not here — see canAccessStudio in
+// studio-permissions.ts for why.
+export const STUDIO_ROLES = ["ADMIN", "EDITOR", "AUTHOR"];
 
 export async function requireRole(roles: string[]) {
   const session = await auth();
@@ -14,8 +16,9 @@ export async function requireRole(roles: string[]) {
   return session;
 }
 
-// Everyone who gets into Studio at all, except STUDENT. Individual pages
-// and actions narrow further (e.g. only EDITOR/ADMIN can publish).
+// Admin/Editor/Author only — Mentor and Student have no Studio access.
+// Individual pages and actions narrow further (e.g. only EDITOR/ADMIN can
+// publish).
 export async function requireStudioAccess() {
   return requireRole(STUDIO_ROLES);
 }

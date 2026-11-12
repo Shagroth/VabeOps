@@ -30,7 +30,12 @@ export function canPublishContent(role: StudioRole): boolean {
   return role === "ADMIN" || role === "EDITOR";
 }
 
-/** Anyone who should land in /studio at all, except STUDENT. */
+/**
+ * Anyone who should land in /studio at all. Mentor is deliberately
+ * excluded — per the brief, Mentor works with cohort feedback/comments
+ * (see admin/actions.ts reviewSubmission) but has no publication access,
+ * so it never sees Article/Signal editorial rows.
+ */
 export function canAccessStudio(role: StudioRole): boolean {
-  return role === "ADMIN" || role === "EDITOR" || role === "AUTHOR" || role === "MENTOR";
+  return role === "ADMIN" || role === "EDITOR" || role === "AUTHOR";
 }

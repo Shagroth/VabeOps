@@ -46,6 +46,11 @@ export default async function SignalDetailPage({
             <span className={signal.kind === "original" ? "text-copper" : "text-system"}>
               {signal.kind === "original" ? "Оригинал" : "Внешний источник"}
             </span>
+            {signal.sourceIsPlaceholder && (
+              <span className="rounded-full border border-warn/40 bg-warn/10 px-2 py-0.5 text-warn">
+                Демо / плейсхолдер
+              </span>
+            )}
             <span className="text-graphite-muted">· {signal.publishedAt} · {signal.author}</span>
           </div>
           <h1 className="mt-3 text-3xl font-semibold tracking-tight sm:text-4xl">{signal.title}</h1>
@@ -64,14 +69,24 @@ export default async function SignalDetailPage({
               <p className="text-graphite-muted">
                 Мы не копируем текст источника — только комментарий выше и ссылка.
               </p>
-              <a href={signal.sourceUrl} className="mt-2 inline-block font-medium text-ink underline">
-                Читать источник →
-              </a>
-              {signal.sourceIsPlaceholder && (
-                <p className="mt-2 text-xs text-warn">
-                  Ссылка — технический плейсхолдер для скелета платформы, не реальный материал.
-                  Перед публикацией редактор заменяет её на настоящий источник с атрибуцией.
-                </p>
+              {signal.sourceIsPlaceholder ? (
+                <>
+                  <p className="mt-2 inline-flex items-center gap-2 font-medium text-graphite-muted">
+                    <span className="rounded-full border border-warn/40 bg-warn/10 px-2 py-0.5 font-mono text-[10px] uppercase tracking-wide text-warn">
+                      Демо / плейсхолдер
+                    </span>
+                    Читать источник →
+                  </p>
+                  <p className="mt-2 text-xs text-warn">
+                    Это технический плейсхолдер для скелета платформы, не реальный материал —
+                    ссылка намеренно не кликабельна. Перед публикацией редактор заменяет её на
+                    настоящий источник с атрибуцией.
+                  </p>
+                </>
+              ) : (
+                <a href={signal.sourceUrl} className="mt-2 inline-block font-medium text-ink underline">
+                  Читать источник →
+                </a>
               )}
             </div>
           )}

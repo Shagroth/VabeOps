@@ -34,9 +34,10 @@ test("only ADMIN/EDITOR can publish or archive", () => {
   assert.equal(canPublishContent("STUDENT"), false);
 });
 
-test("STUDENT is the only role excluded from Studio entirely", () => {
+test("MENTOR and STUDENT are excluded from Studio entirely", () => {
+  assert.equal(canAccessStudio("MENTOR"), false);
   assert.equal(canAccessStudio("STUDENT"), false);
-  for (const role of ["ADMIN", "EDITOR", "AUTHOR", "MENTOR"] as const) {
+  for (const role of ["ADMIN", "EDITOR", "AUTHOR"] as const) {
     assert.equal(canAccessStudio(role), true);
   }
 });

@@ -112,18 +112,19 @@ body {
 /*
  * V4 motion system additions.
  * reveal/reveal-visible: scroll-entry for editorial sections (ScrollReveal
- * component toggles the class via IntersectionObserver). Outside the
- * no-preference query, content has no opacity:0 state at all — reduced-
- * motion users never see anything hidden, just a static page.
+ * component toggles the class via IntersectionObserver). This must fail
+ * open: content stays fully opaque (readable) by default, so a JS error,
+ * a disconnected observer, or an animation that never fires still leaves
+ * every section visible — only a small, safe transform is deferred.
+ * Reduced-motion users get no transform state at all, just a static page.
  */
 @media (prefers-reduced-motion: no-preference) {
   .reveal {
-    opacity: 0;
-    transform: translateY(18px);
-    transition: opacity 550ms cubic-bezier(0.16, 1, 0.3, 1), transform 550ms cubic-bezier(0.16, 1, 0.3, 1);
+    opacity: 1;
+    transform: translateY(10px);
+    transition: transform 550ms cubic-bezier(0.16, 1, 0.3, 1);
   }
   .reveal-visible {
-    opacity: 1;
     transform: none;
   }
 
