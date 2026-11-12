@@ -231,9 +231,9 @@ export function PublicLanding() {
                 </h2>
                 <p className="mt-4 max-w-[56ch] text-ink-muted">{DEMO_COURSE_META.dek}</p>
                 <ul className="mt-6 flex flex-col gap-2 text-sm text-ink-muted">
-                  <li>— 7 шагов: от постановки задачи до итогового Decision Trace</li>
-                  <li>— реальные интерактивные решения, не видео для просмотра</li>
-                  <li>— прогресс хранится только в браузере, с кнопкой сброса</li>
+                  <li>— 7 коротких сцен: от инцидента до review gate</li>
+                  <li>— лаборатория, где собираешь свой Agent Task Contract</li>
+                  <li>— готовый артефакт можно скопировать или скачать как Markdown</li>
                 </ul>
                 <Link
                   href="/demo-course"
@@ -243,11 +243,12 @@ export function PublicLanding() {
                 </Link>
               </div>
               <div className="rounded-2xl border border-hairline-ink bg-white/[0.03] p-6 font-mono text-xs text-ink-muted">
-                <div className="text-system">Шаг 4 · Патч</div>
-                <p className="mt-2 text-ink-foreground/80">
-                  Вариант A — расширить существующую ветку. Вариант B — DiscountResolver.
-                </p>
-                <p className="mt-2">Какой стоит принять — и почему другой стоит отклонить?</p>
+                <div className="text-system">Agent Task Contract / preview</div>
+                <p className="mt-4 text-ink-foreground/80">01. Цель и текущий контракт</p>
+                <p className="mt-2">02. Scope и ограничения</p>
+                <p className="mt-2">03. Права и review gates</p>
+                <p className="mt-2">04. Definition of Done</p>
+                <p className="mt-2 text-signal">05. Stop conditions_</p>
               </div>
             </div>
           </div>
