@@ -1,11 +1,13 @@
 "use server";
 
+import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
 import { prisma } from "@/lib/prisma";
 import { requireRole } from "@/lib/require-role";
 import { canEditContent, canPublishContent, type StudioRole, type ContentStatus } from "@/lib/studio-permissions";
 import { clamp } from "@/lib/validation";
+import { log, getOrCreateCorrelationId } from "@/lib/logger";
 
 const MAX_TITLE = 200;
 const MAX_DEK = 400;
@@ -101,6 +103,14 @@ export async function publishArticle(id: string) {
   revalidatePath("/studio");
   revalidatePath(`/studio/articles/${id}`);
   revalidatePath("/journal");
+
+  log({
+    level: "info",
+    event: "studio_content_published",
+    operation: "studio.publishArticle",
+    correlationId: getOrCreateCorrelationId(await headers()),
+    meta: { contentType: "article", contentId: id, actorId: session.user.id },
+  });
 }
 
 export async function archiveArticle(id: string) {
@@ -179,6 +189,14 @@ export async function publishSignal(id: string) {
   revalidatePath("/studio");
   revalidatePath(`/studio/signals/${id}`);
   revalidatePath("/signals");
+
+  log({
+    level: "info",
+    event: "studio_content_published",
+    operation: "studio.publishSignal",
+    correlationId: getOrCreateCorrelationId(await headers()),
+    meta: { contentType: "signal", contentId: id, actorId: session.user.id },
+  });
 }
 
 export async function archiveSignal(id: string) {

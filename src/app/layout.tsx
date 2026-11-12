@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import type { ReactNode } from "react";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 
@@ -22,7 +23,7 @@ export const metadata: Metadata = {
     "VabeOps учит практикующих инженеров осмысленно работать с AI-агентами: context engineering, MCP, guardrails и проверка результата — не программированию с нуля.",
 };
 
-export default function RootLayout({ children }: LayoutProps<"/">) {
+export default function RootLayout({ children }: { children: ReactNode }) {
   return (
     <html
       lang="ru"

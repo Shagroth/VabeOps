@@ -1,9 +1,11 @@
 "use server";
 
+import { headers } from "next/headers";
 import { revalidatePath } from "next/cache";
 import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
 import { clamp } from "@/lib/validation";
+import { log, getOrCreateCorrelationId } from "@/lib/logger";
 
 export type DecisionBreakdown = {
   content: string;
@@ -80,6 +82,14 @@ export async function submitAssignment(
 
   revalidatePath(`/modules/${moduleId}`);
   revalidatePath("/stream");
+
+  log({
+    level: "info",
+    event: "submission_saved",
+    operation: "modules.submitAssignment",
+    correlationId: getOrCreateCorrelationId(await headers()),
+    meta: { moduleId, submissionId: submission.id, actorId: session.user.id, publishToCohort },
+  });
 }
 
 export async function submitFeedback(formId: string, answers: Record<string, string>) {
