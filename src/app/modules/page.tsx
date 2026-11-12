@@ -4,15 +4,19 @@ import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
 import { WorkspaceShell } from "@/components/WorkspaceShell";
 import { SubmissionStatusBadge } from "@/components/SubmissionStatusBadge";
+import { canAccessStudio } from "@/lib/require-role";
 
 export default async function ModulesPage() {
   const session = await auth();
   if (!session?.user) redirect("/");
 
-  const isAdmin = session.user.role === "ADMIN";
+  const studioAccess = canAccessStudio(session.user.role);
 
+  // See stream/page.tsx for why this orders explicitly by cohort start
+  // date instead of trusting an arbitrary `findFirst` row.
   const enrollment = await prisma.enrollment.findFirst({
     where: { userId: session.user.id },
+    orderBy: { cohort: { startDate: "desc" } },
     include: {
       cohort: {
         include: { modules: { orderBy: { weekNumber: "asc" } } },
@@ -22,7 +26,7 @@ export default async function ModulesPage() {
 
   if (!enrollment) {
     return (
-      <WorkspaceShell active="program" email={session.user.email ?? ""} isAdmin={isAdmin}>
+      <WorkspaceShell active="program" email={session.user.email ?? ""} canAccessStudio={studioAccess}>
         <div className="flex min-h-[60vh] flex-col items-center justify-center gap-4 rounded-2xl border border-hairline bg-white/40 px-6 py-16 text-center">
           <h1 className="text-xl font-semibold">Пока нет активной когорты</h1>
           <p className="max-w-[48ch] text-graphite-muted">
@@ -46,7 +50,7 @@ export default async function ModulesPage() {
     <WorkspaceShell
       active="program"
       email={session.user.email ?? ""}
-      isAdmin={isAdmin}
+      canAccessStudio={studioAccess}
       breadcrumb={enrollment.cohort.name}
     >
       <div className="mx-auto flex max-w-[860px] flex-col gap-6">

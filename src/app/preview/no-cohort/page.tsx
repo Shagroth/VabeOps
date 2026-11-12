@@ -17,7 +17,7 @@ export default function PreviewNoCohortPage() {
   const featured = getFeaturedJournal();
 
   return (
-    <WorkspaceShell active="overview" email="preview-no-cohort@example.test" isAdmin={false}>
+    <WorkspaceShell active="overview" email="preview-no-cohort@example.test" canAccessStudio={false}>
       <div className="mx-auto flex max-w-[1080px] flex-col gap-10">
         <PreviewBanner label="Обзор — аккаунт без когорты" />
 

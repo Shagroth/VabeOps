@@ -15,7 +15,7 @@ export default function PreviewDashboardPage() {
   requirePreviewEnv();
 
   return (
-    <WorkspaceShell active="overview" email="preview@example.test" isAdmin={false} breadcrumb="Demo Pilot">
+    <WorkspaceShell active="overview" email="preview@example.test" canAccessStudio={false} breadcrumb="Demo Pilot">
       <div className="mx-auto flex max-w-[860px] flex-col gap-8">
         <PreviewBanner label="Обзор — зачисленный участник" />
 

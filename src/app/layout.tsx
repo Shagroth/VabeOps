@@ -13,8 +13,13 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Vibe Ops",
-  description: "Когортный курс для инженеров про агентность и гибкость мышления",
+  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || "https://vabeops.example.com"),
+  title: {
+    default: "VabeOps — агентная инженерия для практикующих разработчиков",
+    template: "%s — VabeOps",
+  },
+  description:
+    "VabeOps учит практикующих инженеров осмысленно работать с AI-агентами: context engineering, MCP, guardrails и проверка результата — не программированию с нуля.",
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {

@@ -41,19 +41,26 @@ const NAV_LABEL: Record<NavKey, string> = {
 export function WorkspaceShell({
   active,
   email,
-  isAdmin,
+  canAccessStudio,
   breadcrumb,
   children,
 }: {
   active: NavKey;
   email: string;
-  isAdmin: boolean;
+  /** Any Studio role (Admin/Editor/Author/Mentor) — not Admin-only. */
+  canAccessStudio: boolean;
   /** e.g. cohort name or "Неделя 2" — shown in the desktop top bar next to the section label */
   breadcrumb?: string;
   children: React.ReactNode;
 }) {
   return (
     <div className="mx-auto flex w-full max-w-[1400px] flex-1">
+      <a
+        href="#main-content"
+        className="absolute left-2 top-2 z-50 -translate-y-16 rounded-lg bg-signal px-4 py-2 text-sm font-medium text-signal-ink transition-transform duration-150 focus:translate-y-0"
+      >
+        Перейти к содержанию
+      </a>
       {/* Desktop sidebar */}
       <aside className="sticky top-0 hidden h-screen w-[240px] flex-shrink-0 flex-col justify-between border-r border-hairline px-4 py-6 lg:flex">
         <div className="flex flex-col gap-6">
@@ -63,7 +70,7 @@ export function WorkspaceShell({
               <path d="M7 18 L17 7" stroke="var(--system)" strokeWidth="1.6" fill="none" />
               <circle cx="19" cy="5" r="2" fill="var(--system)" />
             </svg>
-            <span className="font-medium">Vibe Ops</span>
+            <span className="font-medium">VabeOps</span>
           </Link>
           <nav className="flex flex-col gap-1">
             {NAV.map((item) => (
@@ -78,16 +85,16 @@ export function WorkspaceShell({
         </div>
 
         <div className="flex flex-col gap-1 border-t border-hairline pt-4">
-          {isAdmin && (
+          {canAccessStudio && (
             <Link
-              href="/admin"
+              href="/studio"
               className={`rounded-lg px-3 py-2 text-sm transition-colors duration-150 ${
                 active === "admin"
                   ? "bg-black/5 font-medium text-graphite"
                   : "text-graphite-muted hover:bg-black/5 hover:text-graphite"
               }`}
             >
-              Admin
+              Studio
             </Link>
           )}
           <div className="truncate px-3 py-1 text-xs text-graphite-muted">{email}</div>
@@ -116,7 +123,7 @@ export function WorkspaceShell({
             <path d="M7 18 L17 7" stroke="var(--system)" strokeWidth="1.6" fill="none" />
             <circle cx="19" cy="5" r="2" fill="var(--system)" />
           </svg>
-          <span className="text-sm font-medium">Vibe Ops</span>
+          <span className="text-sm font-medium">VabeOps</span>
         </Link>
         <nav className="flex gap-1 text-xs">
           {NAV.map((item) => (
@@ -130,7 +137,7 @@ export function WorkspaceShell({
         </nav>
       </div>
 
-      <main className="min-h-screen flex-1 px-5 pb-16 pt-20 lg:px-10 lg:pt-0">
+      <main id="main-content" className="min-h-screen flex-1 px-5 pb-16 pt-20 lg:px-10 lg:pt-0">
         <div className="hidden items-center gap-2 border-b border-hairline py-4 text-sm text-graphite-muted lg:flex">
           <span>{NAV_LABEL[active]}</span>
           {breadcrumb && (

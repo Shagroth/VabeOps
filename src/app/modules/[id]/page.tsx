@@ -8,6 +8,7 @@ import { FeedbackForm } from "@/components/FeedbackForm";
 import { SubmissionStatusBadge } from "@/components/SubmissionStatusBadge";
 import { CommentThread } from "@/components/CommentThread";
 import { WorkspaceShell } from "@/components/WorkspaceShell";
+import { canAccessStudio } from "@/lib/require-role";
 
 const DECISION_FIELD_LABELS: Record<string, string> = {
   task: "Задача",
@@ -27,8 +28,11 @@ export default async function ModulePage({
   const session = await auth();
   if (!session?.user) redirect("/");
 
+  // See stream/page.tsx for why this orders explicitly by cohort start
+  // date instead of trusting an arbitrary `findFirst` row.
   const enrollment = await prisma.enrollment.findFirst({
     where: { userId: session.user.id },
+    orderBy: { cohort: { startDate: "desc" } },
   });
   if (!enrollment) notFound();
 
@@ -61,7 +65,7 @@ export default async function ModulePage({
       <WorkspaceShell
         active="program"
         email={session.user.email ?? ""}
-        isAdmin={session.user.role === "ADMIN"}
+        canAccessStudio={canAccessStudio(session.user.role)}
         breadcrumb={`Неделя ${mod.weekNumber}`}
       >
         <div className="mx-auto max-w-[820px]">
@@ -96,7 +100,7 @@ export default async function ModulePage({
     <WorkspaceShell
       active="program"
       email={session.user.email ?? ""}
-      isAdmin={session.user.role === "ADMIN"}
+      canAccessStudio={canAccessStudio(session.user.role)}
       breadcrumb={`Неделя ${mod.weekNumber} · ${mod.title}`}
     >
     <div className="mx-auto flex max-w-[820px] flex-col gap-8">

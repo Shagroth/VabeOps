@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import Link from "next/link";
 import { Header } from "@/components/landing/Header";
@@ -7,6 +8,22 @@ import { JOURNAL, getJournalBySlug } from "@/content/journal";
 
 export function generateStaticParams() {
   return JOURNAL.map((j) => ({ slug: j.slug }));
+}
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ slug: string }>;
+}): Promise<Metadata> {
+  const { slug } = await params;
+  const entry = getJournalBySlug(slug);
+  if (!entry) return {};
+  return {
+    title: entry.title,
+    description: entry.dek,
+    alternates: { canonical: `/journal/${entry.slug}` },
+    openGraph: { title: entry.title, description: entry.dek, type: "article" },
+  };
 }
 
 export default async function JournalDetailPage({
@@ -21,7 +38,7 @@ export default async function JournalDetailPage({
   return (
     <div className="flex min-h-screen flex-col bg-paper text-graphite">
       <Header />
-      <main className="flex-1">
+      <main id="main-content" className="flex-1">
         <article className="mx-auto max-w-[760px] px-6 py-16 lg:px-10">
           <Link href="/journal" className="text-sm text-graphite-muted hover:text-graphite">
             ← Все статьи

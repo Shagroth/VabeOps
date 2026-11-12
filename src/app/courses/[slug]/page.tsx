@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import Link from "next/link";
 import { Header } from "@/components/landing/Header";
@@ -8,6 +9,21 @@ import { MINI_COURSES, getCourseBySlug } from "@/content/courses";
 
 export function generateStaticParams() {
   return MINI_COURSES.map((c) => ({ slug: c.slug }));
+}
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ slug: string }>;
+}): Promise<Metadata> {
+  const { slug } = await params;
+  const course = getCourseBySlug(slug);
+  if (!course) return {};
+  return {
+    title: course.title,
+    description: course.summary,
+    alternates: { canonical: `/courses/${course.slug}` },
+  };
 }
 
 export default async function CourseDetailPage({
@@ -22,7 +38,7 @@ export default async function CourseDetailPage({
   return (
     <div className="flex min-h-screen flex-col bg-paper text-graphite">
       <Header />
-      <main className="flex-1">
+      <main id="main-content" className="flex-1">
         <section className="mx-auto max-w-[920px] px-6 py-16 lg:px-10">
           <Link href="/courses" className="text-sm text-graphite-muted hover:text-graphite">
             ← Все мини-курсы
