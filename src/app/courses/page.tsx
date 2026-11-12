@@ -3,13 +3,13 @@ import { Footer } from "@/components/landing/Footer";
 import { CourseCard } from "@/components/cards/CourseCard";
 import { MINI_COURSES } from "@/content/courses";
 
-export const metadata = { title: "Мини-курсы — Vibe Ops" };
+export const metadata = { title: "Мини-курсы" };
 
 export default function CoursesPage() {
   return (
     <div className="flex min-h-screen flex-col bg-paper text-graphite">
       <Header />
-      <main className="flex-1">
+      <main id="main-content" className="flex-1">
         <section className="bg-ink py-16 text-ink-foreground">
           <div className="mx-auto max-w-[1280px] px-6 lg:px-10">
             <span className="font-mono text-xs uppercase tracking-[0.2em] text-system">

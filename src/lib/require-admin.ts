@@ -1,10 +1,5 @@
-import { redirect } from "next/navigation";
-import { auth } from "@/auth";
+import { requireRole } from "@/lib/require-role";
 
 export async function requireAdmin() {
-  const session = await auth();
-  if (!session?.user || session.user.role !== "ADMIN") {
-    redirect("/");
-  }
-  return session;
+  return requireRole(["ADMIN"]);
 }

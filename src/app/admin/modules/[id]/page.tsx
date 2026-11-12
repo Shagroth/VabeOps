@@ -45,7 +45,7 @@ export default async function EditModulePage({
   const boundUpdate = updateModule.bind(null, mod.id);
 
   return (
-    <WorkspaceShell active="admin" email={session.user.email ?? ""} isAdmin>
+    <WorkspaceShell active="admin" email={session.user.email ?? ""} canAccessStudio>
     <div className="mx-auto flex max-w-[860px] flex-col gap-10">
       <section>
         <h1 className="mb-6 text-2xl font-semibold">Неделя {mod.weekNumber} · {mod.title}</h1>

@@ -4,8 +4,10 @@ import { useState, useTransition } from "react";
 import { updateMyProfile } from "@/app/stream/actions";
 
 export function ParticipantProfileForm({
+  cohortId,
   initial,
 }: {
+  cohortId: string;
   initial: { doingNow: string; exploring: string; canHelpWith: string };
 }) {
   const [saved, setSaved] = useState(false);
@@ -15,7 +17,7 @@ export function ParticipantProfileForm({
     <form
       action={(formData) => {
         startTransition(async () => {
-          await updateMyProfile(formData);
+          await updateMyProfile(cohortId, formData);
           setSaved(true);
         });
       }}

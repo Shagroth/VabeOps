@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import Link from "next/link";
 import { Header } from "@/components/landing/Header";
@@ -9,6 +10,23 @@ import { RECORDINGS, getRecordingBySlug } from "@/content/recordings";
 
 export function generateStaticParams() {
   return [...EVENTS.map((e) => ({ slug: e.slug })), ...RECORDINGS.map((r) => ({ slug: r.slug }))];
+}
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ slug: string }>;
+}): Promise<Metadata> {
+  const { slug } = await params;
+  const event = getEventBySlug(slug);
+  const recording = !event ? getRecordingBySlug(slug) : undefined;
+  const item = event ?? recording;
+  if (!item) return {};
+  return {
+    title: item.title,
+    description: "description" in item ? item.description : undefined,
+    alternates: { canonical: `/events/${item.slug}` },
+  };
 }
 
 export default async function EventDetailPage({
@@ -24,7 +42,7 @@ export default async function EventDetailPage({
   return (
     <div className="flex min-h-screen flex-col bg-paper text-graphite">
       <Header />
-      <main className="flex-1">
+      <main id="main-content" className="flex-1">
         <section className="mx-auto max-w-[920px] px-6 py-16 lg:px-10">
           <Link href="/events" className="text-sm text-graphite-muted hover:text-graphite">
             ← Все мероприятия

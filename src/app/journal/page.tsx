@@ -4,7 +4,7 @@ import { Footer } from "@/components/landing/Footer";
 import { JournalCard } from "@/components/cards/JournalCard";
 import { JOURNAL, getFeaturedJournal, type JournalCategory } from "@/content/journal";
 
-export const metadata = { title: "Журнал — Vibe Ops" };
+export const metadata = { title: "Журнал" };
 
 const CATEGORIES: JournalCategory[] = [
   "Инженерные заметки",
@@ -28,7 +28,7 @@ export default async function JournalPage({
   return (
     <div className="flex min-h-screen flex-col bg-paper text-graphite">
       <Header />
-      <main className="flex-1">
+      <main id="main-content" className="flex-1">
         <section className="bg-ink py-16 text-ink-foreground">
           <div className="mx-auto max-w-[1280px] px-6 lg:px-10">
             <span className="font-mono text-xs uppercase tracking-[0.2em] text-copper">

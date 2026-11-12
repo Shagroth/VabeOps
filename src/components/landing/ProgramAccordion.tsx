@@ -23,6 +23,7 @@ export function ProgramAccordion({ weeks }: { weeks: Week[] }) {
               type="button"
               onClick={() => setOpenWeek(isOpen ? null : w.n)}
               aria-expanded={isOpen}
+              aria-controls={`week-${w.n}-panel`}
               className="flex w-full items-start gap-6 py-6 text-left"
             >
               <span className="font-mono text-sm text-graphite-muted">
@@ -44,6 +45,7 @@ export function ProgramAccordion({ weeks }: { weeks: Week[] }) {
             </button>
 
             <div
+              id={`week-${w.n}-panel`}
               className="grid transition-[grid-template-rows] duration-300 ease-out"
               style={{ gridTemplateRows: isOpen ? "1fr" : "0fr" }}
             >

@@ -24,7 +24,7 @@ export default function PreviewPracticePage() {
     <WorkspaceShell
       active="program"
       email="preview@example.test"
-      isAdmin={false}
+      canAccessStudio={false}
       breadcrumb="Неделя 1 · Agentic mindset"
     >
       <div className="mx-auto flex max-w-[820px] flex-col gap-8">

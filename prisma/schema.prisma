@@ -6,9 +6,36 @@ datasource db {
   provider = "postgresql"
 }
 
+// ADMIN: full access. EDITOR: editorial review + publish, no cohort ops.
+// AUTHOR: owns and edits their own courses/articles/signals/comics.
+// MENTOR: cohort feedback/comments, no publication rights. STUDENT: learner.
 enum Role {
   STUDENT
   ADMIN
+  EDITOR
+  AUTHOR
+  MENTOR
+}
+
+// Shared editorial workflow status for Course/Article/Signal/ComicEpisode.
+enum PublicationStatus {
+  DRAFT
+  IN_REVIEW
+  PUBLISHED
+  ARCHIVED
+}
+
+// Only ENGINEERING is ever published publicly today. DESIGN exists so the
+// schema doesn't need a migration the day a design track becomes real —
+// nothing currently sets or displays it.
+enum Track {
+  ENGINEERING
+  DESIGN
+}
+
+enum SignalKind {
+  ORIGINAL
+  EXTERNAL
 }
 
 enum Level {
@@ -50,7 +77,142 @@ model User {
   submissionFeedback SubmissionFeedback[]
   moduleComments     ModuleComment[]
 
+  authorProfile  AuthorProfile?
+  courseAuthorOf CourseAuthor[]
+  articles       Article[]
+  signals        Signal[]
+  comicEpisodes  ComicEpisode[]
+
   createdAt DateTime @default(now())
+}
+
+// Public editorial bio, separate from the auth-facing User row. One per
+// author User; `isDemo` must stay true (and visibly labeled in the UI)
+// until a real author profile replaces it before public launch.
+model AuthorProfile {
+  id          String   @id @default(cuid())
+  userId      String   @unique
+  displayName String
+  title       String
+  bio         String   @db.Text
+  isDemo      Boolean  @default(false)
+  avatarGlyph String   @default("AU")
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+// A public course (e.g. the free demo course) managed through Studio.
+// Distinct from the cohort's Cohort/Module pair, which has its own
+// enrollment-based lifecycle — deliberately not merged into one entity.
+model Course {
+  id          String            @id @default(cuid())
+  slug        String            @unique
+  title       String
+  dek         String            @db.Text
+  track       Track             @default(ENGINEERING)
+  status      PublicationStatus @default(DRAFT)
+  isFree      Boolean           @default(true)
+  createdAt   DateTime          @default(now())
+  updatedAt   DateTime          @updatedAt
+  publishedAt DateTime?
+
+  lessons       Lesson[]
+  authors       CourseAuthor[]
+  relatedArticles Article[] @relation("CourseArticles")
+}
+
+model Lesson {
+  id        String @id @default(cuid())
+  courseId  String
+  order     Int
+  title     String
+  summary   String @db.Text
+  contentMd String @db.Text
+
+  course Course @relation(fields: [courseId], references: [id], onDelete: Cascade)
+
+  @@unique([courseId, order])
+}
+
+// Ownership join table — a course can have more than one author.
+model CourseAuthor {
+  id       String @id @default(cuid())
+  courseId String
+  userId   String
+
+  course Course @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([courseId, userId])
+}
+
+model Article {
+  id          String            @id @default(cuid())
+  slug        String            @unique
+  title       String
+  dek         String            @db.Text
+  bodyMd      String            @db.Text
+  category    String
+  track       Track             @default(ENGINEERING)
+  level       Level?
+  readMinutes Int               @default(5)
+  status      PublicationStatus @default(DRAFT)
+  authorId    String
+  createdAt   DateTime          @default(now())
+  updatedAt   DateTime          @updatedAt
+  publishedAt DateTime?
+
+  author         User     @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  relatedCourses Course[] @relation("CourseArticles")
+}
+
+model Signal {
+  id           String            @id @default(cuid())
+  slug         String            @unique
+  title        String
+  summary      String            @db.Text
+  whyItMatters String            @db.Text
+  kind         SignalKind
+  sourceUrl    String?
+  tags         String[]
+  status       PublicationStatus @default(DRAFT)
+  authorId     String
+  createdAt    DateTime          @default(now())
+  updatedAt    DateTime          @updatedAt
+  publishedAt  DateTime?
+
+  author User @relation(fields: [authorId], references: [id], onDelete: Cascade)
+}
+
+model ComicSeries {
+  id          String @id @default(cuid())
+  slug        String @unique
+  title       String
+  description String @db.Text
+
+  episodes ComicEpisode[]
+}
+
+model ComicEpisode {
+  id          String            @id @default(cuid())
+  seriesId    String
+  slug        String
+  order       Int
+  title       String
+  summary     String            @db.Text
+  panels      Json
+  status      PublicationStatus @default(DRAFT)
+  authorId    String
+  createdAt   DateTime          @default(now())
+  updatedAt   DateTime          @updatedAt
+  publishedAt DateTime?
+
+  series ComicSeries @relation(fields: [seriesId], references: [id], onDelete: Cascade)
+  author User        @relation(fields: [authorId], references: [id], onDelete: Cascade)
+
+  @@unique([seriesId, slug])
 }
 
 model Account {
@@ -227,13 +389,16 @@ model FeedbackResponse {
 }
 
 model Application {
-  id         String             @id @default(cuid())
+  id         String            @id @default(cuid())
   name       String
   email      String
-  experience String             @db.Text
-  workGoal   String             @db.Text
-  status     ApplicationStatus  @default(PENDING)
-  createdAt  DateTime           @default(now())
+  experience String            @db.Text
+  workGoal   String            @db.Text
+  status     ApplicationStatus @default(PENDING)
+  // Explicit consent checkbox on the public form — required at submit time
+  // (see apply/actions.ts), stored so there's a record consent was given.
+  consent    Boolean           @default(false)
+  createdAt  DateTime          @default(now())
 }
 
 model LiveSession {

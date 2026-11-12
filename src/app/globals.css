@@ -2,7 +2,7 @@
 @plugin "@tailwindcss/typography";
 
 /*
- * SIGNAL / SYSTEM — the one Vibe Ops visual system, shared by the public
+ * SIGNAL / SYSTEM — the one VabeOps visual system, shared by the public
  * landing and the workspace (see VIBE_OPS visual-first redesign mandate).
  * `warn` is a semantic state color (needs-revision / changed-conditions),
  * not a brand accent — kept separate from signal/system on purpose.

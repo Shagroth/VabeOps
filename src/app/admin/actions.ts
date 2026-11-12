@@ -3,6 +3,7 @@
 import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
 import { requireAdmin } from "@/lib/require-admin";
+import { requireRole } from "@/lib/require-role";
 import { prisma } from "@/lib/prisma";
 
 function readModuleFields(formData: FormData) {
@@ -83,7 +84,9 @@ export async function reviewSubmission(
   status: "ACCEPTED" | "NEEDS_REVISION",
   feedbackText: string
 ) {
-  const session = await requireAdmin();
+  // Mentor feedback on cohort work is explicitly in-scope for MENTOR
+  // (brief §2/§9) even though mentors don't manage publications.
+  const session = await requireRole(["ADMIN", "MENTOR"]);
 
   await prisma.submission.update({ where: { id: submissionId }, data: { status } });
 

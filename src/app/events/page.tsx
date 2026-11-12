@@ -5,13 +5,13 @@ import { RecordingCard } from "@/components/cards/RecordingCard";
 import { EVENTS } from "@/content/events";
 import { RECORDINGS } from "@/content/recordings";
 
-export const metadata = { title: "Мероприятия — Vibe Ops" };
+export const metadata = { title: "Мероприятия" };
 
 export default function EventsPage() {
   return (
     <div className="flex min-h-screen flex-col bg-paper text-graphite">
       <Header />
-      <main className="flex-1">
+      <main id="main-content" className="flex-1">
         <section className="bg-ink py-16 text-ink-foreground">
           <div className="mx-auto max-w-[1280px] px-6 lg:px-10">
             <span className="font-mono text-xs uppercase tracking-[0.2em] text-system">
