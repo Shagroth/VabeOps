@@ -136,16 +136,61 @@ export function WorkspaceShell({
           </svg>
           <span className="text-sm font-medium">VabeOps</span>
         </Link>
-        <nav className="flex gap-1 text-xs">
-          {NAV.map((item) => (
-            <NavLink
-              key={item.key}
-              item={item}
-              active={active === item.key}
-              className="rounded-md px-2.5 py-1.5 transition-colors duration-150"
-            />
-          ))}
-        </nav>
+        <div className="flex items-center gap-1 text-xs">
+          <nav className="flex gap-1">
+            {NAV.map((item) => (
+              <NavLink
+                key={item.key}
+                item={item}
+                active={active === item.key}
+                className="rounded-md px-2.5 py-1.5 transition-colors duration-150"
+              />
+            ))}
+          </nav>
+          {/* Sign-out, Studio and the review queue live in the desktop sidebar's
+              bottom section; the mobile bar has no room for them inline, so
+              they go behind this disclosure instead of becoming unreachable. */}
+          <details className="relative">
+            <summary className="list-none rounded-md px-2.5 py-1.5 text-graphite-muted transition-colors duration-150 hover:bg-black/5 hover:text-graphite [&::-webkit-details-marker]:hidden">
+              Ещё
+            </summary>
+            <div className="absolute right-0 top-full z-30 mt-1 flex w-48 flex-col gap-1 rounded-lg border border-hairline bg-paper p-2 text-sm shadow-lg">
+              {canReviewSubmissions && (
+                <Link
+                  href="/admin/review"
+                  className="rounded-md px-2 py-1.5 text-graphite-muted transition-colors duration-150 hover:bg-black/5 hover:text-graphite"
+                >
+                  На проверке
+                </Link>
+              )}
+              {canAccessStudio && (
+                <Link
+                  href="/studio"
+                  className="rounded-md px-2 py-1.5 text-graphite-muted transition-colors duration-150 hover:bg-black/5 hover:text-graphite"
+                >
+                  Studio
+                </Link>
+              )}
+              <div className="truncate border-t border-hairline px-2 pt-1.5 text-xs text-graphite-muted">
+                {email}
+              </div>
+              <form
+                action={async () => {
+                  "use server";
+                  const { signOut } = await import("@/auth");
+                  await signOut();
+                }}
+              >
+                <button
+                  type="submit"
+                  className="w-full rounded-md px-2 py-1.5 text-left text-graphite-muted transition-colors duration-150 hover:bg-black/5 hover:text-graphite"
+                >
+                  Выйти
+                </button>
+              </form>
+            </div>
+          </details>
+        </div>
       </div>
 
       <main id="main-content" className="min-h-screen flex-1 px-5 pb-16 pt-20 lg:px-10 lg:pt-0">
