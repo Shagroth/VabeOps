@@ -1,7 +1,7 @@
 import { requireAdmin } from "@/lib/require-admin";
 import { prisma } from "@/lib/prisma";
 import { WorkspaceShell } from "@/components/WorkspaceShell";
-import { enrollParticipant, setApplicationStatus } from "../actions";
+import { setApplicationStatus } from "../actions";
 
 const STATUS_LABEL: Record<string, string> = {
   PENDING: "Новая",
@@ -15,15 +15,15 @@ export default async function ApplicationsPage() {
   const applications = await prisma.application.findMany({
     orderBy: { createdAt: "desc" },
   });
-  const cohorts = await prisma.cohort.findMany({
-    orderBy: { startDate: "desc" },
-    select: { id: true, name: true },
+
+  const usersWithEnrollment = await prisma.user.findMany({
+    where: {
+      email: { in: applications.map((a) => a.email) },
+      enrollments: { some: {} },
+    },
+    select: { email: true },
   });
-  const enrolledEmails = new Set(
-    (
-      await prisma.enrollment.findMany({ select: { user: { select: { email: true } } } })
-    ).map((e) => e.user.email.toLowerCase())
-  );
+  const hasAccess = new Set(usersWithEnrollment.map((u) => u.email));
 
   return (
     <WorkspaceShell active="admin" email={session.user.email ?? ""} canAccessStudio canReviewSubmissions>
@@ -52,34 +52,21 @@ export default async function ApplicationsPage() {
                 <span className="text-black/50">Цель: </span>
                 {a.workGoal}
               </p>
-              {a.status === "ACCEPTED" &&
-                (enrolledEmails.has(a.email.toLowerCase()) ? (
-                  <p className="text-xs text-black/50">Зачислен(а) в когорту ✓</p>
-                ) : cohorts.length === 0 ? (
-                  <p className="text-xs text-black/50">Создай когорту в /admin, чтобы зачислить.</p>
-                ) : (
-                  <form action={enrollParticipant} className="flex flex-wrap gap-2 text-sm">
-                    <input type="hidden" name="email" value={a.email} />
-                    <input type="hidden" name="name" value={a.name} />
-                    <select name="cohortId" className="rounded border border-black/15 p-1">
-                      {cohorts.map((c) => (
-                        <option key={c.id} value={c.id}>
-                          {c.name}
-                        </option>
-                      ))}
-                    </select>
-                    <select name="level" defaultValue="NOVICE" className="rounded border border-black/15 p-1">
-                      <option value="NOVICE">новичок</option>
-                      <option value="STRONG">сильный</option>
-                    </select>
-                    <button type="submit" className="rounded border border-black/15 px-3 py-1">
-                      Зачислить
-                    </button>
-                  </form>
-                ))}
               {a.status === "PENDING" && (
-                <div className="flex gap-2">
-                  <form action={accept}>
+                <div className="flex items-center gap-2">
+                  <form action={accept} className="flex items-center gap-2">
+                    <select
+                      name="level"
+                      required
+                      defaultValue=""
+                      className="rounded border border-black/15 px-2 py-1 text-sm"
+                    >
+                      <option value="" disabled>
+                        Уровень…
+                      </option>
+                      <option value="NOVICE">Новичок</option>
+                      <option value="STRONG">Уверенный</option>
+                    </select>
                     <button
                       type="submit"
                       className="rounded border border-black/15 px-3 py-1 text-sm"
@@ -95,6 +82,40 @@ export default async function ApplicationsPage() {
                       Отклонить
                     </button>
                   </form>
+                </div>
+              )}
+              {a.status === "ACCEPTED" && hasAccess.has(a.email) && (
+                <p className="text-xs text-black/50">
+                  Принят(а) — аккаунт и доступ к когорте созданы, письмо со ссылкой на вход
+                  отправлено.
+                </p>
+              )}
+              {a.status === "ACCEPTED" && !hasAccess.has(a.email) && (
+                <div className="flex items-center gap-2">
+                  <form action={accept} className="flex items-center gap-2">
+                    <select
+                      name="level"
+                      required
+                      defaultValue=""
+                      className="rounded border border-black/15 px-2 py-1 text-sm"
+                    >
+                      <option value="" disabled>
+                        Уровень…
+                      </option>
+                      <option value="NOVICE">Новичок</option>
+                      <option value="STRONG">Уверенный</option>
+                    </select>
+                    <button
+                      type="submit"
+                      className="rounded border border-amber-600/40 px-3 py-1 text-sm text-amber-700"
+                    >
+                      Выдать доступ
+                    </button>
+                  </form>
+                  <p className="text-xs text-black/50">
+                    Принят(а) раньше, но без аккаунта/когорты/письма — выбери уровень и выдай
+                    доступ.
+                  </p>
                 </div>
               )}
             </li>

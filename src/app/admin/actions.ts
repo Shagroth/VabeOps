@@ -15,6 +15,7 @@ import { sendNotifyEmail } from "@/lib/notify-email";
 import { buildFeedbackNotifyEmail } from "@/lib/notify-templates";
 import { parseScores, totalMaxScore } from "@/lib/homework-scoring";
 import { HOMEWORK_SCORING, HOMEWORK_PASS_SCORE } from "@/content/demo-course-homework";
+import { signIn } from "@/auth";
 
 function readModuleFields(formData: FormData) {
   return {
@@ -181,13 +182,71 @@ export async function reviewSubmission(
   }
 }
 
+/**
+ * Accepting an application used to be a single status flag flip with no
+ * downstream effect — no account, no cohort access, no notification.
+ * This now actually provisions access: creates the User if they don't
+ * have one yet (role STUDENT), enrolls them in the (currently single)
+ * cohort at the level the admin picked, and sends them a real sign-in
+ * link via the existing magic-link pipeline — not a separate "welcome"
+ * template, the same email a normal self-service sign-in would send.
+ *
+ * The provisioning gate is "does this email already have an
+ * enrollment," not "did the status field just transition." That matters
+ * for applications that were already marked ACCEPTED before this
+ * existed — re-running Accept on those grants access retroactively
+ * instead of being a permanent no-op. Re-running Accept on an
+ * application that already has access is a safe no-op (no duplicate
+ * user/enrollment, no duplicate email).
+ */
 export async function setApplicationStatus(
   applicationId: string,
-  status: "ACCEPTED" | "REJECTED"
+  status: "ACCEPTED" | "REJECTED",
+  formData?: FormData
 ) {
   await requireAdmin();
+
+  const application = await prisma.application.findUniqueOrThrow({
+    where: { id: applicationId },
+  });
+
   await prisma.application.update({ where: { id: applicationId }, data: { status } });
+
+  if (status === "ACCEPTED") {
+    const existingUser = await prisma.user.findUnique({ where: { email: application.email } });
+    const alreadyEnrolled = existingUser
+      ? await prisma.enrollment.findFirst({ where: { userId: existingUser.id } })
+      : null;
+
+    if (!alreadyEnrolled) {
+      const level = String(formData?.get("level") ?? "");
+      if (level !== "NOVICE" && level !== "STRONG") {
+        throw new Error("Выбери уровень (новичок/уверенный) перед тем, как принять заявку.");
+      }
+
+      // Single-cohort assumption for the current pilot — see
+      // docs/production-readiness.md backlog for picking a cohort
+      // explicitly once there's more than one.
+      const cohort = await prisma.cohort.findFirst({ orderBy: { startDate: "desc" } });
+      if (!cohort) {
+        throw new Error("Нет ни одной когорты — сначала создай когорту, потом принимай заявки.");
+      }
+
+      const user =
+        existingUser ??
+        (await prisma.user.create({ data: { email: application.email, role: "STUDENT" } }));
+
+      await prisma.enrollment.create({ data: { userId: user.id, cohortId: cohort.id, level } });
+
+      // redirect: false — this is the ADMIN's own request; without it,
+      // signIn() would redirect the admin's browser to
+      // /auth/check-email, a page meant for the applicant, not them.
+      await signIn("resend", { email: application.email, redirect: false });
+    }
+  }
+
   revalidatePath("/admin/applications");
+  revalidatePath("/admin");
 }
 
 /**
