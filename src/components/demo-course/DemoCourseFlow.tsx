@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState } from "react";
+import Link from "next/link";
 import {
   AGENT_PLAN,
   CONTRACT_FIELDS,
@@ -286,7 +287,7 @@ export function DemoCourseFlow() {
             </button>
           </div>
 
-          <main className="flex-1 px-5 py-8 sm:px-8 sm:py-10 xl:px-12 xl:py-12">
+          <div className="flex-1 px-5 py-8 sm:px-8 sm:py-10 xl:px-12 xl:py-12">
             <div className="mx-auto max-w-[920px]">
               {state.step === 0 && (
                 <Lesson
@@ -644,6 +645,14 @@ export function DemoCourseFlow() {
                         <div className="rounded-2xl border border-signal/50 bg-signal/10 p-5">
                           <span className="font-mono text-[10px] uppercase tracking-wide text-signal-ink">Модуль завершён</span>
                           <p className="mt-2 text-sm text-graphite-muted">Артефакт сохранён в браузере. Следующий модуль — контекст, Skills и саб-агенты.</p>
+                          <div className="mt-4 flex flex-wrap gap-3">
+                            <Link href="/demo-course/2" className="rounded-lg bg-ink px-4 py-2 text-xs font-medium text-ink-foreground">
+                              К модулю 2 →
+                            </Link>
+                            <Link href="/demo-course" className="px-2 py-2 text-xs text-graphite-muted underline underline-offset-4">
+                              Вся программа
+                            </Link>
+                          </div>
                         </div>
                       ) : (
                         <button
@@ -659,7 +668,7 @@ export function DemoCourseFlow() {
                 </Lesson>
               )}
             </div>
-          </main>
+          </div>
 
           <footer className="border-t border-hairline bg-white/40 px-5 py-4 sm:px-8">
             <div className="mx-auto flex max-w-[920px] items-center justify-between gap-4">
