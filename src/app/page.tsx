@@ -2,7 +2,7 @@ import Link from "next/link";
 import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
 import { WorkspaceShell } from "@/components/WorkspaceShell";
-import { canAccessStudio } from "@/lib/require-role";
+import { canAccessStudio, canReviewSubmissions } from "@/lib/require-role";
 import { SubmissionStatusBadge } from "@/components/SubmissionStatusBadge";
 import { PublicLanding } from "@/components/landing/PublicLanding";
 import { CourseCard } from "@/components/cards/CourseCard";
@@ -11,6 +11,7 @@ import { JournalCard } from "@/components/cards/JournalCard";
 import { MINI_COURSES } from "@/content/courses";
 import { EVENTS } from "@/content/events";
 import { getFeaturedJournal } from "@/content/journal";
+import { pickNextStep } from "@/lib/next-step";
 
 const TYPE_LABEL: Record<string, string> = {
   KICKOFF: "Кикофф",
@@ -27,6 +28,7 @@ export default async function Home() {
 
   const isAdmin = session.user.role === "ADMIN";
   const studioAccess = canAccessStudio(session.user.role);
+  const reviewAccess = canReviewSubmissions(session.user.role);
 
   // See stream/page.tsx for why this orders explicitly by cohort start
   // date instead of trusting an arbitrary `findFirst` row.
@@ -49,7 +51,7 @@ export default async function Home() {
     const featured = getFeaturedJournal();
 
     return (
-      <WorkspaceShell active="overview" email={session.user.email ?? ""} canAccessStudio={studioAccess}>
+      <WorkspaceShell active="overview" email={session.user.email ?? ""} canAccessStudio={studioAccess} canReviewSubmissions={reviewAccess}>
         <div className="mx-auto flex max-w-[1080px] flex-col gap-10">
           <div className="rounded-2xl border border-hairline bg-white/40 px-6 py-12 text-center sm:px-10">
             <svg viewBox="0 0 160 80" className="mx-auto h-14 w-28 opacity-70" fill="none" aria-hidden="true">
@@ -119,7 +121,6 @@ export default async function Home() {
   }
 
   const modules = enrollment.cohort.modules;
-  const openModules = modules.filter((m) => m.isOpen);
 
   const submissions = await prisma.submission.findMany({
     where: { userId: session.user.id, moduleId: { in: modules.map((m) => m.id) } },
@@ -127,7 +128,8 @@ export default async function Home() {
   });
   const statusByModule = new Map(submissions.map((s) => [s.moduleId, s.status]));
 
-  const nextModule = openModules.find((m) => !statusByModule.has(m.id));
+  const nextStep = pickNextStep(modules, statusByModule);
+  const me = await prisma.user.findUnique({ where: { id: session.user.id }, select: { name: true } });
   const now = new Date();
   const nextSession = enrollment.cohort.liveSessions.find((ls) => ls.scheduledAt > now);
 
@@ -136,6 +138,7 @@ export default async function Home() {
       active="overview"
       email={session.user.email ?? ""}
       canAccessStudio={studioAccess}
+      canReviewSubmissions={reviewAccess}
       breadcrumb={enrollment.cohort.name}
     >
       <div className="mx-auto flex max-w-[860px] flex-col gap-8">
@@ -144,28 +147,54 @@ export default async function Home() {
           <p className="text-sm text-graphite-muted">Обзор твоего прогресса в пилоте</p>
         </div>
 
-        {openModules.length === 0 ? (
+        {!me?.name && (
+          <Link
+            href="/stream"
+            className="rounded-xl border border-accent-change/40 bg-accent-change/[0.05] p-4 text-sm transition-colors duration-150 hover:bg-white"
+          >
+            <span className="font-medium">Представься группе.</span>{" "}
+            <span className="text-graphite-muted">
+              Укажи имя и пару строк о себе в «Потоке» — так тебя увидят остальные участники (email им не показывается) →
+            </span>
+          </Link>
+        )}
+
+        {nextStep.kind === "no-open-weeks" ? (
           <p className="rounded-xl border border-hairline bg-white/40 p-6 text-sm text-graphite-muted">
             Курс скоро начнётся — пока нет открытых недель.
           </p>
-        ) : nextModule ? (
+        ) : nextStep.kind === "revision" ? (
           <Link
-            href={`/modules/${nextModule.id}`}
-            className="rounded-xl border border-hairline bg-white/60 p-6 transition-colors duration-150 hover:bg-white"
+            href={`/modules/${nextStep.week.id}#submission`}
+            className="rounded-xl border border-accent-change/50 bg-white/60 p-6 transition-colors duration-150 hover:bg-white"
           >
-            <span className="text-xs uppercase tracking-wide text-graphite-muted">
-              Следующий шаг
-            </span>
+            <span className="text-xs uppercase tracking-wide text-graphite-muted">Следующий шаг</span>
             <div className="mt-1 text-lg font-medium">
-              Неделя {nextModule.weekNumber} · {nextModule.title}
+              Неделя {nextStep.week.weekNumber} · {nextStep.week.title}
             </div>
             <div className="text-sm text-graphite-muted">
-              Открыта, но ты ещё не сдал(а) практику — продолжить →
+              Автор оставил комментарий к твоей сдаче — загляни и отправь новую версию, когда будет время →
+            </div>
+          </Link>
+        ) : nextStep.kind === "start" ? (
+          <Link
+            href={`/modules/${nextStep.week.id}`}
+            className="rounded-xl border border-hairline bg-white/60 p-6 transition-colors duration-150 hover:bg-white"
+          >
+            <span className="text-xs uppercase tracking-wide text-graphite-muted">Следующий шаг</span>
+            <div className="mt-1 text-lg font-medium">
+              Неделя {nextStep.week.weekNumber} · {nextStep.week.title}
+            </div>
+            <div className="text-sm text-graphite-muted">
+              Неделя открыта: урок, лаборатория и домашняя работа. Продолжай в своём темпе →
             </div>
           </Link>
         ) : (
           <p className="rounded-xl border border-signal/40 bg-signal/10 p-6 text-sm text-graphite">
-            Все открытые недели сданы. Ждём, когда откроется следующая.
+            Все открытые недели сданы.{" "}
+            {nextStep.nextClosedWeek
+              ? `Следующей откроется неделя ${nextStep.nextClosedWeek.weekNumber} · ${nextStep.nextClosedWeek.title}.`
+              : "Это была последняя неделя программы — до встречи на финальном созвоне."}
           </p>
         )}
 

@@ -6,6 +6,7 @@ import {
   formatMinutes,
 } from "@/content/demo-course-program";
 import { HOMEWORK_ASSIGNMENTS, formatHomeworkTime } from "@/content/demo-course-homework";
+import { isPublicDemoModule } from "@/content/demo-access";
 
 const TOTAL_MIN = PROGRAM_TOTALS.guidedMin + PROGRAM_TOTALS.practiceMin;
 const TOTAL_MAX = PROGRAM_TOTALS.guidedMax + PROGRAM_TOTALS.practiceMax;
@@ -30,7 +31,7 @@ export function CourseProgramOverview() {
                 <Link href="/demo-course/1" className="rounded-xl bg-ink px-5 py-3 text-sm font-medium text-ink-foreground transition-transform hover:scale-[1.02]">
                   Начать с первого модуля →
                 </Link>
-                <span className="text-xs text-graphite-muted">Без регистрации · первый результат за 45–60 минут</span>
+                <span className="text-xs text-graphite-muted">Модули 1–2 без регистрации · первый результат за 45–60 минут</span>
               </div>
             </div>
 
@@ -92,6 +93,9 @@ export function CourseProgramOverview() {
                 </div>
                 <div className="p-5 sm:p-6">
                   <span className="font-mono text-[9px] uppercase tracking-[0.18em] text-system">Неделя {module.number}</span>
+                  {!isPublicDemoModule(module.number) && (
+                    <span className="ml-2 rounded-full bg-[#e7e9e2] px-2 py-0.5 font-mono text-[8px] uppercase text-graphite-muted">для участников пилота</span>
+                  )}
                   <h3 className="mt-2 text-xl font-semibold tracking-tight sm:text-2xl">{module.title}</h3>
                   <p className="mt-2 max-w-[62ch] text-sm leading-relaxed text-graphite-muted">{module.dek}</p>
                 </div>
@@ -128,14 +132,14 @@ export function CourseProgramOverview() {
 
           <div className="mt-9 grid gap-3 md:grid-cols-2 xl:grid-cols-5">
             {HOMEWORK_ASSIGNMENTS.map((assignment, index) => (
-              <a key={assignment.moduleNumber} href={`/demo-course/${assignment.moduleNumber}#homework`} className={`group flex min-h-[210px] flex-col rounded-2xl border border-hairline bg-white/65 p-5 transition-all hover:-translate-y-0.5 hover:border-system/45 hover:bg-white ${index === HOMEWORK_ASSIGNMENTS.length - 1 ? "md:col-span-2 xl:col-span-1" : ""}`}>
+              <a key={assignment.moduleNumber} href={isPublicDemoModule(assignment.moduleNumber) ? `/demo-course/${assignment.moduleNumber}#homework` : `/demo-course/${assignment.moduleNumber}`} className={`group flex min-h-[210px] flex-col rounded-2xl border border-hairline bg-white/65 p-5 transition-all hover:-translate-y-0.5 hover:border-system/45 hover:bg-white ${index === HOMEWORK_ASSIGNMENTS.length - 1 ? "md:col-span-2 xl:col-span-1" : ""}`}>
                 <div className="flex items-center justify-between gap-3">
                   <span className="font-mono text-xs text-system">0{assignment.moduleNumber}</span>
                   <span className="rounded-full bg-[#e7e9e2] px-2 py-1 font-mono text-[8px] uppercase text-graphite-muted">{formatHomeworkTime(assignment.estimatedMinutes)}</span>
                 </div>
                 <h3 className="mt-5 text-lg font-medium leading-snug">{assignment.shortTitle}</h3>
                 <p className="mt-3 text-xs leading-relaxed text-graphite-muted">{assignment.outcome}</p>
-                <span className="mt-auto pt-5 text-sm transition-transform group-hover:translate-x-1">Открыть ТЗ →</span>
+                <span className="mt-auto pt-5 text-sm transition-transform group-hover:translate-x-1">{isPublicDemoModule(assignment.moduleNumber) ? "Открыть ТЗ →" : "Для участников пилота →"}</span>
               </a>
             ))}
           </div>

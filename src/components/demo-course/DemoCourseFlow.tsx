@@ -18,6 +18,7 @@ import {
   type AgentContract,
   type ContractKey,
 } from "@/content/demo-course";
+import { sendArtifactToSubmission, type WorkspaceFlowLinks } from "@/lib/artifact-bridge";
 
 const STORAGE_KEY = "vabeops-module-contract-v2";
 const LAST_STEP = MODULE_STEPS.length - 1;
@@ -76,7 +77,10 @@ function loadState(): CourseState {
   }
 }
 
-export function DemoCourseFlow() {
+export function DemoCourseFlow({ workspace }: { workspace?: WorkspaceFlowLinks } = {}) {
+  const nextHref = workspace ? workspace.nextHref : "/demo-course/2";
+  const nextLabel = workspace ? workspace.nextLabel ?? "К следующей неделе →" : "К модулю 2 →";
+  const overviewHref = workspace ? workspace.overviewHref : "/demo-course";
   const [state, setState] = useState<CourseState>(INITIAL_STATE);
   const [hydrated, setHydrated] = useState(false);
   const [copyState, setCopyState] = useState<"idle" | "copied" | "failed">("idle");
@@ -639,6 +643,11 @@ export function DemoCourseFlow() {
                         <button type="button" onClick={downloadContract} className="rounded-xl border border-hairline bg-white/70 px-4 py-3 text-sm font-medium">
                           Скачать .md
                         </button>
+                        {workspace && (
+                          <button type="button" onClick={() => sendArtifactToSubmission(contractText)} className="rounded-xl border border-system/40 bg-system/[0.06] px-4 py-3 text-sm font-medium sm:col-span-2 xl:col-span-1">
+                            Перенести в сдачу ↓
+                          </button>
+                        )}
                       </div>
 
                       {state.finished ? (
@@ -646,10 +655,12 @@ export function DemoCourseFlow() {
                           <span className="font-mono text-[10px] uppercase tracking-wide text-signal-ink">Модуль завершён</span>
                           <p className="mt-2 text-sm text-graphite-muted">Артефакт сохранён. Следующий модуль — как давать модели достаточно контекста, не вываливая на неё цифровой чердак.</p>
                           <div className="mt-4 flex flex-wrap gap-3">
-                            <Link href="/demo-course/2" className="rounded-lg bg-ink px-4 py-2 text-xs font-medium text-ink-foreground">
-                              К модулю 2 →
-                            </Link>
-                            <Link href="/demo-course" className="px-2 py-2 text-xs text-graphite-muted underline underline-offset-4">
+                            {nextHref && (
+                              <Link href={nextHref} className="rounded-lg bg-ink px-4 py-2 text-xs font-medium text-ink-foreground">
+                                {nextLabel}
+                              </Link>
+                            )}
+                            <Link href={overviewHref} className="px-2 py-2 text-xs text-graphite-muted underline underline-offset-4">
                               Вся программа
                             </Link>
                           </div>

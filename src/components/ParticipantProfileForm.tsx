@@ -8,7 +8,7 @@ export function ParticipantProfileForm({
   initial,
 }: {
   cohortId: string;
-  initial: { doingNow: string; exploring: string; canHelpWith: string };
+  initial: { name: string; doingNow: string; exploring: string; canHelpWith: string };
 }) {
   const [saved, setSaved] = useState(false);
   const [isPending, startTransition] = useTransition();
@@ -24,6 +24,19 @@ export function ParticipantProfileForm({
       className="flex flex-col gap-2 rounded-lg border border-black/10 p-4 text-sm"
     >
       <span className="font-medium">Твой профиль в потоке</span>
+      <label className="flex flex-col gap-1">
+        Как тебя называть
+        <input
+          name="name"
+          defaultValue={initial.name}
+          maxLength={60}
+          required
+          placeholder="Имя, которое увидит группа"
+          onChange={() => setSaved(false)}
+          className="rounded border border-black/15 p-1.5"
+        />
+        <span className="text-xs text-black/50">Email другим участникам не показывается.</span>
+      </label>
       <label className="flex flex-col gap-1">
         Что делаю
         <input

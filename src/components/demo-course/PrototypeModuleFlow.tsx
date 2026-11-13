@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useEffect, useMemo, useRef, useState } from "react";
 import type { PrototypeModule, PrototypeStep } from "@/content/demo-course-program";
+import { sendArtifactToSubmission, type WorkspaceFlowLinks } from "@/lib/artifact-bridge";
 
 type FlowState = {
   step: number;
@@ -44,7 +45,7 @@ function formatArtifact(module: PrototypeModule, fields: Record<string, string>,
   return `# ${module.artifactName}\n\nМодуль ${String(module.number).padStart(2, "0")}: ${module.title}\n\n${sections}\n\n## Следующий шаг\n${reflection || "_Не заполнено_"}\n`;
 }
 
-export function PrototypeModuleFlow({ module }: { module: PrototypeModule }) {
+export function PrototypeModuleFlow({ module, workspace }: { module: PrototypeModule; workspace?: WorkspaceFlowLinks }) {
   const [state, setState] = useState(() => initialState(module));
   const [hydrated, setHydrated] = useState(false);
   const [copyState, setCopyState] = useState<"idle" | "copied" | "failed">("idle");
@@ -170,7 +171,7 @@ export function PrototypeModuleFlow({ module }: { module: PrototypeModule }) {
               {state.step === labIndex ? (
                 <LabLesson module={module} headingRef={heading} state={state} completed={completedFields} onField={(key, value) => setState((currentState) => ({ ...currentState, fields: { ...currentState.fields, [key]: value } }))} onExample={() => setState((currentState) => ({ ...currentState, fields: Object.fromEntries(module.labFields.map((field) => [field.key, field.example])) }))} />
               ) : state.step === artifactIndex ? (
-                <ArtifactLesson module={module} headingRef={heading} state={state} artifact={artifact} copyState={copyState} onReflection={(value) => setState((currentState) => ({ ...currentState, reflection: value }))} onCopy={copyArtifact} onDownload={downloadArtifact} onFinish={() => setState((currentState) => ({ ...currentState, finished: true }))} />
+                <ArtifactLesson module={module} headingRef={heading} state={state} artifact={artifact} copyState={copyState} onReflection={(value) => setState((currentState) => ({ ...currentState, reflection: value }))} onCopy={copyArtifact} onDownload={downloadArtifact} onFinish={() => setState((currentState) => ({ ...currentState, finished: true }))} workspace={workspace} />
               ) : (
                 <ConceptLesson step={current} headingRef={heading} answer={answer} onAnswer={(value) => setState((currentState) => ({ ...currentState, answers: { ...currentState.answers, [current.id]: value } }))} />
               )}
@@ -212,16 +213,19 @@ function LabLesson({ module, headingRef, state, completed, onField, onExample }:
   </Lesson>;
 }
 
-function ArtifactLesson({ module, headingRef, state, artifact, copyState, onReflection, onCopy, onDownload, onFinish }: { module: PrototypeModule; headingRef: React.RefObject<HTMLHeadingElement | null>; state: FlowState; artifact: string; copyState: "idle" | "copied" | "failed"; onReflection: (value: string) => void; onCopy: () => void; onDownload: () => void; onFinish: () => void }) {
+function ArtifactLesson({ module, headingRef, state, artifact, copyState, onReflection, onCopy, onDownload, onFinish, workspace }: { module: PrototypeModule; headingRef: React.RefObject<HTMLHeadingElement | null>; state: FlowState; artifact: string; copyState: "idle" | "copied" | "failed"; onReflection: (value: string) => void; onCopy: () => void; onDownload: () => void; onFinish: () => void; workspace?: WorkspaceFlowLinks }) {
   const next = module.number < 5 ? module.number + 1 : null;
+  const nextHref = workspace ? workspace.nextHref : next ? `/demo-course/${next}` : null;
+  const nextLabel = workspace ? workspace.nextLabel ?? "К следующей неделе →" : `К модулю ${next} →`;
+  const overviewHref = workspace ? workspace.overviewHref : "/demo-course";
   return <Lesson headingRef={headingRef} kicker="06 / Takeaway" title={`${module.artifactName} готов`} lead="Не полируй его в вакууме. Версия 0.1 должна встретиться с настоящей задачей, получить по зубам и стать точнее — так и рождаются рабочие инструменты.">
     <div className="grid min-w-0 gap-5 xl:grid-cols-[1.15fr_0.85fr]">
       <div className="min-w-0 overflow-hidden rounded-2xl border border-hairline bg-ink text-ink-foreground"><div className="flex items-center justify-between border-b border-hairline-ink px-4 py-3"><span className="font-mono text-[10px] text-ink-muted">{module.artifactFile}</span><span className="font-mono text-[9px] uppercase text-signal">ready</span></div><pre className="max-h-[560px] min-w-0 overflow-auto whitespace-pre-wrap break-words p-5 font-mono text-[11px] leading-relaxed text-ink-muted sm:p-6">{artifact}</pre></div>
       <div className="space-y-4">
         <div className="rounded-2xl border border-hairline bg-white/60 p-5"><span className="font-mono text-[10px] uppercase tracking-[0.18em] text-graphite-muted">Self-check / {module.rubric.length} критериев</span><ul className="mt-4 space-y-3">{module.rubric.map((item) => <li key={item} className="flex gap-3 text-xs leading-relaxed text-graphite-muted"><span className="mt-0.5 flex h-4 w-4 flex-none items-center justify-center rounded-full bg-signal text-[9px] text-signal-ink">✓</span>{item}</li>)}</ul></div>
         <label className="block rounded-2xl border border-hairline bg-white/60 p-5"><span className="text-sm font-medium">Договор с собой</span><span className="mt-1 block text-xs text-graphite-muted">На какой задаче проверишь артефакт в течение недели?</span><textarea value={state.reflection} onChange={(event) => onReflection(event.target.value)} rows={3} className="mt-4 w-full resize-y rounded-xl border border-hairline bg-[#fbfcf8] px-3 py-3 text-sm outline-none focus:border-system" placeholder="На следующей задаче я…" /></label>
-        <div className="grid gap-2 sm:grid-cols-2 xl:grid-cols-1"><button type="button" onClick={onCopy} className="rounded-xl bg-ink px-4 py-3 text-sm font-medium text-ink-foreground">{copyState === "copied" ? "Скопировано ✓" : copyState === "failed" ? "Не удалось скопировать" : "Скопировать артефакт"}</button><button type="button" onClick={onDownload} className="rounded-xl border border-hairline bg-white/70 px-4 py-3 text-sm font-medium">Скачать .md</button></div>
-        {state.finished ? <div className="rounded-2xl border border-signal/50 bg-signal/10 p-5"><span className="font-mono text-[10px] uppercase tracking-wide text-signal-ink">Модуль завершён</span><p className="mt-2 text-sm text-graphite-muted">Прогресс и артефакт сохранены в этом браузере.</p><div className="mt-4 flex flex-wrap gap-3">{next ? <Link href={`/demo-course/${next}`} className="rounded-lg bg-ink px-4 py-2 text-xs font-medium text-ink-foreground">К модулю {next} →</Link> : <Link href="/demo-course" className="rounded-lg bg-ink px-4 py-2 text-xs font-medium text-ink-foreground">К обзору курса →</Link>}<Link href="/demo-course" className="px-2 py-2 text-xs text-graphite-muted underline underline-offset-4">Вся программа</Link></div></div> : <button type="button" onClick={onFinish} className="w-full rounded-xl bg-signal px-4 py-3 text-sm font-medium text-signal-ink">Завершить модуль</button>}
+        <div className="grid gap-2 sm:grid-cols-2 xl:grid-cols-1"><button type="button" onClick={onCopy} className="rounded-xl bg-ink px-4 py-3 text-sm font-medium text-ink-foreground">{copyState === "copied" ? "Скопировано ✓" : copyState === "failed" ? "Не удалось скопировать" : "Скопировать артефакт"}</button><button type="button" onClick={onDownload} className="rounded-xl border border-hairline bg-white/70 px-4 py-3 text-sm font-medium">Скачать .md</button>{workspace && <button type="button" onClick={() => sendArtifactToSubmission(artifact)} className="rounded-xl border border-system/40 bg-system/[0.06] px-4 py-3 text-sm font-medium sm:col-span-2 xl:col-span-1">Перенести в сдачу ↓</button>}</div>
+        {state.finished ? <div className="rounded-2xl border border-signal/50 bg-signal/10 p-5"><span className="font-mono text-[10px] uppercase tracking-wide text-signal-ink">Модуль завершён</span><p className="mt-2 text-sm text-graphite-muted">Прогресс и артефакт сохранены в этом браузере.</p><div className="mt-4 flex flex-wrap gap-3">{nextHref ? <Link href={nextHref} className="rounded-lg bg-ink px-4 py-2 text-xs font-medium text-ink-foreground">{nextLabel}</Link> : <Link href={overviewHref} className="rounded-lg bg-ink px-4 py-2 text-xs font-medium text-ink-foreground">К обзору курса →</Link>}<Link href={overviewHref} className="px-2 py-2 text-xs text-graphite-muted underline underline-offset-4">Вся программа</Link></div></div> : <button type="button" onClick={onFinish} className="w-full rounded-xl bg-signal px-4 py-3 text-sm font-medium text-signal-ink">Завершить модуль</button>}
       </div>
     </div>
   </Lesson>;

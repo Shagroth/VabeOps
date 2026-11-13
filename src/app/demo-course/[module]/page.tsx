@@ -8,6 +8,8 @@ import { ModuleHero } from "@/components/demo-course/ModuleHero";
 import { PrototypeModuleFlow } from "@/components/demo-course/PrototypeModuleFlow";
 import { getHomeworkAssignment } from "@/content/demo-course-homework";
 import { MODULE_ONE_SUMMARY, PROGRAM_MODULES, getPrototypeModule } from "@/content/demo-course-program";
+import { isPublicDemoModule } from "@/content/demo-access";
+import { LockedModuleNotice } from "@/components/demo-course/LockedModuleNotice";
 
 type PageProps = { params: Promise<{ module: string }> };
 
@@ -19,6 +21,14 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   const { module: rawModule } = await params;
   const courseModule = PROGRAM_MODULES.find((item) => String(item.number) === rawModule);
   if (!courseModule) return {};
+  if (!isPublicDemoModule(courseModule.number)) {
+    return {
+      title: courseModule.title,
+      description: courseModule.dek,
+      alternates: { canonical: `/demo-course/${courseModule.number}` },
+      robots: { index: false, follow: true },
+    };
+  }
   return {
     title: courseModule.title,
     description: courseModule.dek,
@@ -50,6 +60,22 @@ export default async function DemoCourseModulePage({ params }: PageProps) {
 
   const courseModule = getPrototypeModule(moduleNumber);
   if (!courseModule) notFound();
+
+  // Modules outside the public demo set render only their summary here —
+  // the lesson flow and homework brief stay server-side and are shown in
+  // the cohort workspace (/modules/[id]) to enrolled participants.
+  if (!isPublicDemoModule(moduleNumber)) {
+    return (
+      <div className="flex min-h-screen flex-col bg-paper text-graphite">
+        <Header />
+        <main id="main-content" className="flex-1">
+          <ModuleHero mode="locked" number={courseModule.number} eyebrow={courseModule.eyebrow} title={courseModule.title} dek={courseModule.dek} result={courseModule.result} guidedMinutes={courseModule.guidedMinutes} practiceMinutes={courseModule.practiceMinutes} />
+          <LockedModuleNotice moduleNumber={courseModule.number} artifactName={courseModule.artifactName} homeworkTitle={homework.title} />
+        </main>
+        <Footer />
+      </div>
+    );
+  }
 
   return (
     <div className="flex min-h-screen flex-col bg-paper text-graphite">

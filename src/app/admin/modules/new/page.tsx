@@ -1,5 +1,6 @@
 import { requireAdmin } from "@/lib/require-admin";
 import { WorkspaceShell } from "@/components/WorkspaceShell";
+import { CourseModuleSelect } from "@/components/admin/CourseModuleSelect";
 import { createModule } from "../../actions";
 
 export default async function NewModulePage({
@@ -11,7 +12,7 @@ export default async function NewModulePage({
   const { cohortId } = await searchParams;
 
   return (
-    <WorkspaceShell active="admin" email={session.user.email ?? ""} canAccessStudio>
+    <WorkspaceShell active="admin" email={session.user.email ?? ""} canAccessStudio canReviewSubmissions>
     <div className="mx-auto max-w-[760px]">
       <h1 className="mb-6 text-2xl font-semibold">Новый модуль</h1>
       <form action={createModule} className="flex flex-col gap-4">
@@ -37,6 +38,7 @@ export default async function NewModulePage({
           <input type="checkbox" name="isOpen" defaultChecked />
           Открыт для участников
         </label>
+        <CourseModuleSelect />
         <label className="flex flex-col gap-1 text-sm">
           R2 video key (опционально)
           <input
