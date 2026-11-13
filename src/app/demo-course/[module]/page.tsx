@@ -3,8 +3,10 @@ import { notFound } from "next/navigation";
 import { Header } from "@/components/landing/Header";
 import { Footer } from "@/components/landing/Footer";
 import { DemoCourseFlow } from "@/components/demo-course/DemoCourseFlow";
+import { HomeworkAssignmentSection } from "@/components/demo-course/HomeworkAssignment";
 import { ModuleHero } from "@/components/demo-course/ModuleHero";
 import { PrototypeModuleFlow } from "@/components/demo-course/PrototypeModuleFlow";
+import { getHomeworkAssignment } from "@/content/demo-course-homework";
 import { MODULE_ONE_SUMMARY, PROGRAM_MODULES, getPrototypeModule } from "@/content/demo-course-program";
 
 type PageProps = { params: Promise<{ module: string }> };
@@ -29,6 +31,8 @@ export default async function DemoCourseModulePage({ params }: PageProps) {
   const { module: rawModule } = await params;
   const moduleNumber = Number(rawModule);
   if (!Number.isInteger(moduleNumber) || moduleNumber < 1 || moduleNumber > 5 || String(moduleNumber) !== rawModule) notFound();
+  const homework = getHomeworkAssignment(moduleNumber);
+  if (!homework) notFound();
 
   if (moduleNumber === 1) {
     return (
@@ -37,6 +41,7 @@ export default async function DemoCourseModulePage({ params }: PageProps) {
         <main id="main-content" className="flex-1">
           <ModuleHero number={MODULE_ONE_SUMMARY.number} eyebrow={MODULE_ONE_SUMMARY.eyebrow} title={MODULE_ONE_SUMMARY.title} dek={MODULE_ONE_SUMMARY.dek} result={MODULE_ONE_SUMMARY.result} guidedMinutes={MODULE_ONE_SUMMARY.guidedMinutes} practiceMinutes={MODULE_ONE_SUMMARY.practiceMinutes} />
           <section className="mx-auto max-w-[1280px] px-4 py-8 sm:px-6 lg:px-10 lg:py-12"><DemoCourseFlow /></section>
+          <HomeworkAssignmentSection assignment={homework} />
         </main>
         <Footer />
       </div>
@@ -54,6 +59,7 @@ export default async function DemoCourseModulePage({ params }: PageProps) {
         <section className="mx-auto max-w-[1280px] px-4 py-8 sm:px-6 lg:px-10 lg:py-12">
           <PrototypeModuleFlow module={courseModule} />
         </section>
+        <HomeworkAssignmentSection assignment={homework} />
       </main>
       <Footer />
     </div>

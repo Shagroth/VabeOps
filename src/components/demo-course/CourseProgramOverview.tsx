@@ -5,6 +5,7 @@ import {
   formatHours,
   formatMinutes,
 } from "@/content/demo-course-program";
+import { HOMEWORK_ASSIGNMENTS, formatHomeworkTime } from "@/content/demo-course-homework";
 
 const TOTAL_MIN = PROGRAM_TOTALS.guidedMin + PROGRAM_TOTALS.practiceMin;
 const TOTAL_MAX = PROGRAM_TOTALS.guidedMax + PROGRAM_TOTALS.practiceMax;
@@ -113,6 +114,34 @@ export function CourseProgramOverview() {
             </li>
           ))}
         </ol>
+      </section>
+
+      <section className="border-y border-hairline bg-[#eef0ea]">
+        <div className="mx-auto max-w-[1280px] px-6 py-14 lg:px-10 lg:py-20">
+          <div className="flex flex-wrap items-end justify-between gap-5">
+            <div>
+              <span className="font-mono text-[10px] uppercase tracking-[0.2em] text-system">Homework / 05 field assignments</span>
+              <h2 className="mt-3 max-w-[18ch] text-3xl font-semibold leading-tight tracking-tight sm:text-4xl">Пять домашних работ. Один инженерный портфель.</h2>
+            </div>
+            <p className="max-w-[52ch] text-sm leading-relaxed text-graphite-muted">Каждая работа продолжает модуль на живом сценарии: от безопасного bugfix до MCP-сервера, policy engine и честного сравнения одного агента с командой.</p>
+          </div>
+
+          <div className="mt-9 grid gap-3 md:grid-cols-2 xl:grid-cols-5">
+            {HOMEWORK_ASSIGNMENTS.map((assignment, index) => (
+              <a key={assignment.moduleNumber} href={`/demo-course/${assignment.moduleNumber}#homework`} className={`group flex min-h-[210px] flex-col rounded-2xl border border-hairline bg-white/65 p-5 transition-all hover:-translate-y-0.5 hover:border-system/45 hover:bg-white ${index === HOMEWORK_ASSIGNMENTS.length - 1 ? "md:col-span-2 xl:col-span-1" : ""}`}>
+                <div className="flex items-center justify-between gap-3">
+                  <span className="font-mono text-xs text-system">0{assignment.moduleNumber}</span>
+                  <span className="rounded-full bg-[#e7e9e2] px-2 py-1 font-mono text-[8px] uppercase text-graphite-muted">{formatHomeworkTime(assignment.estimatedMinutes)}</span>
+                </div>
+                <h3 className="mt-5 text-lg font-medium leading-snug">{assignment.shortTitle}</h3>
+                <p className="mt-3 text-xs leading-relaxed text-graphite-muted">{assignment.outcome}</p>
+                <span className="mt-auto pt-5 text-sm transition-transform group-hover:translate-x-1">Открыть ТЗ →</span>
+              </a>
+            ))}
+          </div>
+
+          <p className="mt-6 text-xs leading-relaxed text-graphite-muted">Оценка каждой работы — 20 баллов. Проходной результат — 14. Считаются доказательства и инженерное решение, а не длина ответа модели.</p>
+        </div>
       </section>
 
       <section className="border-y border-hairline bg-ink text-ink-foreground">
