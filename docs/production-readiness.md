@@ -70,3 +70,34 @@ but pilot can run without it. **P2** = follow-up, out of scope for this PR.
 4. If error monitoring is wanted later: create a Sentry account/DSN
    out-of-band, then re-evaluate `@sentry/nextjs` against whatever Next.js
    version is current at that time.
+
+## Backlog — auth UX and method (observed 2026-11-13, not yet actioned)
+
+- **Sign-in form gives no feedback while the magic-link request is
+  in flight.** The `#signin` form in `PublicLanding.tsx` is a plain
+  `<form action={...}>` server action with no `useFormStatus`/pending
+  state — clicking "Войти" looks like nothing happened for the whole
+  round-trip to Resend (confirmed: production itself was fine, the
+  email did send; the button just gives zero visual acknowledgment
+  before the browser navigates to `/auth/check-email`). Candidate fix:
+  a small client component for the submit button showing a pending
+  state, or an optimistic redirect/toast on submit.
+- **Consider an auth method beyond magic-link-only** (e.g. SSO via an
+  OAuth provider, or a passkey option) — magic-link-only means every
+  sign-in depends on Resend deliverability/latency and gives the "did
+  it even do anything" UX above. No decision made yet; needs a product
+  call on which provider(s) make sense for this audience before any
+  implementation.
+
+## Fixed 2026-11-13 — accepting an application did nothing
+
+`setApplicationStatus("ACCEPTED")` used to only flip the `Application.status`
+flag — no `User`, no `Enrollment`, no notification. An admin could accept
+someone and the applicant would never be able to sign into a cohort, with
+no error anywhere to explain why. Now accepting (or re-accepting an
+already-ACCEPTED-but-unprovisioned row, which surfaces as a distinct
+"Выдать доступ" action in `/admin/applications`) creates the `User` if
+needed, enrolls them in the single current cohort at the level the admin
+picks, and sends the real sign-in email via the existing magic-link
+pipeline. See `src/app/admin/actions.ts` (`setApplicationStatus`) and
+`src/app/admin/applications/page.tsx`.
