@@ -1,5 +1,6 @@
 import { requireAdmin } from "@/lib/require-admin";
 import { WorkspaceShell } from "@/components/WorkspaceShell";
+import { CourseModuleSelect } from "@/components/admin/CourseModuleSelect";
 import { createModule } from "../../actions";
 
 export default async function NewModulePage({
@@ -37,6 +38,7 @@ export default async function NewModulePage({
           <input type="checkbox" name="isOpen" defaultChecked />
           Открыт для участников
         </label>
+        <CourseModuleSelect />
         <label className="flex flex-col gap-1 text-sm">
           R2 video key (опционально)
           <input

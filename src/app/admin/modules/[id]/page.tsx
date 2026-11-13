@@ -4,6 +4,7 @@ import { prisma } from "@/lib/prisma";
 import { updateModule, setFeedbackQuestions, reviewSubmission } from "../../actions";
 import { SubmissionStatusBadge } from "@/components/SubmissionStatusBadge";
 import { WorkspaceShell } from "@/components/WorkspaceShell";
+import { CourseModuleSelect } from "@/components/admin/CourseModuleSelect";
 
 const DECISION_FIELD_LABELS: Record<string, string> = {
   task: "Задача",
@@ -74,6 +75,7 @@ export default async function EditModulePage({
             <input type="checkbox" name="isOpen" defaultChecked={mod.isOpen} />
             Открыт для участников
           </label>
+          <CourseModuleSelect defaultValue={mod.courseModuleNumber} />
           <label className="flex flex-col gap-1 text-sm">
             R2 video key
             <input

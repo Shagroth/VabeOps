@@ -1,7 +1,7 @@
 import { requireAdmin } from "@/lib/require-admin";
 import { prisma } from "@/lib/prisma";
 import { WorkspaceShell } from "@/components/WorkspaceShell";
-import { setApplicationStatus } from "../actions";
+import { enrollParticipant, setApplicationStatus } from "../actions";
 
 const STATUS_LABEL: Record<string, string> = {
   PENDING: "Новая",
@@ -15,6 +15,15 @@ export default async function ApplicationsPage() {
   const applications = await prisma.application.findMany({
     orderBy: { createdAt: "desc" },
   });
+  const cohorts = await prisma.cohort.findMany({
+    orderBy: { startDate: "desc" },
+    select: { id: true, name: true },
+  });
+  const enrolledEmails = new Set(
+    (
+      await prisma.enrollment.findMany({ select: { user: { select: { email: true } } } })
+    ).map((e) => e.user.email.toLowerCase())
+  );
 
   return (
     <WorkspaceShell active="admin" email={session.user.email ?? ""} canAccessStudio>
@@ -43,6 +52,31 @@ export default async function ApplicationsPage() {
                 <span className="text-black/50">Цель: </span>
                 {a.workGoal}
               </p>
+              {a.status === "ACCEPTED" &&
+                (enrolledEmails.has(a.email.toLowerCase()) ? (
+                  <p className="text-xs text-black/50">Зачислен(а) в когорту ✓</p>
+                ) : cohorts.length === 0 ? (
+                  <p className="text-xs text-black/50">Создай когорту в /admin, чтобы зачислить.</p>
+                ) : (
+                  <form action={enrollParticipant} className="flex flex-wrap gap-2 text-sm">
+                    <input type="hidden" name="email" value={a.email} />
+                    <input type="hidden" name="name" value={a.name} />
+                    <select name="cohortId" className="rounded border border-black/15 p-1">
+                      {cohorts.map((c) => (
+                        <option key={c.id} value={c.id}>
+                          {c.name}
+                        </option>
+                      ))}
+                    </select>
+                    <select name="level" defaultValue="NOVICE" className="rounded border border-black/15 p-1">
+                      <option value="NOVICE">новичок</option>
+                      <option value="STRONG">сильный</option>
+                    </select>
+                    <button type="submit" className="rounded border border-black/15 px-3 py-1">
+                      Зачислить
+                    </button>
+                  </form>
+                ))}
               {a.status === "PENDING" && (
                 <div className="flex gap-2">
                   <form action={accept}>

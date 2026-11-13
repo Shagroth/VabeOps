@@ -291,6 +291,9 @@ model Module {
   assignmentMd       String  @db.Text
   isOpen             Boolean @default(true) // manual admin toggle, not a date lock
   conditionsChangedMd String? @db.Text // author-authored "conditions changed" follow-up prompt
+  // Which course module (1..5 in src/content/demo-course-program.ts) this
+  // week renders. Null = legacy week driven only by notesMd/assignmentMd.
+  courseModuleNumber Int?
 
   cohort       Cohort             @relation(fields: [cohortId], references: [id], onDelete: Cascade)
   submissions  Submission[]

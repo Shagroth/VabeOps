@@ -1,7 +1,9 @@
 "use client";
 
-import { useState, useTransition } from "react";
+import { useEffect, useState, useTransition } from "react";
 import { submitAssignment, type DecisionBreakdown } from "@/app/modules/[id]/actions";
+import { ARTIFACT_EVENT, SUBMISSION_ANCHOR, mergeArtifactIntoContent } from "@/lib/artifact-bridge";
+import { MAX_SUBMISSION_CONTENT_LEN } from "@/lib/submission-limits";
 
 const STEPS: {
   key: keyof Omit<DecisionBreakdown, "content" | "conditionsResponse">;
@@ -52,6 +54,22 @@ export function SubmissionForm({
   const [publish, setPublish] = useState(initialPublished);
   const [saved, setSaved] = useState(false);
   const [isPending, startTransition] = useTransition();
+  const [error, setError] = useState<string | null>(null);
+
+  // Lab artifact hand-off from the course flow on the same page.
+  useEffect(() => {
+    function onArtifact(event: Event) {
+      const artifact = (event as CustomEvent<string>).detail;
+      if (typeof artifact !== "string" || !artifact.trim()) return;
+      setValues((prev) => ({
+        ...prev,
+        content: mergeArtifactIntoContent(prev.content, artifact).slice(0, MAX_SUBMISSION_CONTENT_LEN),
+      }));
+      setSaved(false);
+    }
+    window.addEventListener(ARTIFACT_EVENT, onArtifact);
+    return () => window.removeEventListener(ARTIFACT_EVENT, onArtifact);
+  }, []);
 
   function set<K extends keyof DecisionBreakdown>(key: K, value: string) {
     setValues((prev) => ({ ...prev, [key]: value }));
@@ -62,20 +80,27 @@ export function SubmissionForm({
     <form
       onSubmit={(e) => {
         e.preventDefault();
+        setError(null);
         startTransition(async () => {
-          await submitAssignment(moduleId, values, publish);
-          setSaved(true);
+          try {
+            await submitAssignment(moduleId, values, publish);
+            setSaved(true);
+          } catch {
+            setError("Не удалось отправить. Проверь соединение и попробуй ещё раз — введённый текст не потерян.");
+          }
         });
       }}
-      className="flex flex-col gap-5"
+      id={SUBMISSION_ANCHOR}
+      className="flex scroll-mt-24 flex-col gap-5"
     >
       <label className="flex flex-col gap-1 text-sm">
         Результат
         <textarea
           value={values.content}
           onChange={(e) => set("content", e.target.value)}
-          placeholder="Ссылка на репозиторий, описание решения..."
-          rows={4}
+          placeholder="Ссылка на репозиторий или PR, артефакт из лаборатории, короткое описание решения..."
+          rows={6}
+          maxLength={MAX_SUBMISSION_CONTENT_LEN}
           className="w-full rounded-lg border border-hairline p-3"
         />
       </label>
@@ -141,6 +166,12 @@ export function SubmissionForm({
           автору — не публикуй здесь секреты или закрытый рабочий код.
         </span>
       </label>
+
+      {error && (
+        <p role="alert" className="text-sm text-accent-change">
+          {error}
+        </p>
+      )}
 
       <button
         type="submit"

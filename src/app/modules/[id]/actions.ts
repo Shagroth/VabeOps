@@ -5,6 +5,7 @@ import { revalidatePath } from "next/cache";
 import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
 import { clamp } from "@/lib/validation";
+import { MAX_SUBMISSION_CONTENT_LEN } from "@/lib/submission-limits";
 import { log, getOrCreateCorrelationId } from "@/lib/logger";
 
 export type DecisionBreakdown = {
@@ -18,7 +19,7 @@ export type DecisionBreakdown = {
   conditionsResponse: string;
 };
 
-const MAX_CONTENT_LEN = 4000;
+const MAX_CONTENT_LEN = MAX_SUBMISSION_CONTENT_LEN;
 const MAX_FIELD_LEN = 2000;
 const MAX_ANSWER_LEN = 2000;
 

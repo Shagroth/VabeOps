@@ -4,6 +4,7 @@ import { prisma } from "@/lib/prisma";
 import { WorkspaceShell } from "@/components/WorkspaceShell";
 import { canAccessStudio } from "@/lib/require-role";
 import { ParticipantProfileForm } from "@/components/ParticipantProfileForm";
+import { displayName } from "@/lib/display-name";
 
 const TYPE_LABEL: Record<string, string> = {
   KICKOFF: "Кикофф",
@@ -27,7 +28,7 @@ export default async function StreamPage() {
       cohort: {
         include: {
           liveSessions: { orderBy: { scheduledAt: "asc" } },
-          enrollments: { include: { user: true } },
+          enrollments: { include: { user: { select: { id: true, name: true } } } },
         },
       },
     },
@@ -48,10 +49,11 @@ export default async function StreamPage() {
 
   const myEnrollment = enrollment.cohort.enrollments.find((e) => e.userId === session.user.id)!;
   const now = new Date();
+  const myName = myEnrollment.user.name;
 
   const recentComments = await prisma.moduleComment.findMany({
     where: { module: { cohortId: enrollment.cohortId } },
-    include: { user: true, module: true },
+    include: { user: { select: { name: true } }, module: true },
     orderBy: { createdAt: "desc" },
     take: 10,
   });
@@ -59,7 +61,7 @@ export default async function StreamPage() {
   const sharedSubmissions = await prisma.submission.findMany({
     where: { publishedToCohort: true, module: { cohortId: enrollment.cohortId } },
     include: {
-      user: true,
+      user: { select: { name: true } },
       module: true,
       versions: { orderBy: { createdAt: "desc" }, take: 1 },
     },
@@ -109,7 +111,10 @@ export default async function StreamPage() {
           <ul className="grid grid-cols-1 gap-2 sm:grid-cols-2">
             {enrollment.cohort.enrollments.map((e) => (
               <li key={e.id} className="rounded-xl border border-hairline bg-white/40 p-3 text-sm">
-                <div className="font-medium">{e.user.email}</div>
+                <div className="font-medium">
+                  {displayName(e.user)}
+                  {e.userId === session.user.id && <span className="ml-1 text-xs text-graphite-muted">(ты)</span>}
+                </div>
                 {e.doingNow && <div className="text-graphite-muted">Делает: {e.doingNow}</div>}
                 {e.exploring && <div className="text-graphite-muted">Исследует: {e.exploring}</div>}
                 {e.canHelpWith && (
@@ -126,6 +131,7 @@ export default async function StreamPage() {
         <ParticipantProfileForm
           cohortId={enrollment.cohortId}
           initial={{
+            name: myName ?? "",
             doingNow: myEnrollment.doingNow ?? "",
             exploring: myEnrollment.exploring ?? "",
             canHelpWith: myEnrollment.canHelpWith ?? "",
@@ -140,7 +146,7 @@ export default async function StreamPage() {
                 <div className="mb-1 text-xs text-graphite-muted">
                   Неделя {s.module.weekNumber} · {s.module.title}
                 </div>
-                <span className="text-graphite-muted">{s.user.email}: </span>
+                <span className="text-graphite-muted">{displayName(s.user)}: </span>
                 {s.versions[0]?.content}
               </li>
             ))}
@@ -160,7 +166,7 @@ export default async function StreamPage() {
                 <div className="mb-1 text-xs text-graphite-muted">
                   Неделя {c.module.weekNumber} · {c.module.title}
                 </div>
-                <span className="text-graphite-muted">{c.user.email}: </span>
+                <span className="text-graphite-muted">{displayName(c.user)}: </span>
                 {c.content}
               </li>
             ))}
