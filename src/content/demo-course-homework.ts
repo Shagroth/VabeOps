@@ -21,6 +21,9 @@ export type HomeworkAssignment = {
   comparisonRows?: string[];
 };
 
+/** Minimum total (out of the 20-point HOMEWORK_SCORING rubric below) to pass. */
+export const HOMEWORK_PASS_SCORE = 14;
+
 export const HOMEWORK_SCORING = [
   { points: 5, label: "Работоспособность", detail: "Решение запускается и выполняет заявленный сценарий." },
   { points: 5, label: "Контракты и границы", detail: "Ограничения соблюдаются технически, а не только обещаются в тексте." },

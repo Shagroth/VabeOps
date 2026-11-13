@@ -2,7 +2,7 @@ import Link from "next/link";
 import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
 import { WorkspaceShell } from "@/components/WorkspaceShell";
-import { canAccessStudio } from "@/lib/require-role";
+import { canAccessStudio, canReviewSubmissions } from "@/lib/require-role";
 import { SubmissionStatusBadge } from "@/components/SubmissionStatusBadge";
 import { PublicLanding } from "@/components/landing/PublicLanding";
 import { CourseCard } from "@/components/cards/CourseCard";
@@ -28,6 +28,7 @@ export default async function Home() {
 
   const isAdmin = session.user.role === "ADMIN";
   const studioAccess = canAccessStudio(session.user.role);
+  const reviewAccess = canReviewSubmissions(session.user.role);
 
   // See stream/page.tsx for why this orders explicitly by cohort start
   // date instead of trusting an arbitrary `findFirst` row.
@@ -50,7 +51,7 @@ export default async function Home() {
     const featured = getFeaturedJournal();
 
     return (
-      <WorkspaceShell active="overview" email={session.user.email ?? ""} canAccessStudio={studioAccess}>
+      <WorkspaceShell active="overview" email={session.user.email ?? ""} canAccessStudio={studioAccess} canReviewSubmissions={reviewAccess}>
         <div className="mx-auto flex max-w-[1080px] flex-col gap-10">
           <div className="rounded-2xl border border-hairline bg-white/40 px-6 py-12 text-center sm:px-10">
             <svg viewBox="0 0 160 80" className="mx-auto h-14 w-28 opacity-70" fill="none" aria-hidden="true">
@@ -137,6 +138,7 @@ export default async function Home() {
       active="overview"
       email={session.user.email ?? ""}
       canAccessStudio={studioAccess}
+      canReviewSubmissions={reviewAccess}
       breadcrumb={enrollment.cohort.name}
     >
       <div className="mx-auto flex max-w-[860px] flex-col gap-8">
