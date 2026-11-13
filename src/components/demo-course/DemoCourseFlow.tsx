@@ -214,7 +214,7 @@ export function DemoCourseFlow() {
               </div>
               <h2 className="mt-5 text-xl font-medium leading-tight">{DEMO_COURSE_META.title}</h2>
               <p className="mt-2 text-xs leading-relaxed text-ink-muted">
-                На выходе — рабочий контракт, а не сертификат за просмотр.
+                На выходе — контракт для живой задачи. Сертификат прод не спасает.
               </p>
             </div>
 
@@ -293,8 +293,8 @@ export function DemoCourseFlow() {
                 <Lesson
                   headingRef={lessonHeading}
                   kicker="00 / Cold open"
-                  title="Агент всё сделал. Прод сломан."
-                  lead="Зелёные тесты могут доказывать только то, что агент успешно изменил и код, и мерку успеха. Начнём не с терминов, а с небольшого инцидента."
+                  title="Агент всё сделал. Прод всё равно сломан."
+                  lead="Зелёные тесты иногда доказывают лишь одно: агент успел переписать и код, и правила победы. Начнём не с терминов, а с инцидента, который слишком легко представить настоящим."
                 >
                   <div className="grid gap-4 xl:grid-cols-[0.9fr_1.1fr]">
                     <div className="rounded-2xl border border-hairline bg-white/70 p-5">
@@ -348,8 +348,8 @@ export function DemoCourseFlow() {
                 <Lesson
                   headingRef={lessonHeading}
                   kicker="01 / Operating modes"
-                  title="Не каждую задачу стоит отдавать агенту"
-                  lead="Разница не в интерфейсе и не в названии продукта. Разница — в автономности, доступе к среде и цене ошибочного действия."
+                  title="Не каждой задаче нужен агент с доступом к кнопкам"
+                  lead="Чат, copilot и агент могут выглядеть похоже. Но цена ошибки у них разная: один советует, другой действует в твоей среде. Режим выбирают по риску и нужной автономности, а не по моде."
                 >
                   <div className="grid gap-3 md:grid-cols-3">
                     {WORK_MODES.map((mode, index) => (
@@ -381,8 +381,8 @@ export function DemoCourseFlow() {
                     {state.modeChoice && (
                       <Feedback good={state.modeChoice === "agent"}>
                         {state.modeChoice === "agent"
-                          ? "Да. Это многошаговая работа в среде с проверяемым результатом. Но право записи отделено review gate — автономность не обязана быть безграничной."
-                          : "Здесь нужно исследовать несколько файлов и построить план изменений. Чат или copilot помогут частично, но не выполнят весь диагностический цикл как единую задачу."}
+                          ? "Да. Здесь есть несколько шагов, работа в среде и проверяемый результат. Но право записи остаётся за review gate: автономность — не абонемент на всё."
+                          : "Чат или copilot помогут на отдельном шаге. Но здесь нужен цельный цикл: исследовать несколько файлов, собрать гипотезу и вернуть план до записи."}
                       </Feedback>
                     )}
                   </Question>
@@ -393,8 +393,8 @@ export function DemoCourseFlow() {
                 <Lesson
                   headingRef={lessonHeading}
                   kicker="02 / Contract anatomy"
-                  title="Семь полей, которые возвращают контроль"
-                  lead="Хороший контракт не пытается предсказать каждый шаг агента. Он фиксирует цель, поверхность изменений и доказательство готовности. Открой все семь полей."
+                  title="Семь полей вместо надежды на телепатию"
+                  lead="Хороший контракт не диктует агенту каждый шаг. Он фиксирует цель, границы, права и доказательства готовности — то, что опасно оставлять на догадки. Открой все семь полей."
                 >
                   <div className="grid gap-5 lg:grid-cols-[0.8fr_1.2fr]">
                     <div className="space-y-2">
@@ -445,8 +445,8 @@ export function DemoCourseFlow() {
                 <Lesson
                   headingRef={lessonHeading}
                   kicker="03 / Contract lab"
-                  title="Теперь собери контракт сам"
-                  lead="Возьми свою задачу или загрузи учебный пример. Текст сохраняется только в этом браузере — можно вернуться и продолжить позже."
+                  title="Теперь преврати свою задачу в контракт"
+                  lead="Возьми рабочую задачу, которую действительно готов отдать агенту. Если такой сейчас нет, загрузи учебный пример. Черновик останется только в этом браузере."
                 >
                   <div className="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-system/25 bg-system/[0.05] p-4">
                     <div>
@@ -498,8 +498,8 @@ export function DemoCourseFlow() {
                 <Lesson
                   headingRef={lessonHeading}
                   kicker="04 / Red team"
-                  title="А теперь попробуй сломать постановку"
-                  lead="Перед запуском полезно на минуту сменить роль: не улучшать промпт, а искать свободу, которой агент сможет воспользоваться не так, как ты ожидал."
+                  title="Красная команда: сломай задачу до запуска"
+                  lead="На минуту перестань улучшать формулировку. Ищи лишнюю свободу, конфликт и лазейку, через которые агент сможет сделать не то — формально оставаясь правым."
                 >
                   <div className="overflow-hidden rounded-2xl border border-hairline bg-white/70">
                     <div className="flex items-center gap-2 border-b border-hairline px-4 py-3">
@@ -584,7 +584,7 @@ export function DemoCourseFlow() {
                       <Feedback good={state.gateChoice === "approve"}>
                         {state.gateChoice === "approve"
                           ? "Верно. План соответствует контракту, а точка подтверждения стоит перед записью. Можно разрешить этот ограниченный следующий шаг."
-                          : "Это либо слишком жёстко, либо слишком широко. Хороший guardrail не запрещает работу — он ограничивает следующий рискованный переход."}
+                          : "Это либо тормоз на ровном месте, либо открытая дверь во весь репозиторий. Хороший guardrail не мешает работе — он контролирует следующий рискованный переход."}
                       </Feedback>
                     )}
                   </Question>
@@ -595,8 +595,8 @@ export function DemoCourseFlow() {
                 <Lesson
                   headingRef={lessonHeading}
                   kicker="06 / Takeaway"
-                  title="Контракт готов. Теперь он должен попасть в работу."
-                  lead="Это не идеальный универсальный шаблон. Это минимальная инженерная память задачи: что хотим, чем рискуем и как узнаем, что действительно закончили."
+                  title="Контракт готов. Пора столкнуть его с реальностью."
+                  lead="Это не священный шаблон на все случаи. Это минимальная инженерная память задачи: чего хотим, где границы, чем рискуем и как докажем, что закончили."
                 >
                   <div className="grid min-w-0 gap-5 xl:grid-cols-[1.15fr_0.85fr]">
                     <div className="min-w-0 overflow-hidden rounded-2xl border border-hairline bg-ink text-ink-foreground">
@@ -644,7 +644,7 @@ export function DemoCourseFlow() {
                       {state.finished ? (
                         <div className="rounded-2xl border border-signal/50 bg-signal/10 p-5">
                           <span className="font-mono text-[10px] uppercase tracking-wide text-signal-ink">Модуль завершён</span>
-                          <p className="mt-2 text-sm text-graphite-muted">Артефакт сохранён в браузере. Следующий модуль — контекст, Skills и саб-агенты.</p>
+                          <p className="mt-2 text-sm text-graphite-muted">Артефакт сохранён. Следующий модуль — как давать модели достаточно контекста, не вываливая на неё цифровой чердак.</p>
                           <div className="mt-4 flex flex-wrap gap-3">
                             <Link href="/demo-course/2" className="rounded-lg bg-ink px-4 py-2 text-xs font-medium text-ink-foreground">
                               К модулю 2 →
