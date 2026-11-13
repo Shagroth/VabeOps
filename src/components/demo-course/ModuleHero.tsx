@@ -39,8 +39,8 @@ export function ModuleHero({ number, eyebrow, title, dek, result, guidedMinutes,
             <div className="flex h-10 w-10 items-center justify-center rounded-full border border-system/50 bg-system/10 font-mono text-xs text-system">{PROGRAM_AUTHOR.initials}</div>
             <div><p className="text-sm font-medium">{PROGRAM_AUTHOR.name}</p><p className="text-xs text-ink-muted">{PROGRAM_AUTHOR.role}</p></div>
           </div>
-          <div className="mt-6 border-t border-hairline-ink pt-5"><span className="font-mono text-[10px] uppercase tracking-[0.18em] text-signal">Результат модуля</span><p className="mt-2 text-sm leading-relaxed text-ink-muted">{result}. Его можно скопировать или скачать как Markdown.</p></div>
-          <p className="mt-5 text-[11px] leading-relaxed text-ink-muted/70">Демо-автор и учебные кейсы вымышлены. Хронометраж — гипотеза прототипа для проверки на пилоте.</p>
+          <div className="mt-6 border-t border-hairline-ink pt-5"><span className="font-mono text-[10px] uppercase tracking-[0.18em] text-signal">Унесёшь с собой</span><p className="mt-2 text-sm leading-relaxed text-ink-muted">{result}. Скопируй в задачу, скачай как Markdown и проверь на живой работе.</p></div>
+          <p className="mt-5 text-[11px] leading-relaxed text-ink-muted/70">Учебные кейсы вымышлены, инженерные проблемы — до обидного настоящие. Время уточним после пилота.</p>
         </div>
       </div>
     </section>

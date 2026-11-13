@@ -17,20 +17,26 @@ export function CourseProgramOverview() {
           <div className="grid gap-10 lg:grid-cols-[1.15fr_0.85fr] lg:items-end">
             <div>
               <span className="font-mono text-[10px] uppercase tracking-[0.22em] text-system">
-                Field course / оценочный прототип
+                Field course / ИИ без цирка
               </span>
               <h1 className="mt-5 max-w-[15ch] text-[2.8rem] font-semibold leading-[0.98] tracking-tight sm:text-[4.4rem] lg:text-[5.3rem]">
                 Инженерная работа с ИИ
               </h1>
               <p className="mt-7 max-w-[62ch] text-lg leading-relaxed text-graphite-muted">
-                Пять модулей от постановки задачи до мультиагентной системы. Это уже проходимый прототип программы: с кейсами, решениями, лабораториями и рабочими артефактами.
+                Не курс про кнопки и «секретные промпты». За пять модулей ты соберёшь рабочую систему: ставить задачи агентам, управлять контекстом, безопасно подключать инструменты и не разводить мультиагентный зоопарк без причины.
               </p>
+              <div className="mt-8 flex flex-wrap items-center gap-4">
+                <Link href="/demo-course/1" className="rounded-xl bg-ink px-5 py-3 text-sm font-medium text-ink-foreground transition-transform hover:scale-[1.02]">
+                  Начать с первого модуля →
+                </Link>
+                <span className="text-xs text-graphite-muted">Без регистрации · первый результат за 45–60 минут</span>
+              </div>
             </div>
 
             <div className="rounded-2xl bg-ink p-6 text-ink-foreground sm:p-8">
               <div className="flex items-center justify-between gap-4">
                 <span className="font-mono text-[10px] uppercase tracking-[0.2em] text-signal">Нагрузка участника</span>
-                <span className="rounded-full border border-hairline-ink px-2.5 py-1 font-mono text-[9px] uppercase text-ink-muted">v0.2</span>
+                <span className="rounded-full border border-hairline-ink px-2.5 py-1 font-mono text-[9px] uppercase text-ink-muted">пилот</span>
               </div>
               <p className="mt-5 text-4xl font-semibold tracking-tight">{formatHours(TOTAL_MIN, TOTAL_MAX)}</p>
               <p className="mt-2 text-sm text-ink-muted">за 5 недель · примерно {formatHours(Math.round(TOTAL_MIN / 5), Math.round(TOTAL_MAX / 5))} в неделю</p>
@@ -39,9 +45,25 @@ export function CourseProgramOverview() {
                 <Metric label="Своя практика" value={formatHours(PROGRAM_TOTALS.practiceMin, PROGRAM_TOTALS.practiceMax)} />
               </div>
               <p className="mt-5 text-[11px] leading-relaxed text-ink-muted/75">
-                Это оценка прототипа, не обещание длительности. Финальный хронометраж уточним после пилота по медиане и p90 прохождения.
+                Не марафон фоновых видео. Время уходит на решения, практику и артефакты, которые можно забрать в работу.
               </p>
             </div>
+          </div>
+        </div>
+      </section>
+
+      <section className="mx-auto max-w-[1280px] px-6 py-12 lg:px-10 lg:py-16">
+        <div className="grid gap-8 lg:grid-cols-[0.72fr_1.28fr] lg:items-start">
+          <div>
+            <span className="font-mono text-[10px] uppercase tracking-[0.2em] text-system">Кому подойдёт</span>
+            <h2 className="mt-3 max-w-[14ch] text-3xl font-semibold leading-tight tracking-tight sm:text-4xl">
+              Не учим программировать. Учим работать с ИИ по-инженерному.
+            </h2>
+          </div>
+          <div className="grid gap-px overflow-hidden rounded-2xl border border-hairline bg-hairline md:grid-cols-3">
+            <Audience title="Только начинаешь" body="Получишь понятную модель: когда достаточно чата, когда нужен агент и какие границы поставить до первого запуска." />
+            <Audience title="Уже используешь каждый день" body="Превратишь личные приёмы в повторяемые Skills, контракты и проверки, которые выдерживают настоящую задачу." />
+            <Audience title="Строишь для команды" body="Сможешь обсуждать MCP, guardrails и мультиагентность как архитектуру — с правами, рисками и владельцами решений." />
           </div>
         </div>
       </section>
@@ -50,10 +72,10 @@ export function CourseProgramOverview() {
         <div className="flex flex-wrap items-end justify-between gap-5">
           <div>
             <span className="font-mono text-[10px] uppercase tracking-[0.2em] text-graphite-muted">Curriculum / 05 modules</span>
-            <h2 className="mt-3 text-3xl font-semibold tracking-tight sm:text-4xl">Полный маршрут</h2>
+            <h2 className="mt-3 text-3xl font-semibold tracking-tight sm:text-4xl">Пять недель. Ноль магии.</h2>
           </div>
           <p className="max-w-[48ch] text-sm leading-relaxed text-graphite-muted">
-            Каждый модуль заканчивается артефактом, который можно перенести в рабочий процесс — не только ответом на тест.
+            Каждый модуль меняет один участок твоей работы и заканчивается артефактом. Не «посмотрел урок» — а унёс готовый инструмент.
           </p>
         </div>
 
@@ -96,30 +118,34 @@ export function CourseProgramOverview() {
       <section className="border-y border-hairline bg-ink text-ink-foreground">
         <div className="mx-auto grid max-w-[1280px] gap-10 px-6 py-14 lg:grid-cols-[0.9fr_1.1fr] lg:px-10 lg:py-20">
           <div>
-            <span className="font-mono text-[10px] uppercase tracking-[0.2em] text-signal">Content budget</span>
-            <h2 className="mt-4 max-w-[14ch] text-4xl font-semibold leading-tight tracking-tight">Сколько контента предстоит довести</h2>
+            <span className="font-mono text-[10px] uppercase tracking-[0.2em] text-signal">После курса</span>
+            <h2 className="mt-4 max-w-[15ch] text-4xl font-semibold leading-tight tracking-tight">Не сертификат. Пять рабочих инструментов.</h2>
             <p className="mt-5 max-w-[52ch] text-sm leading-relaxed text-ink-muted">
-              Сейчас это сильный сценарный прототип для проверки структуры и времени. Для публикации каждый кейс потребует технической верификации, редакторской вычитки и примеров из нескольких инженерных дисциплин.
+              Сертификат не остановит агента перед опасной командой. А хороший контракт, матрица прав и проверяемый handoff — вполне. Всё, что соберёшь, останется у тебя в Markdown и в голове.
             </p>
           </div>
           <div className="grid grid-cols-2 gap-px overflow-hidden rounded-2xl bg-hairline-ink sm:grid-cols-3">
-            <BudgetMetric value={String(PROGRAM_TOTALS.screens)} label="учебных экранов" />
-            <BudgetMetric value="5" label="инженерных кейсов" />
-            <BudgetMetric value="5" label="лабораторий" />
-            <BudgetMetric value="5" label="рабочих артефактов" />
-            <BudgetMetric value="45–65k" label="знаков финального текста" />
-            <BudgetMetric value="50–80 ч" label="авторской работы" />
+            <BudgetMetric value="01" label="Agent Task Contract" />
+            <BudgetMetric value="02" label="Context Pack + Skill Spec" />
+            <BudgetMetric value="03" label="MCP Integration Card" />
+            <BudgetMetric value="04" label="Agent Safety Policy" />
+            <BudgetMetric value="05" label="Multi-agent System Map" />
+            <BudgetMetric value="∞" label="меньше веры — больше контроля" />
           </div>
         </div>
       </section>
 
       <section className="mx-auto max-w-[1280px] px-6 py-12 lg:px-10 lg:py-16">
         <div className="rounded-2xl border border-system/25 bg-system/[0.05] p-6 sm:p-8">
-          <span className="font-mono text-[10px] uppercase tracking-[0.18em] text-system">Как оценивать прототип</span>
+          <span className="font-mono text-[10px] uppercase tracking-[0.18em] text-system">Подход VabeOps</span>
           <div className="mt-5 grid gap-6 md:grid-cols-3">
-            <Evaluation number="01" title="Засечь реальное время" body="Проходить без спешки и записывать начало/конец теории, лаборатории и самостоятельной доработки." />
-            <Evaluation number="02" title="Пометить места трения" body="Где не хватает примера, формулировка двусмысленна или задание требует знаний, которых ещё не дали." />
-            <Evaluation number="03" title="Проверить перенос" body="Через неделю открыть артефакт и понять, помог ли он в настоящей инженерной задаче." />
+            <Evaluation number="01" title="Сначала решение" body="ИИ должен двигать рабочую задачу, а не производить убедительный текст ради текста." />
+            <Evaluation number="02" title="Потом свобода" body="Автономность выдаётся по мере доказанной надёжности. Не наоборот. Прод — плохое место для воспитательных экспериментов." />
+            <Evaluation number="03" title="Результат — в систему" body="Если подход нельзя повторить, проверить и передать коллеге, это удача, а не инженерия." />
+          </div>
+          <div className="mt-7 flex flex-wrap items-center gap-4 border-t border-system/20 pt-6">
+            <Link href="/demo-course/1" className="rounded-xl bg-signal px-5 py-3 text-sm font-medium text-signal-ink">Собрать первый контракт →</Link>
+            <span className="text-xs text-graphite-muted">Можно остановиться после первого модуля. Но обычно уже не хочется.</span>
           </div>
         </div>
       </section>
@@ -137,4 +163,8 @@ function BudgetMetric({ value, label }: { value: string; label: string }) {
 
 function Evaluation({ number, title, body }: { number: string; title: string; body: string }) {
   return <div><span className="font-mono text-[10px] text-system">{number}</span><h3 className="mt-2 font-medium">{title}</h3><p className="mt-2 text-sm leading-relaxed text-graphite-muted">{body}</p></div>;
+}
+
+function Audience({ title, body }: { title: string; body: string }) {
+  return <article className="bg-white/65 p-5 sm:p-6"><h3 className="font-medium">{title}</h3><p className="mt-3 text-sm leading-relaxed text-graphite-muted">{body}</p></article>;
 }

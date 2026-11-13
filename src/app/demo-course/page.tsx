@@ -5,11 +5,11 @@ import { CourseProgramOverview } from "@/components/demo-course/CourseProgramOve
 
 export const metadata: Metadata = {
   title: "Инженерная работа с ИИ — программа курса",
-  description: "Пять практических модулей VabeOps: агенты, контекст, Skills, MCP, guardrails и мультиагентные системы.",
+  description: "Практический курс VabeOps: ставь задачи агентам, управляй контекстом, подключай MCP и строй guardrails без магии и лишнего риска.",
   alternates: { canonical: "/demo-course" },
   openGraph: {
     title: "Инженерная работа с ИИ — программа курса",
-    description: "Пять практических модулей VabeOps с кейсами, лабораториями и рабочими артефактами.",
+    description: "Пять практических модулей про инженерную работу с ИИ — без секретных промптов, магии и мультиагентного театра.",
     type: "website",
   },
 };
