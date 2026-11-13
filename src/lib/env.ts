@@ -51,3 +51,15 @@ export function requireR2Config() {
 export function siteUrl(): string {
   return process.env.NEXT_PUBLIC_SITE_URL || "https://vabeops.example.com";
 }
+
+/** Recipient for "new submission" notifications. Unset = quiet no-op, not a crash. */
+export function notifyAdminEmail(): string | null {
+  return process.env.NOTIFY_ADMIN_EMAIL || null;
+}
+
+export type ResendCredentials = { apiKey?: string; from?: string };
+
+/** Raw Resend credentials for a best-effort send — callers already check isEmailProviderConfigured(). */
+export function resendCredentials(): ResendCredentials {
+  return { apiKey: process.env.AUTH_RESEND_KEY, from: process.env.EMAIL_FROM };
+}

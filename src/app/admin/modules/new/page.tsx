@@ -12,7 +12,7 @@ export default async function NewModulePage({
   const { cohortId } = await searchParams;
 
   return (
-    <WorkspaceShell active="admin" email={session.user.email ?? ""} canAccessStudio>
+    <WorkspaceShell active="admin" email={session.user.email ?? ""} canAccessStudio canReviewSubmissions>
     <div className="mx-auto max-w-[760px]">
       <h1 className="mb-6 text-2xl font-semibold">Новый модуль</h1>
       <form action={createModule} className="flex flex-col gap-4">

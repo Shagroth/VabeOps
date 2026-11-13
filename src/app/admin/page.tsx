@@ -36,7 +36,7 @@ export default async function AdminPage() {
   });
 
   return (
-    <WorkspaceShell active="admin" email={session.user.email ?? ""} canAccessStudio>
+    <WorkspaceShell active="admin" email={session.user.email ?? ""} canAccessStudio canReviewSubmissions>
     <div className="mx-auto flex max-w-[860px] flex-col gap-10">
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-semibold">Admin</h1>

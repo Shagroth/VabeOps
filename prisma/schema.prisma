@@ -361,6 +361,11 @@ model SubmissionFeedback {
   authorId     String
   content      String   @db.Text
   createdAt    DateTime @default(now())
+  // Rubric scores for this review, in HOMEWORK_SCORING order (src/content/
+  // demo-course-homework.ts) — a plain number[], index-matched to the
+  // rubric's criteria. Null = reviewer didn't score this review (scoring
+  // is optional, all-or-nothing when present — see lib/homework-scoring.ts).
+  scores       Json?
 
   submission Submission @relation(fields: [submissionId], references: [id], onDelete: Cascade)
   author     User       @relation(fields: [authorId], references: [id], onDelete: Cascade)

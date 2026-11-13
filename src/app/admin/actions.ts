@@ -1,5 +1,6 @@
 "use server";
 
+import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
 import { requireAdmin } from "@/lib/require-admin";
@@ -8,6 +9,12 @@ import { prisma } from "@/lib/prisma";
 import { parseCourseModuleNumber, planProgramWeeks } from "@/lib/course-module-link";
 import { PROGRAM_MODULES } from "@/content/demo-course-program";
 import { isAssignableRole, parseEnrollmentInput } from "@/lib/enrollment";
+import { getOrCreateCorrelationId } from "@/lib/logger";
+import { isEmailProviderConfigured, resendCredentials, siteUrl } from "@/lib/env";
+import { sendNotifyEmail } from "@/lib/notify-email";
+import { buildFeedbackNotifyEmail } from "@/lib/notify-templates";
+import { parseScores, totalMaxScore } from "@/lib/homework-scoring";
+import { HOMEWORK_SCORING, HOMEWORK_PASS_SCORE } from "@/content/demo-course-homework";
 
 function readModuleFields(formData: FormData) {
   return {
@@ -113,22 +120,65 @@ export async function createLiveSession(formData: FormData) {
 export async function reviewSubmission(
   submissionId: string,
   status: "ACCEPTED" | "NEEDS_REVISION",
-  feedbackText: string
+  feedbackText: string,
+  scoresRaw: Record<string, string> = {}
 ) {
   // Mentor feedback on cohort work is explicitly in-scope for MENTOR
   // (brief §2/§9) even though mentors don't manage publications.
   const session = await requireRole(["ADMIN", "MENTOR"]);
 
+  // Scoring is optional (see homework-scoring.ts) but all-or-nothing when
+  // attempted — an invalid/half-filled rubric throws before anything is
+  // saved, rather than silently recording a misleading partial total.
+  const parsed = parseScores(HOMEWORK_SCORING, scoresRaw);
+  if (parsed.kind === "invalid") throw new Error(parsed.error);
+  const scores = parsed.kind === "complete" ? parsed.scores : null;
+
   await prisma.submission.update({ where: { id: submissionId }, data: { status } });
 
-  if (feedbackText.trim()) {
+  if (feedbackText.trim() || scores) {
     await prisma.submissionFeedback.create({
-      data: { submissionId, authorId: session.user.id, content: feedbackText.trim() },
+      data: {
+        submissionId,
+        authorId: session.user.id,
+        content: feedbackText.trim(),
+        // Omit entirely rather than pass `null` — Prisma's Json field
+        // wants Prisma.JsonNull for an explicit null; leaving the key
+        // out stores ordinary SQL NULL, which is what "not scored" means.
+        ...(scores ? { scores } : {}),
+      },
     });
   }
 
-  const submission = await prisma.submission.findUnique({ where: { id: submissionId } });
-  if (submission) revalidatePath(`/admin/modules/${submission.moduleId}`);
+  const submission = await prisma.submission.findUnique({
+    where: { id: submissionId },
+    include: { user: true, module: true },
+  });
+  if (!submission) return;
+
+  revalidatePath(`/admin/modules/${submission.moduleId}`);
+  revalidatePath("/admin/review");
+
+  // Best-effort: the review decision itself already saved above — a
+  // failed notification must not surface as a failed review action.
+  if (submission.user.email && isEmailProviderConfigured()) {
+    const { subject, text } = buildFeedbackNotifyEmail({
+      weekNumber: submission.module.weekNumber,
+      weekTitle: submission.module.title,
+      moduleId: submission.moduleId,
+      status,
+      feedbackText,
+      siteUrl: siteUrl(),
+      score: scores
+        ? { total: scores.reduce((sum, s) => sum + s, 0), max: totalMaxScore(HOMEWORK_SCORING), pass: HOMEWORK_PASS_SCORE }
+        : null,
+    });
+    await sendNotifyEmail(
+      { to: submission.user.email, subject, text, ...resendCredentials() },
+      getOrCreateCorrelationId(await headers()),
+      "feedback_notify_sent"
+    );
+  }
 }
 
 export async function setApplicationStatus(

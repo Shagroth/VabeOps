@@ -26,7 +26,7 @@ export default async function ApplicationsPage() {
   );
 
   return (
-    <WorkspaceShell active="admin" email={session.user.email ?? ""} canAccessStudio>
+    <WorkspaceShell active="admin" email={session.user.email ?? ""} canAccessStudio canReviewSubmissions>
     <div className="mx-auto max-w-[860px]">
       <h1 className="mb-6 text-2xl font-semibold">Заявки</h1>
       <ul className="flex flex-col gap-4">

@@ -42,13 +42,16 @@ export function WorkspaceShell({
   active,
   email,
   canAccessStudio,
+  canReviewSubmissions = false,
   breadcrumb,
   children,
 }: {
   active: NavKey;
   email: string;
-  /** Any Studio role (Admin/Editor/Author/Mentor) — not Admin-only. */
+  /** Any Studio role (Admin/Editor/Author) — not Mentor, see studio-permissions.ts. */
   canAccessStudio: boolean;
+  /** ADMIN or MENTOR — shows the cross-cohort review queue link. */
+  canReviewSubmissions?: boolean;
   /** e.g. cohort name or "Неделя 2" — shown in the desktop top bar next to the section label */
   breadcrumb?: string;
   children: React.ReactNode;
@@ -85,6 +88,14 @@ export function WorkspaceShell({
         </div>
 
         <div className="flex flex-col gap-1 border-t border-hairline pt-4">
+          {canReviewSubmissions && (
+            <Link
+              href="/admin/review"
+              className="rounded-lg px-3 py-2 text-sm text-graphite-muted transition-colors duration-150 hover:bg-black/5 hover:text-graphite"
+            >
+              На проверке
+            </Link>
+          )}
           {canAccessStudio && (
             <Link
               href="/studio"

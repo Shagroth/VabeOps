@@ -2,7 +2,7 @@ import { redirect } from "next/navigation";
 import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
 import { WorkspaceShell } from "@/components/WorkspaceShell";
-import { canAccessStudio } from "@/lib/require-role";
+import { canAccessStudio, canReviewSubmissions } from "@/lib/require-role";
 import { ParticipantProfileForm } from "@/components/ParticipantProfileForm";
 import { displayName } from "@/lib/display-name";
 
@@ -17,6 +17,7 @@ export default async function StreamPage() {
   if (!session?.user) redirect("/");
 
   const studioAccess = canAccessStudio(session.user.role);
+  const reviewAccess = canReviewSubmissions(session.user.role);
 
   // A user could in principle hold enrollments in more than one cohort
   // (e.g. a repeat participant across pilots) — pick the most recently
@@ -36,7 +37,7 @@ export default async function StreamPage() {
 
   if (!enrollment) {
     return (
-      <WorkspaceShell active="stream" email={session.user.email ?? ""} canAccessStudio={studioAccess}>
+      <WorkspaceShell active="stream" email={session.user.email ?? ""} canAccessStudio={studioAccess} canReviewSubmissions={reviewAccess}>
         <div className="flex min-h-[60vh] flex-col items-center justify-center gap-4 rounded-2xl border border-hairline bg-white/40 px-6 py-16 text-center">
           <h1 className="text-xl font-semibold">Пока нет активной когорты</h1>
           <p className="max-w-[48ch] text-graphite-muted">
@@ -74,6 +75,7 @@ export default async function StreamPage() {
       active="stream"
       email={session.user.email ?? ""}
       canAccessStudio={studioAccess}
+      canReviewSubmissions={reviewAccess}
       breadcrumb={enrollment.cohort.name}
     >
       <div className="mx-auto flex max-w-[860px] flex-col gap-8">
