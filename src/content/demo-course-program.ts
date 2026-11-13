@@ -76,7 +76,7 @@ const module2: PrototypeModule = {
   dek: "Перестань кормить модель всем репозиторием «на всякий случай». Собери минимальный контекст, оформи повторяемую работу в Skill и пойми, когда саб-агент действительно окупается.",
   result: "компактный Context Pack и Skill Spec для реальной инженерной задачи",
   guidedMinutes: [70, 90],
-  practiceMinutes: [60, 90],
+  practiceMinutes: [120, 180],
   artifactName: "Context Pack + Skill Spec",
   artifactFile: "context-pack-and-skill-spec.md",
   labTitle: "Собери контекст без цифрового чердака",
@@ -174,7 +174,7 @@ const module3: PrototypeModule = {
   dek: "Подключить Jira или GitHub несложно. Сложнее не выдать агенту лишнего. Разложи интеграцию на возможности, права, ошибки и безопасный отказ.",
   result: "MCP Integration Card с матрицей прав, контрактом инструментов и безопасным отказом",
   guidedMinutes: [75, 100],
-  practiceMinutes: [75, 120],
+  practiceMinutes: [240, 360],
   artifactName: "MCP Integration Card",
   artifactFile: "mcp-integration-card.md",
   labTitle: "Спроектируй MCP-интеграцию, которую можно пустить в пилот",
@@ -223,7 +223,7 @@ const module3: PrototypeModule = {
 };
 
 const module4: PrototypeModule = {
-  number: 4, slug: "guardrails", eyebrow: "Модуль 04 · Guardrails и безопасность", title: "Guardrails: свобода без самодеятельности", shortTitle: "Guardrails и безопасность", dek: "Построй права, review gates и проверки так, чтобы агент работал быстро, но не превращал уверенную догадку в дорогой инцидент.", result: "Agent Safety Policy с понятными разрешениями, точками контроля и stop conditions", guidedMinutes: [70, 90], practiceMinutes: [60, 90], artifactName: "Agent Safety Policy", artifactFile: "agent-safety-policy.md",
+  number: 4, slug: "guardrails", eyebrow: "Модуль 04 · Guardrails и безопасность", title: "Guardrails: свобода без самодеятельности", shortTitle: "Guardrails и безопасность", dek: "Построй права, review gates и проверки так, чтобы агент работал быстро, но не превращал уверенную догадку в дорогой инцидент.", result: "Agent Safety Policy с понятными разрешениями, точками контроля и stop conditions", guidedMinutes: [70, 90], practiceMinutes: [180, 300], artifactName: "Agent Safety Policy", artifactFile: "agent-safety-policy.md",
   labTitle: "Поставь агенту отбойники, а не наручники", labLead: "Возьми один агентный workflow. Разреши безопасное автоматически, поставь подтверждение перед рискованным и запрети то, что пока нечем проверить.",
   labFields: [
     { key: "workflow", label: "Workflow", prompt: "Какой результат и какие действия включает агентный цикл?", placeholder: "Диагностировать flaky test, предложить и применить патч…", example: "Найти причину flaky integration test, подготовить минимальный патч, после подтверждения применить и проверить." },
@@ -255,7 +255,7 @@ const module4: PrototypeModule = {
 };
 
 const module5: PrototypeModule = {
-  number: 5, slug: "multi-agent-systems", eyebrow: "Модуль 05 · Multi-agent systems", title: "Мультиагентность без театра", shortTitle: "Мультиагентные системы", dek: "Отличи полезный параллелизм от дорогой толпы ботов. Спроектируй роли, общую память и handoff так, чтобы у финального решения оставался владелец.", result: "Multi-agent System Map с ролями, контрактами передачи и сценарием деградации", guidedMinutes: [75, 100], practiceMinutes: [75, 120], artifactName: "Multi-agent System Map", artifactFile: "multi-agent-system-map.md",
+  number: 5, slug: "multi-agent-systems", eyebrow: "Модуль 05 · Multi-agent systems", title: "Мультиагентность без театра", shortTitle: "Мультиагентные системы", dek: "Отличи полезный параллелизм от дорогой толпы ботов. Спроектируй роли, общую память и handoff так, чтобы у финального решения оставался владелец.", result: "Multi-agent System Map с ролями, контрактами передачи и сценарием деградации", guidedMinutes: [75, 100], practiceMinutes: [240, 360], artifactName: "Multi-agent System Map", artifactFile: "multi-agent-system-map.md",
   labTitle: "Спроектируй систему — или честно оставь одного агента", labLead: "Возьми сложный workflow. Сначала докажи, что параллелизм окупит координацию. Только потом добавляй роли, shared state и правила сборки результата.",
   labFields: [
     { key: "outcome", label: "Outcome", prompt: "Какой единый результат должна выдать система?", placeholder: "Подготовить проверяемый release readiness report…", example: "Подготовить release-readiness report с рисками, evidence и однозначной рекомендацией go/no-go." },
@@ -297,7 +297,7 @@ export const MODULE_ONE_SUMMARY = {
   dek: "Агент ускоряет всё — в том числе неверно понятую задачу. Зафиксируй цель, границы и доказательства готовности до того, как он начнёт действовать.",
   result: "Agent Task Contract, который можно вставить в реальную задачу уже сегодня",
   guidedMinutes: [45, 60] as [number, number],
-  practiceMinutes: [45, 90] as [number, number],
+  practiceMinutes: [90, 150] as [number, number],
   artifactName: "Agent Task Contract",
   stepCount: 7,
 };

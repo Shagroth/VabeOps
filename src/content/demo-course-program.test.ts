@@ -1,5 +1,6 @@
 import assert from "node:assert/strict";
 import test from "node:test";
+import { HOMEWORK_ASSIGNMENTS, HOMEWORK_SCORING } from "./demo-course-homework.ts";
 import { PROGRAM_MODULES, PROGRAM_TOTALS, PROTOTYPE_MODULES } from "./demo-course-program.ts";
 
 test("flagship prototype contains five seven-screen modules", () => {
@@ -25,4 +26,23 @@ test("every prototype module has a gated learning path and a complete artifact s
     assert.ok(courseModule.labFields.every((field) => field.example.length >= 12));
     assert.ok(courseModule.rubric.length >= 6);
   }
+});
+
+test("every module has one complete homework assignment with an honest time estimate", () => {
+  assert.equal(HOMEWORK_ASSIGNMENTS.length, 5);
+  assert.deepEqual(HOMEWORK_ASSIGNMENTS.map((assignment) => assignment.moduleNumber), [1, 2, 3, 4, 5]);
+  assert.equal(new Set(HOMEWORK_ASSIGNMENTS.map((assignment) => assignment.moduleNumber)).size, 5);
+
+  for (const assignment of HOMEWORK_ASSIGNMENTS) {
+    const courseModule = PROGRAM_MODULES.find((item) => item.number === assignment.moduleNumber);
+    assert.ok(courseModule, `module ${assignment.moduleNumber} is missing`);
+    assert.deepEqual(courseModule.practiceMinutes, assignment.estimatedMinutes);
+    assert.ok(assignment.tasks.length >= 6);
+    assert.ok(assignment.acceptance.length >= 6);
+    assert.ok(assignment.deliverables.tree.includes(`homework-0${assignment.moduleNumber}/`));
+  }
+});
+
+test("homework scoring rubric totals twenty points", () => {
+  assert.equal(HOMEWORK_SCORING.reduce((total, item) => total + item.points, 0), 20);
 });

@@ -31,6 +31,7 @@ export function ModuleHero({ number, eyebrow, title, dek, result, guidedMinutes,
           <p className="mt-6 max-w-[60ch] text-lg leading-relaxed text-ink-muted">{dek}</p>
           <div className="mt-8 flex flex-wrap gap-2">
             {[`${formatMinutes(guidedMinutes)} в интерфейсе`, `${formatMinutes(practiceMinutes)} практика`, "без регистрации"].map((item) => <span key={item} className="rounded-full border border-hairline-ink px-3 py-1.5 font-mono text-[10px] uppercase tracking-wide text-ink-muted">{item}</span>)}
+            <a href="#homework" className="rounded-full border border-signal/45 bg-signal/10 px-3 py-1.5 font-mono text-[10px] uppercase tracking-wide text-signal transition-colors hover:bg-signal hover:text-signal-ink">Домашняя работа ↓</a>
           </div>
         </div>
 
