@@ -14,11 +14,12 @@ import {
   type HomeworkAssignment,
 } from "./demo-course-homework.ts";
 import { PUBLIC_DEMO_MODULES } from "./demo-access.ts";
-import { FIRST_FLIGHT_MODULES, FIRST_FLIGHT_PATH, getFirstFlightModule } from "./first-flight-program.ts";
+import { FIRST_FLIGHT_MODULES, getFirstFlightModule } from "./first-flight-program.ts";
 import { FIRST_FLIGHT_PASS_SCORE, FIRST_FLIGHT_SCORING, getFirstFlightHomework } from "./first-flight-homework.ts";
 
-export const COURSE_KEYS = ["ENGINEERS", "FIRST_FLIGHT"] as const;
-export type CourseKey = (typeof COURSE_KEYS)[number];
+import { COURSE_KEYS, COURSE_LIST, isCourseKey, type CourseKey } from "./course-list.ts";
+
+export { COURSE_KEYS, isCourseKey, type CourseKey };
 
 export type CourseModuleSummary = {
   number: number;
@@ -64,9 +65,7 @@ export type CourseDefinition = {
 
 const engineers: CourseDefinition = {
   key: "ENGINEERS",
-  title: "KiteGrip for Engineers",
-  audience: "для разработчиков",
-  path: "/demo-course",
+  ...COURSE_LIST.ENGINEERS,
   modules: PROGRAM_MODULES,
   publicModules: PUBLIC_DEMO_MODULES,
   scoring: HOMEWORK_SCORING,
@@ -86,9 +85,7 @@ const engineers: CourseDefinition = {
 
 const firstFlight: CourseDefinition = {
   key: "FIRST_FLIGHT",
-  title: "First Flight",
-  audience: "для новичков, без кода",
-  path: FIRST_FLIGHT_PATH,
+  ...COURSE_LIST.FIRST_FLIGHT,
   modules: FIRST_FLIGHT_MODULES,
   publicModules: [1, 2],
   scoring: FIRST_FLIGHT_SCORING,
@@ -105,10 +102,6 @@ const firstFlight: CourseDefinition = {
 };
 
 export const COURSES: Record<CourseKey, CourseDefinition> = { ENGINEERS: engineers, FIRST_FLIGHT: firstFlight };
-
-export function isCourseKey(value: unknown): value is CourseKey {
-  return typeof value === "string" && (COURSE_KEYS as readonly string[]).includes(value);
-}
 
 /** Unknown or missing keys fall back to the engineers' course, which every older cohort ran. */
 export function getCourse(key: unknown): CourseDefinition {

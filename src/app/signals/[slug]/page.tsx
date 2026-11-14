@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { SHOW_AUTHORS } from "@/content/authors";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Header } from "@/components/landing/Header";
@@ -51,7 +52,7 @@ export default async function SignalDetailPage({
                 Демо / плейсхолдер
               </span>
             )}
-            <span className="text-graphite-muted">· {signal.publishedAt} · {signal.author}</span>
+            <span className="text-graphite-muted">· {signal.publishedAt}{SHOW_AUTHORS ? ` · ${signal.author}` : ""}</span>
           </div>
           <h1 className="mt-3 text-3xl font-semibold tracking-tight sm:text-4xl">{signal.title}</h1>
 

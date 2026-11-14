@@ -2,7 +2,8 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { Header } from "@/components/landing/Header";
 import { Footer } from "@/components/landing/Footer";
-import { AUTHORS } from "@/content/authors";
+import { notFound } from "next/navigation";
+import { AUTHORS, SHOW_AUTHORS } from "@/content/authors";
 
 export const metadata: Metadata = {
   title: "Авторы",
@@ -11,6 +12,7 @@ export const metadata: Metadata = {
 };
 
 export default function AuthorsPage() {
+  if (!SHOW_AUTHORS) notFound();
   return (
     <div className="flex min-h-screen flex-col bg-paper text-graphite">
       <Header />

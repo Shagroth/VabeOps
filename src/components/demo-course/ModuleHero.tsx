@@ -2,6 +2,7 @@ import Link from "next/link";
 import type { CSSProperties } from "react";
 import { KiteGripMark } from "@/components/brand/KiteGripMark";
 import { PROGRAM_AUTHOR, formatMinutes } from "@/content/demo-course-program";
+import { SHOW_AUTHORS } from "@/content/authors";
 
 const step = (i: number) => ({ "--i": i }) as CSSProperties;
 
@@ -86,6 +87,7 @@ export function ModuleHero({
             <p className="mt-4 max-w-[30em] text-[15px] leading-relaxed text-graphite-soft">
               {mode === "locked" ? "Модуль открывается участникам пилота в рабочем пространстве." : "Скопируй в задачу, скачай как Markdown и проверь на живой работе."}
             </p>
+            {SHOW_AUTHORS && (
             <div className="mt-7 flex items-center gap-3.5 border-t border-[#c9d6f4] pt-6">
               <span aria-hidden="true" className="flex h-11 w-11 flex-none items-center justify-center rounded-full bg-ink font-mono text-[13px] text-ink-foreground">{PROGRAM_AUTHOR.initials}</span>
               <div>
@@ -93,6 +95,7 @@ export function ModuleHero({
                 <p className="text-[15px] text-graphite-soft">{PROGRAM_AUTHOR.role}</p>
               </div>
             </div>
+            )}
             <p className="mt-5 text-[13px] leading-relaxed text-graphite-muted">Учебные кейсы вымышлены, инженерные проблемы — до обидного настоящие. Время уточним после пилота.</p>
           </aside>
         </div>

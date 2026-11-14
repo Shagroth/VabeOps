@@ -69,7 +69,7 @@ export default async function FirstFlightModulePage({ params }: PageProps) {
         {open ? (
           <>
             <section className="mx-auto max-w-[1280px] px-3 pb-20 sm:px-8 lg:pb-24">
-              <PrototypeModuleFlow module={prototype} />
+              <PrototypeModuleFlow module={prototype} track={{ course: "FIRST_FLIGHT", moduleNumber }} />
             </section>
             <HomeworkAssignmentSection
               assignment={homework}

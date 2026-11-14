@@ -40,6 +40,9 @@ export default async function AdminPage() {
     <div className="mx-auto flex max-w-[860px] flex-col gap-10">
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-semibold">Admin</h1>
+        <Link href="/admin/analytics" className="ml-auto mr-4 text-sm underline">
+          Воронка
+        </Link>
         <Link href="/admin/applications" className="text-sm underline">
           Заявки{pendingApplications > 0 ? ` (${pendingApplications} новых)` : ""}
         </Link>

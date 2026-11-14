@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { KiteGripLogo } from "@/components/brand/KiteGripLogo";
+import { SHOW_AUTHORS } from "@/content/authors";
 
 const COLUMNS = [
   {
@@ -26,7 +27,7 @@ const COLUMNS = [
   {
     title: "О школе",
     links: [
-      { href: "/authors", label: "Авторы" },
+      ...(SHOW_AUTHORS ? [{ href: "/authors", label: "Авторы" }] : []),
       { href: "/privacy", label: "Политика данных" },
       { href: "/#signin", label: "Войти" },
     ],

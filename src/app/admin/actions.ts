@@ -246,12 +246,17 @@ export async function setApplicationStatus(
         throw new Error("Выбери уровень (новичок/уверенный) перед тем, как принять заявку.");
       }
 
-      // Single-cohort assumption for the current pilot — see
-      // docs/production-readiness.md backlog for picking a cohort
-      // explicitly once there's more than one.
-      const cohort = await prisma.cohort.findFirst({ orderBy: { startDate: "desc" } });
+      // The newest cohort of the course the person applied to. One cohort
+      // per course at a time is assumed; picking among several is a backlog
+      // item in docs/production-readiness.md.
+      const cohort = await prisma.cohort.findFirst({
+        where: { course: application.course },
+        orderBy: { startDate: "desc" },
+      });
       if (!cohort) {
-        throw new Error("Нет ни одной когорты — сначала создай когорту, потом принимай заявки.");
+        throw new Error(
+          `Нет потока курса «${getCourse(application.course).title}» — сначала создай поток этого курса, потом принимай заявку.`,
+        );
       }
 
       const user =

@@ -3,6 +3,19 @@
 // surface that renders them (brief §2 "Авторы") — no invented company
 // names, awards, or testimonials attached to a demo persona.
 
+/**
+ * The author block is switched off until there is a real person to show.
+ * The only profile below is a demo persona, and a school that does not say
+ * who teaches is better off saying nothing than showing an invented name.
+ *
+ * To switch it on: replace the entry in AUTHORS and PROGRAM_AUTHOR in
+ * demo-course-program.ts with real data (name, one-line title, short bio,
+ * initials), set `isDemo: false`, then set SHOW_AUTHORS to true. That brings
+ * back the author card in lessons, the /authors pages, their footer link
+ * and sitemap entries, and bylines on signals.
+ */
+export const SHOW_AUTHORS = false;
+
 export type AuthorEntry = {
   slug: string;
   displayName: string;

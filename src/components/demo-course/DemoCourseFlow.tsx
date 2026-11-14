@@ -19,6 +19,7 @@ import {
   type ContractKey,
 } from "@/content/demo-course";
 import { sendArtifactToSubmission, type WorkspaceFlowLinks } from "@/lib/artifact-bridge";
+import { useFunnel, type FunnelTarget } from "./useFunnel";
 import {
   BTN,
   CARD,
@@ -95,7 +96,8 @@ function loadState(): CourseState {
   }
 }
 
-export function DemoCourseFlow({ workspace }: { workspace?: WorkspaceFlowLinks } = {}) {
+export function DemoCourseFlow({ workspace, track }: { workspace?: WorkspaceFlowLinks; track?: FunnelTarget } = {}) {
+  const mark = useFunnel(track);
   const nextHref = workspace ? workspace.nextHref : "/demo-course/2";
   const nextLabel = workspace ? workspace.nextLabel ?? "К следующей неделе →" : "К модулю 2 →";
   const overviewHref = workspace ? workspace.overviewHref : "/demo-course";
@@ -128,6 +130,14 @@ export function DemoCourseFlow({ workspace }: { workspace?: WorkspaceFlowLinks }
     }
     lessonHeading.current?.focus();
   }, [hydrated, state.step]);
+
+  useEffect(() => {
+    if (!hydrated) return;
+    mark("open");
+    if (state.maxStepReached >= 3) mark("lab");
+    if (state.maxStepReached >= LAST_STEP) mark("artifact");
+    if (state.finished) mark("finished");
+  }, [hydrated, mark, state.maxStepReached, state.finished]);
 
   const completedFields = CONTRACT_FIELDS.filter(
     (field) => state.contract[field.key].trim().length >= 12,
@@ -203,6 +213,7 @@ export function DemoCourseFlow({ workspace }: { workspace?: WorkspaceFlowLinks }
     try {
       await navigator.clipboard.writeText(contractText);
       setCopyState("copied");
+      mark("export");
     } catch {
       setCopyState("failed");
     }
@@ -215,6 +226,7 @@ export function DemoCourseFlow({ workspace }: { workspace?: WorkspaceFlowLinks }
     anchor.href = href;
     anchor.download = "agent-task-contract.md";
     anchor.click();
+    mark("export");
     URL.revokeObjectURL(href);
   }
 

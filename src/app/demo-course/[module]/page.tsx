@@ -50,7 +50,7 @@ export default async function DemoCourseModulePage({ params }: PageProps) {
         <Header />
         <main id="main-content" className="flex-1">
           <ModuleHero number={MODULE_ONE_SUMMARY.number} eyebrow={MODULE_ONE_SUMMARY.eyebrow} title={MODULE_ONE_SUMMARY.title} dek={MODULE_ONE_SUMMARY.dek} result={MODULE_ONE_SUMMARY.result} guidedMinutes={MODULE_ONE_SUMMARY.guidedMinutes} practiceMinutes={MODULE_ONE_SUMMARY.practiceMinutes} />
-          <section className="mx-auto max-w-[1280px] px-3 pb-20 sm:px-8 lg:pb-24"><DemoCourseFlow /></section>
+          <section className="mx-auto max-w-[1280px] px-3 pb-20 sm:px-8 lg:pb-24"><DemoCourseFlow track={{ course: "ENGINEERS", moduleNumber: 1 }} /></section>
           <HomeworkAssignmentSection assignment={homework} />
         </main>
         <Footer />
@@ -83,7 +83,7 @@ export default async function DemoCourseModulePage({ params }: PageProps) {
       <main id="main-content" className="flex-1">
         <ModuleHero number={courseModule.number} eyebrow={courseModule.eyebrow} title={courseModule.title} dek={courseModule.dek} result={courseModule.result} guidedMinutes={courseModule.guidedMinutes} practiceMinutes={courseModule.practiceMinutes} />
         <section className="mx-auto max-w-[1280px] px-3 pb-20 sm:px-8 lg:pb-24">
-          <PrototypeModuleFlow module={courseModule} />
+          <PrototypeModuleFlow module={courseModule} track={{ course: "ENGINEERS", moduleNumber }} />
         </section>
         <HomeworkAssignmentSection assignment={homework} />
       </main>
