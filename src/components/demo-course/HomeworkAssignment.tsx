@@ -1,11 +1,13 @@
 import type { ReactNode } from "react";
 import {
+  HOMEWORK_BAR,
   HOMEWORK_PASS_SCORE,
   HOMEWORK_SCORING,
   type HomeworkAssignment,
   formatHomeworkTime,
 } from "@/content/demo-course-homework";
 import type { ScoringCriterion } from "@/content/course-catalog";
+import { ENGINEER_ROLE_LABEL } from "@/content/engineer-roles";
 import { Reveal } from "@/components/motion/Reveal";
 import { CARD, Checklist, FileCard, Label } from "./flow-ui";
 
@@ -82,6 +84,24 @@ export function HomeworkAssignmentSection({
           </Block>
         </Reveal>
 
+        {assignment.tracks && (
+          <Reveal mode="children">
+            <h3 className={H3}>Выбери сценарий по своей роли</h3>
+            <p className="mt-3 max-w-[38em] leading-relaxed text-graphite-soft">
+              Задание одно, предметная область твоя. Требования к сдаче и критерии приёмки общие для всех сценариев.
+            </p>
+            <ul className="mt-6 grid gap-4 md:grid-cols-2">
+              {assignment.tracks.map((track, index) => (
+                <li key={track.role} className={`kg-item ${CARD}`} style={{ "--i": index } as React.CSSProperties}>
+                  <span className="font-mono text-[13px] uppercase tracking-[0.08em] text-system">{ENGINEER_ROLE_LABEL[track.role]}</span>
+                  <h4 className="mt-2 text-lg font-bold tracking-[-0.01em]">{track.title}</h4>
+                  <p className="mt-2 text-[15px] leading-relaxed text-graphite-soft">{track.scenario}</p>
+                </li>
+              ))}
+            </ul>
+          </Reveal>
+        )}
+
         {assignment.validationScenarios && (
           <Reveal>
             <Block title="Обязательные проверки">
@@ -117,6 +137,20 @@ export function HomeworkAssignmentSection({
             <Checklist items={assignment.acceptance} />
           </div>
         </Reveal>
+
+        {assignment.tracks && (
+          <Reveal as="div" className="rounded-[28px] bg-ink p-7 text-ink-foreground sm:p-9">
+            <span className="font-mono text-[13px] uppercase tracking-[0.08em] text-system">Планка для всех сценариев</span>
+            <ol className="mt-4">
+              {HOMEWORK_BAR.map((item, i) => (
+                <li key={item} className="grid grid-cols-[36px_1fr] gap-x-2 border-t border-ink-line py-3 leading-relaxed">
+                  <span className="font-mono text-[15px] text-system">0{i + 1}</span>
+                  <span>{item}</span>
+                </li>
+              ))}
+            </ol>
+          </Reveal>
+        )}
 
         {assignment.comparisonRows && <ComparisonTable rows={assignment.comparisonRows} />}
 

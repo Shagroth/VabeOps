@@ -1,3 +1,5 @@
+import { ENGINEERING_DEPTH } from "./demo-course-depth.ts";
+import type { RoleTask } from "./engineer-roles.ts";
 export type CheckpointOption = {
   id: string;
   label: string;
@@ -50,6 +52,8 @@ export type PrototypeStep = {
   /** Plain-language theory paragraphs shown before the notes. */
   theory?: string[];
   diagram?: LessonDiagram;
+  /** One task per engineering role; the participant picks their own. */
+  roleTasks?: RoleTask[];
   notes: Array<{
     number: string;
     title: string;
@@ -334,7 +338,33 @@ const module5: PrototypeModule = {
   ],
 };
 
-export const PROTOTYPE_MODULES = [module2, module3, module4, module5] as const;
+/**
+ * Merges the depth layer (demo-course-depth.ts) into a module: theory,
+ * scheme, role tasks and a harder scenario question per concept step,
+ * with the extra reading time added to the step and the module estimate.
+ */
+function withDepth(module: PrototypeModule): PrototypeModule {
+  const depth = ENGINEERING_DEPTH[module.number];
+  if (!depth) return module;
+  return {
+    ...module,
+    guidedMinutes: depth.guidedMinutes,
+    steps: module.steps.map((step) => {
+      const extra = depth.steps[step.id];
+      if (!extra) return step;
+      return {
+        ...step,
+        theory: extra.theory,
+        diagram: extra.diagram,
+        roleTasks: extra.roleTasks,
+        checkpoint: extra.checkpoint,
+        minutes: step.minutes + extra.addMinutes,
+      };
+    }),
+  };
+}
+
+export const PROTOTYPE_MODULES = [module2, module3, module4, module5].map(withDepth);
 
 export const MODULE_ONE_SUMMARY = {
   number: 1,

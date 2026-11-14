@@ -230,8 +230,8 @@ export function PublicLanding() {
                   for Engineers
                 </h3>
                 <p className="relative text-base leading-[1.55] text-[#e8eeff]">
-                  Агентная инженерия для тех, кто уже пишет код: контракт задачи, контекст, MCP, guardrails и
-                  мультиагентные системы.
+                  Агентная инженерия для тех, кто уже держит прод: контракт задачи, контекст, MCP, guardrails и
+                  мультиагентные системы. С задачами для platform, DevOps, SRE и fullstack.
                 </p>
                 <p className="relative mt-auto font-mono text-[13px] text-sky-soft">5 модулей · 5–7 недель · 5 мест</p>
                 <Link

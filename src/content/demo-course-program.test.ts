@@ -46,3 +46,35 @@ test("every module has one complete homework assignment with an honest time esti
 test("homework scoring rubric totals twenty points", () => {
   assert.equal(HOMEWORK_SCORING.reduce((total, item) => total + item.points, 0), 20);
 });
+
+test("engineers' concept steps carry theory, a scheme, a scenario question and a task per role", async () => {
+  const { ENGINEER_ROLES } = await import("./engineer-roles.ts");
+  for (const courseModule of PROTOTYPE_MODULES) {
+    const concept = courseModule.steps.slice(1, 5);
+    assert.equal(concept.length, 4);
+    for (const step of concept) {
+      const where = `module ${courseModule.number} / ${step.id}`;
+      assert.ok(step.theory && step.theory.length >= 3, `${where}: theory`);
+      assert.ok(step.diagram, `${where}: scheme`);
+      assert.deepEqual(step.roleTasks?.map((t) => t.role), [...ENGINEER_ROLES], `${where}: role tasks`);
+      assert.ok(step.roleTasks?.every((t) => t.task.length > 60), `${where}: role tasks are real tasks`);
+      const cp = step.checkpoint;
+      assert.ok(cp && cp.options.length === 4, `${where}: four options`);
+      assert.ok(cp.options.some((o) => o.id === cp.correctId), `${where}: correct option exists`);
+    }
+  }
+});
+
+test("module 1 lab and every homework offer a scenario per engineering role", async () => {
+  const { ENGINEER_ROLES } = await import("./engineer-roles.ts");
+  const { ROLE_CONTRACT_TEMPLATES, CONTRACT_FIELDS } = await import("./demo-course.ts");
+  assert.deepEqual(ROLE_CONTRACT_TEMPLATES.map((t) => t.role), [...ENGINEER_ROLES]);
+  for (const template of ROLE_CONTRACT_TEMPLATES) {
+    for (const field of CONTRACT_FIELDS) {
+      assert.ok(template.contract[field.key].trim().length >= 12, `${template.role}: ${field.key}`);
+    }
+  }
+  for (const assignment of HOMEWORK_ASSIGNMENTS) {
+    assert.deepEqual(assignment.tracks?.map((t) => t.role), [...ENGINEER_ROLES], `homework ${assignment.moduleNumber}`);
+  }
+});

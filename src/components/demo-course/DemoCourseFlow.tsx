@@ -5,7 +5,7 @@ import Link from "next/link";
 import {
   AGENT_PLAN,
   CONTRACT_FIELDS,
-  CONTRACT_TEMPLATE,
+  ROLE_CONTRACT_TEMPLATES,
   DEMO_COURSE_META,
   INCIDENT,
   MODE_SCENARIO,
@@ -36,8 +36,8 @@ import {
   Label,
   Lesson,
   Question,
-  StarterCase,
 } from "./flow-ui";
+import { ENGINEER_ROLE_LABEL } from "@/content/engineer-roles";
 
 const STORAGE_KEY = "vabeops-module-contract-v2";
 const LAST_STEP = MODULE_STEPS.length - 1;
@@ -407,12 +407,25 @@ export function DemoCourseFlow({ workspace, track }: { workspace?: WorkspaceFlow
           title="Теперь преврати свою задачу в контракт"
           lead="Возьми рабочую задачу, которую действительно готов отдать агенту. Если такой сейчас нет, загрузи учебный пример. Черновик останется только в этом браузере."
         >
-          <StarterCase
-            title="Нужен быстрый старт?"
-            text="Подставим кейс со скидками — каждое поле можно переписать."
-            action="Загрузить учебный кейс"
-            onClick={() => setState((current) => ({ ...current, contract: CONTRACT_TEMPLATE }))}
-          />
+          <div className="rounded-[24px] bg-sky-tint p-6">
+            <p className="text-lg font-bold tracking-[-0.01em]">Нужен быстрый старт?</p>
+            <p className="mt-1 text-[15px] text-graphite-soft">
+              Загрузи учебный контракт по своей роли и перепиши его под настоящую задачу. Каждое поле редактируется.
+            </p>
+            <div className="mt-4 grid gap-2.5 sm:grid-cols-2">
+              {ROLE_CONTRACT_TEMPLATES.map((template) => (
+                <button
+                  key={template.role}
+                  type="button"
+                  onClick={() => setState((current) => ({ ...current, contract: template.contract }))}
+                  className="kg-btn flex min-h-14 flex-col items-start justify-center rounded-[18px] border-[1.5px] border-graphite bg-white px-4 py-2.5 text-left hover:bg-ink hover:text-ink-foreground"
+                >
+                  <span className="font-mono text-xs uppercase tracking-[0.08em] opacity-70">{ENGINEER_ROLE_LABEL[template.role]}</span>
+                  <span className="font-semibold leading-snug">{template.title}</span>
+                </button>
+              ))}
+            </div>
+          </div>
 
           <div className="mt-5 space-y-4">
             {CONTRACT_FIELDS.map((field) => {
