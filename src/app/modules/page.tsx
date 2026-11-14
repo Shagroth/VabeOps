@@ -1,22 +1,20 @@
-import Link from "next/link";
 import { redirect } from "next/navigation";
 import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
 import { WorkspaceShell } from "@/components/WorkspaceShell";
-import { SubmissionStatusBadge } from "@/components/SubmissionStatusBadge";
 import { canAccessStudio, canReviewSubmissions } from "@/lib/require-role";
+import { CourseProgramCard, DashboardHeader, NoCohortCard } from "@/components/workspace/dashboard";
+import { PILOT_COURSE_TITLE } from "@/content/demo-course-program";
 
 export default async function ModulesPage() {
   const session = await auth();
   if (!session?.user) redirect("/");
 
-  const studioAccess = canAccessStudio(session.user.role);
-  const reviewAccess = canReviewSubmissions(session.user.role);
+  const userId = session.user.id;
 
-  // See stream/page.tsx for why this orders explicitly by cohort start
-  // date instead of trusting an arbitrary `findFirst` row.
-  const enrollment = await prisma.enrollment.findFirst({
-    where: { userId: session.user.id },
+  // One program per cohort the person is enrolled in, newest first.
+  const enrollments = await prisma.enrollment.findMany({
+    where: { userId },
     orderBy: { cohort: { startDate: "desc" } },
     include: {
       cohort: {
@@ -25,64 +23,52 @@ export default async function ModulesPage() {
     },
   });
 
-  if (!enrollment) {
-    return (
-      <WorkspaceShell active="program" email={session.user.email ?? ""} canAccessStudio={studioAccess} canReviewSubmissions={reviewAccess}>
-        <div className="flex min-h-[60vh] flex-col items-center justify-center gap-4 rounded-2xl border border-hairline bg-white/40 px-6 py-16 text-center">
-          <h1 className="text-xl font-semibold">Пока нет активной когорты</h1>
-          <p className="max-w-[48ch] text-graphite-muted">
-            Программа появится здесь, как только тебя зачислят в когорту.
-          </p>
-        </div>
-      </WorkspaceShell>
-    );
-  }
-
-  const submissions = await prisma.submission.findMany({
-    where: {
-      userId: session.user.id,
-      moduleId: { in: enrollment.cohort.modules.map((m) => m.id) },
-    },
-    select: { moduleId: true, status: true },
-  });
+  const moduleIds = enrollments.flatMap((e) => e.cohort.modules.map((m) => m.id));
+  const submissions =
+    moduleIds.length > 0
+      ? await prisma.submission.findMany({
+          where: { userId, moduleId: { in: moduleIds } },
+          select: { moduleId: true, status: true },
+        })
+      : [];
   const statusByModule = new Map(submissions.map((s) => [s.moduleId, s.status]));
 
   return (
     <WorkspaceShell
       active="program"
       email={session.user.email ?? ""}
-      canAccessStudio={studioAccess}
-      canReviewSubmissions={reviewAccess}
-      breadcrumb={enrollment.cohort.name}
+      canAccessStudio={canAccessStudio(session.user.role)}
+      canReviewSubmissions={canReviewSubmissions(session.user.role)}
+      breadcrumb={enrollments[0]?.cohort.name}
     >
-      <div className="mx-auto flex max-w-[860px] flex-col gap-6">
-        <h1 className="text-2xl font-semibold">{enrollment.cohort.name}</h1>
-        <ul className="flex flex-col gap-2">
-          {enrollment.cohort.modules.map((m) =>
-            m.isOpen ? (
-              <li key={m.id}>
-                <Link
-                  href={`/modules/${m.id}`}
-                  className="flex items-center justify-between rounded-xl border border-hairline bg-white/50 p-4 transition-colors duration-150 hover:bg-white"
-                >
-                  <div>
-                    <span className="text-sm text-graphite-muted">Неделя {m.weekNumber}</span>
-                    <div className="font-medium">{m.title}</div>
-                  </div>
-                  {statusByModule.has(m.id) && (
-                    <SubmissionStatusBadge status={statusByModule.get(m.id)!} />
-                  )}
-                </Link>
-              </li>
-            ) : (
-              <li key={m.id} className="rounded-xl border border-hairline bg-white/20 p-4 opacity-60">
-                <span className="text-sm text-graphite-muted">Неделя {m.weekNumber}</span>
-                <div className="font-medium">{m.title}</div>
-                <div className="text-xs text-graphite-muted">Скоро откроется</div>
-              </li>
-            )
-          )}
-        </ul>
+      <div className="mx-auto flex max-w-[1080px] flex-col gap-10 text-[17px]">
+        <DashboardHeader
+          eyebrow="Программа"
+          title={enrollments.length > 0 ? "Недели твоих курсов" : "Программа появится после зачисления"}
+          lead={
+            enrollments.length > 0
+              ? "В каждой неделе — урок, лаборатория, домашняя работа и разбор от автора."
+              : undefined
+          }
+        />
+        {enrollments.length === 0 && <NoCohortCard isAdmin={session.user.role === "ADMIN"} />}
+        {enrollments.map((e) => (
+          <CourseProgramCard
+            key={e.cohort.id}
+            course={{
+              id: e.cohort.id,
+              courseTitle: PILOT_COURSE_TITLE,
+              cohortName: e.cohort.name,
+              weeks: e.cohort.modules.map((m) => ({
+                id: m.id,
+                weekNumber: m.weekNumber,
+                title: m.title,
+                isOpen: m.isOpen,
+                status: statusByModule.get(m.id) ?? null,
+              })),
+            }}
+          />
+        ))}
       </div>
     </WorkspaceShell>
   );

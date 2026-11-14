@@ -61,6 +61,9 @@ export type PrototypeModule = {
   steps: PrototypeStep[];
 };
 
+/** Every cohort today runs this one course; shown as the course name in the workspace. */
+export const PILOT_COURSE_TITLE = "KiteGrip for Engineers";
+
 export const PROGRAM_AUTHOR = {
   name: "Игорь Ковалёв",
   initials: "ИК",

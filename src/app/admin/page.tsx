@@ -99,7 +99,7 @@ export default async function AdminPage() {
             <form action={createProgramWeeks} className="text-sm">
               <input type="hidden" name="cohortId" value={cohort.id} />
               <button type="submit" className="rounded-lg border border-black/15 px-3 py-2 hover:bg-black/5">
-                Создать недостающие недели из программы курса (откроется только неделя 1)
+                Создать недостающие недели из программы курса (сразу открытыми)
               </button>
             </form>
           )}

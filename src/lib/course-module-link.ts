@@ -20,8 +20,9 @@ export type ProgramWeekSeed = {
 
 /**
  * Weeks to create for a cohort from the course program, skipping week
- * numbers that already exist so the action is safe to click twice. Only
- * the first week opens immediately; the rest are opened by hand in admin.
+ * numbers that already exist so the action is safe to click twice. Every
+ * week is created open: a pilot participant works through the program at
+ * their own pace. A week can still be closed by hand in admin.
  */
 export function planProgramWeeks(
   program: readonly { number: number; shortTitle: string }[],
@@ -34,6 +35,6 @@ export function planProgramWeeks(
       weekNumber: m.number,
       courseModuleNumber: m.number,
       title: m.shortTitle,
-      isOpen: m.number === 1,
+      isOpen: true,
     }));
 }
