@@ -135,7 +135,7 @@ export function PrototypeModuleFlow({ module, workspace }: { module: PrototypeMo
               </div>
               <div className="mt-3 h-1 overflow-hidden rounded-full bg-white/10"><div className="h-full rounded-full bg-signal transition-[width] duration-500" style={{ width: `${progress}%` }} /></div>
               <h2 className="mt-5 text-xl font-medium leading-tight">{module.title}</h2>
-              <p className="mt-2 text-xs leading-relaxed text-ink-muted">На выходе — {module.artifactName}. Это не сувенир — понесёшь его в работу.</p>
+              <p className="mt-2 text-xs leading-relaxed text-ink-muted">На выходе — {module.artifactName}. Это не сувенир: он пойдёт прямо в работу.</p>
             </div>
 
             <nav className="min-w-0 overflow-x-auto p-3 lg:max-h-[500px] lg:overflow-y-auto lg:p-4" aria-label="Навигация по модулю">

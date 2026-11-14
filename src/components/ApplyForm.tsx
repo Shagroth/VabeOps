@@ -36,9 +36,8 @@ export function ApplyForm({ variant = "light" }: { variant?: "light" | "dark" })
       <div className={`rounded-xl border p-6 text-sm ${s.confirm}`}>
         <p className="mb-2 font-medium">Заявка отправлена.</p>
         <p className={s.confirmMuted}>
-          Это пилотный бесплатный поток на 5 человек — автор рассматривает заявки вручную,
-          без автоматического зачисления и без обещанного срока ответа. Если тебя выберут,
-          доступ придёт на указанный email.
+          Пилот бесплатный, мест пять. Автор читает каждую заявку сам, поэтому точный срок
+          ответа обещать не будем. Если тебя выберут, доступ придёт на указанный email.
         </p>
       </div>
     );
@@ -110,7 +109,7 @@ export function ApplyForm({ variant = "light" }: { variant?: "light" | "dark" })
       </label>
 
       <p className={`text-xs ${s.hint}`}>
-        Пилот бесплатный. Доступ к AI-инструментам (Claude, Cursor и т.п.) — свой, за твой счёт.
+        Пилот бесплатный. Подписки на AI-инструменты (Claude, Cursor и т. п.) оплачиваешь сам.
       </p>
 
       <label className={`flex items-start gap-2 text-xs ${s.hint}`}>

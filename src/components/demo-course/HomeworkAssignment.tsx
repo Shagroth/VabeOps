@@ -100,7 +100,7 @@ export function HomeworkAssignmentSection({ assignment }: { assignment: Homework
           <div className="flex flex-wrap items-end justify-between gap-4">
             <div>
               <SectionLabel>Как считаются 20 баллов</SectionLabel>
-              <p className="mt-3 max-w-[64ch] text-sm leading-relaxed text-graphite-muted">Оценивается не объём кода и не красота ответа модели, а способность поставить границы, получить доказательства и принять собственное инженерное решение.</p>
+              <p className="mt-3 max-w-[64ch] text-sm leading-relaxed text-graphite-muted">Объём кода и красота ответа модели баллов не приносят. Баллы — за то, что ты поставил границы, добыл доказательства и сам принял инженерное решение.</p>
             </div>
             <span className="font-mono text-xs uppercase tracking-wide text-system">pass: 14 / 20</span>
           </div>

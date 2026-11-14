@@ -47,7 +47,7 @@ export function CourseProgramOverview() {
                 <Metric label="Своя практика" value={formatHours(PROGRAM_TOTALS.practiceMin, PROGRAM_TOTALS.practiceMax)} />
               </div>
               <p className="mt-5 text-[11px] leading-relaxed text-ink-muted/75">
-                Не марафон фоновых видео. Время уходит на решения, практику и артефакты, которые можно забрать в работу.
+                Многочасовых видео на фоне тут нет. Время уходит на решения, практику и артефакты, которые потом пойдут в работу.
               </p>
             </div>
           </div>
@@ -77,7 +77,7 @@ export function CourseProgramOverview() {
             <h2 className="mt-3 text-3xl font-semibold tracking-tight sm:text-4xl">Пять недель. Ноль магии.</h2>
           </div>
           <p className="max-w-[48ch] text-sm leading-relaxed text-graphite-muted">
-            Каждый модуль меняет один участок твоей работы и заканчивается артефактом. Не «посмотрел урок» — а унёс готовый инструмент.
+            Каждый модуль меняет один участок твоей работы и заканчивается артефактом. Из урока уносишь готовый инструмент, а не галочку «просмотрено».
           </p>
         </div>
 
