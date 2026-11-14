@@ -3,6 +3,41 @@ export type CheckpointOption = {
   label: string;
 };
 
+/**
+ * A scheme inside a lesson step. Data, not markup: the lesson renders it
+ * with the brand's line as connectors (see components/demo-course/LessonDiagram).
+ */
+export type DiagramTone = "plain" | "sky" | "ink";
+export type LessonDiagram =
+  | {
+      kind: "flow";
+      title: string;
+      nodes: Array<{ label: string; note?: string; tone?: DiagramTone }>;
+      /** Text on the arrow that returns from the last node to the first. */
+      loop?: string;
+      caption?: string;
+    }
+  | {
+      kind: "compare";
+      title: string;
+      columns: Array<{ label: string; tone?: DiagramTone; points: string[] }>;
+      caption?: string;
+    }
+  | {
+      kind: "stack";
+      title: string;
+      layers: Array<{ label: string; note?: string; tone?: DiagramTone }>;
+      caption?: string;
+    }
+  | {
+      kind: "scale";
+      title: string;
+      from: string;
+      to: string;
+      stops: Array<{ label: string; note?: string }>;
+      caption?: string;
+    };
+
 export type PrototypeStep = {
   id: string;
   index: string;
@@ -12,6 +47,9 @@ export type PrototypeStep = {
   title: string;
   lead: string;
   minutes: number;
+  /** Plain-language theory paragraphs shown before the notes. */
+  theory?: string[];
+  diagram?: LessonDiagram;
   notes: Array<{
     number: string;
     title: string;
@@ -59,10 +97,17 @@ export type PrototypeModule = {
   labFields: LabField[];
   rubric: string[];
   steps: PrototypeStep[];
+  /** Overrides for the lab and artifact screens; engineers modules use the built-in wording. */
+  /** Line under the title in the lesson sidebar. */
+  flowNote?: string;
+  labKicker?: string;
+  artifactKicker?: string;
+  artifactLead?: string;
+  /** Public base path of the module's course. Defaults to "/demo-course". */
+  coursePath?: string;
+  /** localStorage key for progress. Defaults to the engineers course key. */
+  storageKey?: string;
 };
-
-/** Every cohort today runs this one course; shown as the course name in the workspace. */
-export const PILOT_COURSE_TITLE = "KiteGrip for Engineers";
 
 export const PROGRAM_AUTHOR = {
   name: "Игорь Ковалёв",

@@ -4,7 +4,7 @@ import { prisma } from "@/lib/prisma";
 import { WorkspaceShell } from "@/components/WorkspaceShell";
 import { canAccessStudio, canReviewSubmissions } from "@/lib/require-role";
 import { CourseProgramCard, DashboardHeader, NoCohortCard } from "@/components/workspace/dashboard";
-import { PILOT_COURSE_TITLE } from "@/content/demo-course-program";
+import { getCourse } from "@/content/course-catalog";
 
 export default async function ModulesPage() {
   const session = await auth();
@@ -57,7 +57,7 @@ export default async function ModulesPage() {
             key={e.cohort.id}
             course={{
               id: e.cohort.id,
-              courseTitle: PILOT_COURSE_TITLE,
+              courseTitle: getCourse(e.cohort.course).title,
               cohortName: e.cohort.name,
               weeks: e.cohort.modules.map((m) => ({
                 id: m.id,

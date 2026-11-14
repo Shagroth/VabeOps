@@ -7,14 +7,13 @@ import { requireAdmin } from "@/lib/require-admin";
 import { requireRole } from "@/lib/require-role";
 import { prisma } from "@/lib/prisma";
 import { parseCourseModuleNumber, planProgramWeeks } from "@/lib/course-module-link";
-import { PROGRAM_MODULES } from "@/content/demo-course-program";
+import { getCourse, isCourseKey } from "@/content/course-catalog";
 import { isAssignableRole, parseEnrollmentInput } from "@/lib/enrollment";
 import { getOrCreateCorrelationId } from "@/lib/logger";
 import { isEmailProviderConfigured, resendCredentials, siteUrl } from "@/lib/env";
 import { sendNotifyEmail } from "@/lib/notify-email";
 import { buildFeedbackNotifyEmail } from "@/lib/notify-templates";
 import { parseScores, totalMaxScore } from "@/lib/homework-scoring";
-import { HOMEWORK_SCORING, HOMEWORK_PASS_SCORE } from "@/content/demo-course-homework";
 import { signIn } from "@/auth";
 
 function readModuleFields(formData: FormData) {
@@ -80,11 +79,14 @@ export async function createCohort(formData: FormData) {
   const startDate = new Date(String(formData.get("startDate")));
   // A new cohort gets the whole course program at once, so an enrolled
   // participant never lands in an empty workspace.
-  const weeks = planProgramWeeks(PROGRAM_MODULES, []);
+  const courseRaw = formData.get("course");
+  const course = isCourseKey(courseRaw) ? courseRaw : "ENGINEERS";
+  const weeks = planProgramWeeks(getCourse(course).modules, []);
   await prisma.cohort.create({
     data: {
       name,
       startDate,
+      course,
       modules: { create: weeks.map((w) => ({ ...w, notesMd: "", assignmentMd: "" })) },
     },
   });
@@ -95,8 +97,12 @@ export async function createCohort(formData: FormData) {
 export async function createProgramWeeks(formData: FormData) {
   await requireAdmin();
   const cohortId = String(formData.get("cohortId"));
-  const existing = await prisma.module.findMany({ where: { cohortId }, select: { weekNumber: true } });
-  const plan = planProgramWeeks(PROGRAM_MODULES, existing.map((m) => m.weekNumber));
+  const cohort = await prisma.cohort.findUnique({
+    where: { id: cohortId },
+    select: { course: true, modules: { select: { weekNumber: true } } },
+  });
+  if (!cohort) return;
+  const plan = planProgramWeeks(getCourse(cohort.course).modules, cohort.modules.map((m) => m.weekNumber));
   if (plan.length > 0) {
     await prisma.module.createMany({
       data: plan.map((w) => ({ ...w, cohortId, notesMd: "", assignmentMd: "" })),
@@ -140,7 +146,14 @@ export async function reviewSubmission(
   // Scoring is optional (see homework-scoring.ts) but all-or-nothing when
   // attempted — an invalid/half-filled rubric throws before anything is
   // saved, rather than silently recording a misleading partial total.
-  const parsed = parseScores(HOMEWORK_SCORING, scoresRaw);
+  // The rubric belongs to the course of the cohort the work was handed in to.
+  const target = await prisma.submission.findUnique({
+    where: { id: submissionId },
+    select: { module: { select: { cohort: { select: { course: true } } } } },
+  });
+  if (!target) throw new Error("Submission not found");
+  const course = getCourse(target.module.cohort.course);
+  const parsed = parseScores(course.scoring, scoresRaw);
   if (parsed.kind === "invalid") throw new Error(parsed.error);
   const scores = parsed.kind === "complete" ? parsed.scores : null;
 
@@ -180,7 +193,7 @@ export async function reviewSubmission(
       feedbackText,
       siteUrl: siteUrl(),
       score: scores
-        ? { total: scores.reduce((sum, s) => sum + s, 0), max: totalMaxScore(HOMEWORK_SCORING), pass: HOMEWORK_PASS_SCORE }
+        ? { total: scores.reduce((sum, s) => sum + s, 0), max: totalMaxScore(course.scoring), pass: course.passScore }
         : null,
     });
     await sendNotifyEmail(

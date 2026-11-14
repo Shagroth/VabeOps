@@ -4,7 +4,7 @@ import { WorkspaceShell } from "@/components/WorkspaceShell";
 import { SubmissionStatusBadge } from "@/components/SubmissionStatusBadge";
 import { ScoreInputs } from "@/components/admin/ScoreInputs";
 import { DECISION_FIELD_LABELS } from "@/lib/decision-field-labels";
-import { HOMEWORK_SCORING } from "@/content/demo-course-homework";
+import { getCourse } from "@/content/course-catalog";
 import { reviewSubmission } from "../actions";
 
 /**
@@ -22,7 +22,7 @@ export default async function ReviewQueuePage() {
     orderBy: { createdAt: "asc" },
     include: {
       user: true,
-      module: { include: { cohort: { select: { name: true } } } },
+      module: { include: { cohort: { select: { name: true, course: true } } } },
       versions: { orderBy: { createdAt: "desc" } },
       feedback: { include: { author: true }, orderBy: { createdAt: "asc" } },
     },
@@ -48,6 +48,8 @@ export default async function ReviewQueuePage() {
         <ul className="flex flex-col gap-4">
           {submissions.map((s) => {
             const latest = s.versions[0];
+            const rubric = getCourse(s.module.cohort.course).scoring;
+            const rubricSize = rubric.length;
             const accept = reviewSubmission.bind(null, s.id, "ACCEPTED");
             const requestRevision = reviewSubmission.bind(null, s.id, "NEEDS_REVISION");
 
@@ -107,7 +109,7 @@ export default async function ReviewQueuePage() {
                     "use server";
                     const comment = String(fd.get("comment") || "");
                     const scoresRaw = Object.fromEntries(
-                      HOMEWORK_SCORING.map((_, i) => [String(i), String(fd.get(`score-${i}`) || "")])
+                      Array.from({ length: rubricSize }, (_, i) => [String(i), String(fd.get(`score-${i}`) || "")])
                     );
                     const action = fd.get("intent") === "accept" ? accept : requestRevision;
                     await action(comment, scoresRaw);
@@ -120,7 +122,7 @@ export default async function ReviewQueuePage() {
                     rows={2}
                     className="rounded border border-hairline p-2 text-sm"
                   />
-                  <ScoreInputs />
+                  <ScoreInputs rubric={rubric} />
                   <div className="flex gap-2">
                     <button
                       type="submit"

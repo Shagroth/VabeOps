@@ -6,7 +6,7 @@ import { PublicLanding } from "@/components/landing/PublicLanding";
 import { WorkspaceOverview, type CourseAccess } from "@/components/workspace/dashboard";
 import { MINI_COURSES } from "@/content/courses";
 import { getFeaturedJournal } from "@/content/journal";
-import { PILOT_COURSE_TITLE } from "@/content/demo-course-program";
+import { getCourse } from "@/content/course-catalog";
 import { pickNextStep, type NextStep } from "@/lib/next-step";
 
 const TYPE_LABEL: Record<string, string> = {
@@ -54,7 +54,7 @@ export default async function Home() {
 
   const courses: CourseAccess[] = enrollments.map((e) => ({
     id: e.cohort.id,
-    courseTitle: PILOT_COURSE_TITLE,
+    courseTitle: getCourse(e.cohort.course).title,
     cohortName: e.cohort.name,
     weeks: e.cohort.modules.map((m) => ({
       id: m.id,

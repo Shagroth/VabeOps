@@ -14,7 +14,8 @@ const COLUMNS = [
   {
     title: "Материалы",
     links: [
-      { href: "/demo-course", label: "Демо-модуль" },
+      { href: "/demo-course", label: "KiteGrip for Engineers" },
+      { href: "/first-flight", label: "First Flight" },
       { href: "/courses", label: "Мини-курсы" },
       { href: "/journal", label: "Журнал" },
       { href: "/signals", label: "Signals" },

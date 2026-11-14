@@ -209,6 +209,9 @@ export function NoCohortCard({ isAdmin }: { isAdmin: boolean }) {
         <Link href="/demo-course" className={`${PILL} border-[1.5px] border-graphite hover:bg-ink hover:text-ink-foreground`}>
           Вся программа курса
         </Link>
+        <Link href="/first-flight" className={`${PILL} border-[1.5px] border-graphite hover:bg-ink hover:text-ink-foreground`}>
+          First Flight — курс для новичков
+        </Link>
         {isAdmin && (
           <Link href="/admin" className={`${PILL} bg-ink text-ink-foreground hover:bg-signal`}>
             Управлять пилотом

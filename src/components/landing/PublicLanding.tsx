@@ -273,20 +273,20 @@ export function PublicLanding() {
                 <CardKite className="-bottom-10 -right-4 w-40 text-white/10" />
                 <div className="relative flex items-center justify-between gap-3">
                   <span className="font-mono text-[13px] text-ink-muted">03 · START</span>
-                  <Pill className="bg-string text-white">Скоро</Pill>
+                  <Pill className="bg-string text-white">Открыты модули 1–2</Pill>
                 </div>
                 <h3 lang="en" className="relative text-[34px] font-extrabold leading-[1.02] tracking-[-0.03em]">
                   First Flight
                 </h3>
                 <p className="relative text-base leading-[1.55] text-[#d5d9e3]">
-                  Первый полёт: ИИ с нуля, без кода и без страха всё сломать. [ПРОГРАММА]
+                  Первый полёт: ИИ с нуля, без кода и без страха всё сломать. Как устроены модели, как ставить задачу, проверять ответ и выбирать инструменты.
                 </p>
-                <p className="relative mt-auto font-mono text-[13px] text-ink-muted">[ФОРМАТ] · [ДЛИТЕЛЬНОСТЬ]</p>
+                <p className="relative mt-auto font-mono text-[13px] text-ink-muted">5 модулей · теория со схемами · без кода</p>
                 <Link
-                  href="#apply"
-                  className="kg-btn relative inline-flex min-h-11 items-center self-start rounded-full border-[1.5px] border-ink-foreground px-[19px] font-semibold hover:bg-paper hover:text-ink"
+                  href="/first-flight"
+                  className="kg-btn relative inline-flex min-h-11 items-center gap-2 self-start rounded-full border-[1.5px] border-ink-foreground px-[19px] font-semibold hover:bg-paper hover:text-ink"
                 >
-                  Узнать о старте
+                  Начать с модуля 1 <Arrow />
                 </Link>
               </article>
             </div>

@@ -1,15 +1,33 @@
 import type { ReactNode } from "react";
 import {
+  HOMEWORK_PASS_SCORE,
   HOMEWORK_SCORING,
   type HomeworkAssignment,
   formatHomeworkTime,
 } from "@/content/demo-course-homework";
+import type { ScoringCriterion } from "@/content/course-catalog";
 import { Reveal } from "@/components/motion/Reveal";
 import { CARD, Checklist, FileCard, Label } from "./flow-ui";
 
 const H3 = "text-[23px] font-bold leading-tight tracking-[-0.015em]";
 
-export function HomeworkAssignmentSection({ assignment }: { assignment: HomeworkAssignment }) {
+export function HomeworkAssignmentSection({
+  assignment,
+  scoring = HOMEWORK_SCORING,
+  passScore = HOMEWORK_PASS_SCORE,
+  scoringNote = "Объём кода и красота ответа модели баллов не приносят. Баллы — за то, что ты поставил границы, добыл доказательства и сам принял инженерное решение.",
+  tasksTitle = "Техническое задание",
+}: {
+  assignment: HomeworkAssignment;
+  /** Rubric of the course; defaults to the engineers' one. */
+  scoring?: readonly ScoringCriterion[];
+  passScore?: number;
+  /** One line on what the points are given for. */
+  scoringNote?: string;
+  /** Heading of the task list. */
+  tasksTitle?: string;
+}) {
+  const maxScore = scoring.reduce((sum, item) => sum + item.points, 0);
   return (
     <section id="homework" className="kg-anchor border-t border-hairline bg-white">
       <div className="mx-auto flex max-w-[1280px] flex-col gap-14 px-5 py-20 sm:px-8 lg:py-24">
@@ -28,7 +46,7 @@ export function HomeworkAssignmentSection({ assignment }: { assignment: Homework
           <div className="rounded-[28px] bg-ink p-7 text-ink-foreground sm:p-8">
             <dl className="grid grid-cols-2 gap-6">
               <Metric label="Оценка времени" value={formatHomeworkTime(assignment.estimatedMinutes)} />
-              <Metric label="Максимум" value="20 баллов" />
+              <Metric label="Максимум" value={`${maxScore} баллов`} />
             </dl>
             <div className="mt-7 border-t border-ink-line pt-6">
               <span className="font-mono text-[13px] uppercase tracking-[0.08em] text-system">На выходе</span>
@@ -52,7 +70,7 @@ export function HomeworkAssignmentSection({ assignment }: { assignment: Homework
             )}
           </Block>
 
-          <Block title="Техническое задание">
+          <Block title={tasksTitle}>
             <ol className="mt-2">
               {assignment.tasks.map((task, index) => (
                 <li key={task} className="kg-item grid grid-cols-[44px_1fr] gap-x-3 border-b border-hairline py-4 leading-relaxed" style={{ "--i": index } as React.CSSProperties}>
@@ -105,16 +123,16 @@ export function HomeworkAssignmentSection({ assignment }: { assignment: Homework
         <Reveal mode="children">
           <div className="flex flex-wrap items-end justify-between gap-4">
             <div>
-              <h3 className={H3}>Как считаются 20 баллов</h3>
+              <h3 className={H3}>Как считаются {maxScore} баллов</h3>
               <p className="mt-3 max-w-[38em] leading-relaxed text-graphite-soft">
-                Объём кода и красота ответа модели баллов не приносят. Баллы — за то, что ты поставил границы, добыл доказательства и сам принял инженерное решение.
+{scoringNote}
               </p>
             </div>
-            <span className="rounded-full bg-sky-tint px-4 py-2 font-mono text-[13px] text-sky-deep">зачёт: 14 / 20</span>
+            <span className="rounded-full bg-sky-tint px-4 py-2 font-mono text-[13px] text-sky-deep">зачёт: {passScore} / {maxScore}</span>
           </div>
           <div className="relative mt-8 grid gap-x-7 sm:grid-cols-2 lg:grid-cols-3">
             <span aria-hidden="true" className="kg-rule absolute inset-x-0 top-0 h-[1.5px] bg-graphite" />
-            {HOMEWORK_SCORING.map((item, index) => (
+            {scoring.map((item, index) => (
               <article key={item.label} className="kg-item border-b border-hairline py-6" style={{ "--i": index } as React.CSSProperties}>
                 <span className="text-[40px] font-extrabold leading-none tracking-[-0.04em] text-signal">+{item.points}</span>
                 <h4 className="mt-3 text-lg font-bold tracking-[-0.01em]">{item.label}</h4>
