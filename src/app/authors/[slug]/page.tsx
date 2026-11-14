@@ -3,10 +3,10 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Header } from "@/components/landing/Header";
 import { Footer } from "@/components/landing/Footer";
-import { AUTHORS, getAuthorBySlug } from "@/content/authors";
+import { AUTHORS, SHOW_AUTHORS, getAuthorBySlug } from "@/content/authors";
 
 export function generateStaticParams() {
-  return AUTHORS.map((a) => ({ slug: a.slug }));
+  return SHOW_AUTHORS ? AUTHORS.map((a) => ({ slug: a.slug })) : [];
 }
 
 export async function generateMetadata({
@@ -15,7 +15,7 @@ export async function generateMetadata({
   params: Promise<{ slug: string }>;
 }): Promise<Metadata> {
   const { slug } = await params;
-  const author = getAuthorBySlug(slug);
+  const author = SHOW_AUTHORS ? getAuthorBySlug(slug) : undefined;
   if (!author) return {};
   return {
     title: `${author.displayName} — Авторы`,
@@ -30,7 +30,7 @@ export default async function AuthorDetailPage({
   params: Promise<{ slug: string }>;
 }) {
   const { slug } = await params;
-  const author = getAuthorBySlug(slug);
+  const author = SHOW_AUTHORS ? getAuthorBySlug(slug) : undefined;
   if (!author) notFound();
 
   return (

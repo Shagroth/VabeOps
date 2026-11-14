@@ -1,10 +1,11 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState } from "react";
+import Link from "next/link";
 import {
   AGENT_PLAN,
   CONTRACT_FIELDS,
-  CONTRACT_TEMPLATE,
+  ROLE_CONTRACT_TEMPLATES,
   DEMO_COURSE_META,
   INCIDENT,
   MODE_SCENARIO,
@@ -17,6 +18,26 @@ import {
   type AgentContract,
   type ContractKey,
 } from "@/content/demo-course";
+import { sendArtifactToSubmission, type WorkspaceFlowLinks } from "@/lib/artifact-bridge";
+import { useFunnel, type FunnelTarget } from "./useFunnel";
+import {
+  BTN,
+  CARD,
+  CARD_DARK,
+  Checklist,
+  ChoiceButton,
+  Feedback,
+  FIELD,
+  FileCard,
+  FlowPlaceholder,
+  FlowShell,
+  LabField,
+  LabProgress,
+  Label,
+  Lesson,
+  Question,
+} from "./flow-ui";
+import { ENGINEER_ROLE_LABEL } from "@/content/engineer-roles";
 
 const STORAGE_KEY = "vabeops-module-contract-v2";
 const LAST_STEP = MODULE_STEPS.length - 1;
@@ -75,11 +96,16 @@ function loadState(): CourseState {
   }
 }
 
-export function DemoCourseFlow() {
+export function DemoCourseFlow({ workspace, track }: { workspace?: WorkspaceFlowLinks; track?: FunnelTarget } = {}) {
+  const mark = useFunnel(track);
+  const nextHref = workspace ? workspace.nextHref : "/demo-course/2";
+  const nextLabel = workspace ? workspace.nextLabel ?? "К следующей неделе →" : "К модулю 2 →";
+  const overviewHref = workspace ? workspace.overviewHref : "/demo-course";
   const [state, setState] = useState<CourseState>(INITIAL_STATE);
   const [hydrated, setHydrated] = useState(false);
   const [copyState, setCopyState] = useState<"idle" | "copied" | "failed">("idle");
   const lessonHeading = useRef<HTMLHeadingElement>(null);
+  const focusReady = useRef(false);
 
   useEffect(() => {
     // localStorage is intentionally loaded after hydration to keep the server
@@ -95,8 +121,23 @@ export function DemoCourseFlow() {
   }, [hydrated, state]);
 
   useEffect(() => {
-    if (hydrated) lessonHeading.current?.focus();
+    if (!hydrated) return;
+    // Skip the first run: focusing the heading on page load would scroll
+    // the visitor past the module hero. Later step changes do move focus.
+    if (!focusReady.current) {
+      focusReady.current = true;
+      return;
+    }
+    lessonHeading.current?.focus();
   }, [hydrated, state.step]);
+
+  useEffect(() => {
+    if (!hydrated) return;
+    mark("open");
+    if (state.maxStepReached >= 3) mark("lab");
+    if (state.maxStepReached >= LAST_STEP) mark("artifact");
+    if (state.finished) mark("finished");
+  }, [hydrated, mark, state.maxStepReached, state.finished]);
 
   const completedFields = CONTRACT_FIELDS.filter(
     (field) => state.contract[field.key].trim().length >= 12,
@@ -172,6 +213,7 @@ export function DemoCourseFlow() {
     try {
       await navigator.clipboard.writeText(contractText);
       setCopyState("copied");
+      mark("export");
     } catch {
       setCopyState("failed");
     }
@@ -184,579 +226,390 @@ export function DemoCourseFlow() {
     anchor.href = href;
     anchor.download = "agent-task-contract.md";
     anchor.click();
+    mark("export");
     URL.revokeObjectURL(href);
   }
 
-  if (!hydrated) {
-    return <div className="min-h-[720px] rounded-[28px] border border-hairline bg-white/30" />;
-  }
-
-  const progress = state.finished ? 100 : Math.round(((state.maxStepReached + 1) / MODULE_STEPS.length) * 100);
+  if (!hydrated) return <FlowPlaceholder />;
 
   return (
-    <div className="overflow-hidden rounded-[28px] border border-hairline bg-[#f3f4ef] shadow-[0_30px_80px_-55px_rgba(10,15,24,0.55)]">
-      <div className="grid min-h-[760px] min-w-0 lg:grid-cols-[286px_minmax(0,1fr)]">
-        <aside className="min-w-0 border-b border-hairline bg-ink text-ink-foreground lg:border-b-0 lg:border-r lg:border-hairline-ink">
-          <div className="lg:sticky lg:top-[73px]">
-            <div className="border-b border-hairline-ink p-5 lg:p-6">
-              <div className="flex items-center justify-between gap-4">
-                <span className="font-mono text-[10px] uppercase tracking-[0.2em] text-system">
-                  Field course / 01
-                </span>
-                <span className="font-mono text-[10px] text-ink-muted">{progress}%</span>
+    <FlowShell
+      eyebrow="Модуль 01"
+      title={DEMO_COURSE_META.title}
+      note="На выходе — контракт для живой задачи. Сертификат прод не спасает."
+      steps={MODULE_STEPS}
+      step={state.step}
+      maxStepReached={state.maxStepReached}
+      finished={state.finished}
+      topNote={`${DEMO_COURSE_META.duration} · прогресс хранится в браузере`}
+      canAdvance={canAdvance}
+      onGoTo={goTo}
+      onBack={back}
+      onNext={next}
+      onReset={resetCourse}
+    >
+      {state.step === 0 && (
+        <Lesson
+          headingRef={lessonHeading}
+          kicker="00 / Cold open"
+          title="Агент всё сделал. Прод всё равно сломан."
+          lead="Зелёные тесты иногда доказывают лишь одно: агент успел переписать и код, и правила победы. Начнём не с терминов, а с инцидента, который слишком легко представить настоящим."
+        >
+          <div className="grid gap-5 xl:grid-cols-2">
+            <div className={`flex flex-col ${CARD}`}>
+              <Label>Тикет · 09:12</Label>
+              <p className="mt-4 text-[22px] font-bold leading-snug tracking-[-0.015em]">{INCIDENT.ticket}</p>
+              <div className="mt-auto pt-7">
+                <div className="rounded-[18px] bg-ink p-5 text-ink-foreground">
+                  <span className="font-mono text-[13px] text-system">agent · 09:18</span>
+                  <p className="mt-2 leading-relaxed text-ink-muted">{INCIDENT.agentReport}</p>
+                </div>
               </div>
-              <div className="mt-3 h-1 overflow-hidden rounded-full bg-white/10">
-                <div
-                  className="h-full rounded-full bg-signal transition-[width] duration-500"
-                  style={{ width: `${progress}%` }}
-                />
-              </div>
-              <h2 className="mt-5 text-xl font-medium leading-tight">{DEMO_COURSE_META.title}</h2>
-              <p className="mt-2 text-xs leading-relaxed text-ink-muted">
-                На выходе — рабочий контракт, а не сертификат за просмотр.
-              </p>
             </div>
-
-            <nav className="min-w-0 overflow-x-auto p-3 lg:max-h-[500px] lg:overflow-y-auto lg:p-4" aria-label="Навигация по модулю">
-              <ol className="flex min-w-max gap-2 lg:min-w-0 lg:flex-col">
-                {MODULE_STEPS.map((item, index) => {
-                  const active = index === state.step;
-                  const reachable = index <= state.maxStepReached;
-                  const passed = index < state.maxStepReached || state.finished;
-                  return (
-                    <li key={item.id}>
-                      <button
-                        type="button"
-                        disabled={!reachable}
-                        onClick={() => goTo(index)}
-                        aria-current={active ? "step" : undefined}
-                        className={`group flex w-[210px] items-start gap-3 rounded-xl border px-3 py-3 text-left transition-colors lg:w-full ${
-                          active
-                            ? "border-system/60 bg-system/10"
-                            : reachable
-                              ? "border-transparent hover:border-hairline-ink hover:bg-white/[0.03]"
-                              : "border-transparent opacity-35"
-                        }`}
-                      >
-                        <span
-                          className={`mt-0.5 flex h-6 w-6 flex-none items-center justify-center rounded-full border font-mono text-[9px] ${
-                            passed
-                              ? "border-signal bg-signal text-signal-ink"
-                              : active
-                                ? "border-system text-system"
-                                : "border-hairline-ink text-ink-muted"
-                          }`}
-                        >
-                          {passed ? "✓" : item.index}
-                        </span>
-                        <span>
-                          <span className="block text-xs font-medium text-ink-foreground">{item.label}</span>
-                          <span className="mt-0.5 block text-[11px] leading-snug text-ink-muted">{item.short}</span>
-                        </span>
-                      </button>
-                    </li>
-                  );
-                })}
-              </ol>
-            </nav>
-
-            <div className="hidden border-t border-hairline-ink p-6 lg:block">
-              <button
-                type="button"
-                onClick={resetCourse}
-                className="font-mono text-[10px] uppercase tracking-wide text-ink-muted underline underline-offset-4 hover:text-ink-foreground"
-              >
-                Сбросить прогресс
-              </button>
+            <div className={CARD}>
+              <Label tone="danger">Incident report · 09:31</Label>
+              <ul className="mt-2">
+                {INCIDENT.damage.map((item, index) => (
+                  <li key={item} className="grid grid-cols-[36px_1fr] gap-x-3 border-b border-hairline py-4 last:border-b-0 last:pb-0">
+                    <span className="font-mono text-[15px] text-string">0{index + 1}</span>
+                    <span className="leading-relaxed">{item}</span>
+                  </li>
+                ))}
+              </ul>
             </div>
           </div>
-        </aside>
 
-        <div className="flex min-w-0 flex-col">
-          <div className="flex items-center justify-between border-b border-hairline px-5 py-3 sm:px-8">
-            <span className="font-mono text-[10px] uppercase tracking-[0.18em] text-graphite-muted">
-              {DEMO_COURSE_META.duration} · прогресс хранится в браузере
-            </span>
+          <Question title="Где произошла главная ошибка?">
+            {[
+              { id: "tests" as const, label: "Нужно было написать больше тестов" },
+              { id: "contract" as const, label: "До запуска не зафиксировали неизменяемый контракт" },
+              { id: "model" as const, label: "Выбрали недостаточно сильную модель" },
+            ].map((choice) => (
+              <ChoiceButton
+                key={choice.id}
+                selected={state.incidentChoice === choice.id}
+                onClick={() => setState((current) => ({ ...current, incidentChoice: choice.id }))}
+              >
+                {choice.label}
+              </ChoiceButton>
+            ))}
+            {state.incidentChoice && (
+              <Feedback good={state.incidentChoice === "contract"}>
+                {state.incidentChoice === "contract"
+                  ? INCIDENT.lesson
+                  : "Это могло усилить защиту, но не устраняет первопричину: мерка успеха и неизменяемая граница задачи не были названы до старта."}
+              </Feedback>
+            )}
+          </Question>
+        </Lesson>
+      )}
+
+      {state.step === 1 && (
+        <Lesson
+          headingRef={lessonHeading}
+          kicker="01 / Operating modes"
+          title="Не каждой задаче нужен агент с доступом к кнопкам"
+          lead="Чат, copilot и агент могут выглядеть похоже. Но цена ошибки у них разная: один советует, другой действует в твоей среде. Режим выбирают по риску и нужной автономности, а не по моде."
+        >
+          <div className="grid gap-4 md:grid-cols-3">
+            {WORK_MODES.map((mode, index) => {
+              const agent = mode.id === "agent";
+              return (
+                <article key={mode.id} className={`flex flex-col ${agent ? CARD_DARK : CARD}`}>
+                  <span className={`font-mono text-[15px] ${agent ? "text-system" : "text-string"}`}>0{index + 1}</span>
+                  <h3 className="mt-6 text-[28px] font-extrabold leading-none tracking-[-0.03em]">{mode.title}</h3>
+                  <p className={`mt-3 font-mono text-[13px] ${agent ? "text-system" : "text-graphite-muted"}`}>{mode.command}</p>
+                  <p className="mt-6 text-[15px] font-semibold">{mode.autonomy}</p>
+                  <p className={`mt-2 text-[15px] leading-relaxed ${agent ? "text-ink-muted" : "text-graphite-soft"}`}>{mode.useWhen}</p>
+                </article>
+              );
+            })}
+          </div>
+
+          <Question title="Какой режим нужен здесь?" description={MODE_SCENARIO}>
+            <div className="grid gap-2.5 sm:grid-cols-3">
+              {WORK_MODES.map((mode) => (
+                <ChoiceButton
+                  key={mode.id}
+                  selected={state.modeChoice === mode.id}
+                  onClick={() => setState((current) => ({ ...current, modeChoice: mode.id }))}
+                >
+                  {mode.title}
+                </ChoiceButton>
+              ))}
+            </div>
+            {state.modeChoice && (
+              <Feedback good={state.modeChoice === "agent"}>
+                {state.modeChoice === "agent"
+                  ? "Да. Здесь есть несколько шагов, работа в среде и проверяемый результат. Но право записи остаётся за review gate: автономность — не абонемент на всё."
+                  : "Чат или copilot помогут на отдельном шаге. Но здесь нужен цельный цикл: исследовать несколько файлов, собрать гипотезу и вернуть план до записи."}
+              </Feedback>
+            )}
+          </Question>
+        </Lesson>
+      )}
+
+      {state.step === 2 && (
+        <Lesson
+          headingRef={lessonHeading}
+          kicker="02 / Contract anatomy"
+          title="Семь полей вместо надежды на телепатию"
+          lead="Хороший контракт не диктует агенту каждый шаг. Он фиксирует цель, границы, права и доказательства готовности — то, что опасно оставлять на догадки. Открой все семь полей."
+        >
+          <div className="grid gap-5 lg:grid-cols-[0.8fr_1.2fr]">
+            <div className="border-t-[1.5px] border-graphite">
+              {CONTRACT_FIELDS.map((field) => {
+                const active = state.activeField === field.key;
+                const seen = state.anatomySeen.includes(field.key);
+                return (
+                  <button
+                    key={field.key}
+                    type="button"
+                    onClick={() => exploreField(field.key)}
+                    aria-pressed={active}
+                    className={`kg-row flex min-h-14 w-full items-center gap-4 border-b border-hairline px-3 text-left transition-colors duration-200 ${active ? "bg-sky-tint" : "hover:bg-paper"}`}
+                  >
+                    <span className="font-mono text-[15px] text-string">{field.number}</span>
+                    <span className="kg-row-title flex-1 text-lg font-bold tracking-[-0.01em]">{field.title}</span>
+                    <span className={`font-mono text-xs ${seen ? "text-sky-deep" : "text-graphite-muted"}`}>
+                      {seen ? "открыто" : "открыть"}
+                    </span>
+                  </button>
+                );
+              })}
+            </div>
+
+            {CONTRACT_FIELDS.map((field) =>
+              field.key === state.activeField ? (
+                <FileCard key={field.key} name="agent-task-contract.md" status={`поле ${field.number}`} className="kg-rise min-h-[380px]">
+                  <div className="pb-8 pr-6 sm:pr-8">
+                    <h3 className="mt-2 text-[34px] font-extrabold leading-none tracking-[-0.03em]">{field.title}</h3>
+                    <p className="mt-5 max-w-[45ch] text-[17px] leading-relaxed text-ink-muted">{field.prompt}</p>
+                    <div className="mt-8 border-t border-ink-line pt-5">
+                      <span className="font-mono text-[13px] uppercase tracking-[0.08em] text-system">Антипаттерн</span>
+                      <p className="mt-2 leading-relaxed">{field.antiPattern}</p>
+                    </div>
+                    <p className="mt-8 font-mono text-[13px] text-ink-muted" role="status">
+                      Изучено {state.anatomySeen.length} / {CONTRACT_FIELDS.length}
+                    </p>
+                  </div>
+                </FileCard>
+              ) : null,
+            )}
+          </div>
+        </Lesson>
+      )}
+
+      {state.step === 3 && (
+        <Lesson
+          headingRef={lessonHeading}
+          kicker="03 / Contract lab"
+          title="Теперь преврати свою задачу в контракт"
+          lead="Возьми рабочую задачу, которую действительно готов отдать агенту. Если такой сейчас нет, загрузи учебный пример. Черновик останется только в этом браузере."
+        >
+          <div className="rounded-[24px] bg-sky-tint p-6">
+            <p className="text-lg font-bold tracking-[-0.01em]">Нужен быстрый старт?</p>
+            <p className="mt-1 text-[15px] text-graphite-soft">
+              Загрузи учебный контракт по своей роли и перепиши его под настоящую задачу. Каждое поле редактируется.
+            </p>
+            <div className="mt-4 grid gap-2.5 sm:grid-cols-2">
+              {ROLE_CONTRACT_TEMPLATES.map((template) => (
+                <button
+                  key={template.role}
+                  type="button"
+                  onClick={() => setState((current) => ({ ...current, contract: template.contract }))}
+                  className="kg-btn flex min-h-14 flex-col items-start justify-center rounded-[18px] border-[1.5px] border-graphite bg-white px-4 py-2.5 text-left hover:bg-ink hover:text-ink-foreground"
+                >
+                  <span className="font-mono text-xs uppercase tracking-[0.08em] opacity-70">{ENGINEER_ROLE_LABEL[template.role]}</span>
+                  <span className="font-semibold leading-snug">{template.title}</span>
+                </button>
+              ))}
+            </div>
+          </div>
+
+          <div className="mt-5 space-y-4">
+            {CONTRACT_FIELDS.map((field) => {
+              const value = state.contract[field.key];
+              return (
+                <LabField
+                  key={field.key}
+                  title={`${field.number}. ${field.title}`}
+                  prompt={field.prompt}
+                  value={value}
+                  ready={value.trim().length >= 12}
+                  placeholder={`Напиши: ${field.prompt.toLowerCase()}`}
+                  onChange={(next) => setContractField(field.key, next)}
+                />
+              );
+            })}
+          </div>
+
+          <LabProgress label="Контракт собран" done={completedFields} total={CONTRACT_FIELDS.length} />
+        </Lesson>
+      )}
+
+      {state.step === 4 && (
+        <Lesson
+          headingRef={lessonHeading}
+          kicker="04 / Red team"
+          title="Красная команда: сломай задачу до запуска"
+          lead="На минуту перестань улучшать формулировку. Ищи лишнюю свободу, конфликт и лазейку, через которые агент сможет сделать не то — формально оставаясь правым."
+        >
+          <div className={CARD}>
+            <Label>task.md · слабая постановка</Label>
+            <pre className="mt-4 whitespace-pre-wrap font-mono text-[17px] leading-relaxed">{WEAK_REQUEST}</pre>
+          </div>
+
+          <Question title="Какие риски здесь действительно есть?" description="Можно выбрать несколько вариантов.">
+            <div className="space-y-2.5">
+              {REVIEW_RISKS.map((risk) => {
+                const checked = state.reviewRisks.includes(risk.id);
+                return (
+                  <label
+                    key={risk.id}
+                    className={`flex min-h-14 cursor-pointer items-center gap-3.5 rounded-[18px] border-[1.5px] px-5 py-3.5 transition-colors duration-200 ${
+                      checked ? "border-signal bg-sky-tint" : "border-hairline-strong bg-white hover:border-graphite"
+                    }`}
+                  >
+                    <input type="checkbox" checked={checked} onChange={() => toggleRisk(risk.id)} className="h-5 w-5 flex-none accent-signal" />
+                    <span className="font-semibold leading-snug">{risk.label}</span>
+                  </label>
+                );
+              })}
+            </div>
             <button
               type="button"
-              onClick={resetCourse}
-              className="text-xs text-graphite-muted underline underline-offset-4 lg:hidden"
+              disabled={state.reviewRisks.length === 0}
+              onClick={() => setState((current) => ({ ...current, reviewSubmitted: true }))}
+              className={`mt-3 ${BTN.dark}`}
             >
-              Сбросить
+              Проверить разбор
             </button>
-          </div>
+            {state.reviewSubmitted && (
+              <Feedback good={reviewScore === correctRiskIds.length && !selectedDecoy}>
+                Ты нашёл {reviewScore} из {correctRiskIds.length} реальных рисков. Роль «senior» не создаёт границ и не заменяет проверяемый контракт — это декоративная уверенность, а не guardrail.
+              </Feedback>
+            )}
+          </Question>
+        </Lesson>
+      )}
 
-          <main className="flex-1 px-5 py-8 sm:px-8 sm:py-10 xl:px-12 xl:py-12">
-            <div className="mx-auto max-w-[920px]">
-              {state.step === 0 && (
-                <Lesson
-                  headingRef={lessonHeading}
-                  kicker="00 / Cold open"
-                  title="Агент всё сделал. Прод сломан."
-                  lead="Зелёные тесты могут доказывать только то, что агент успешно изменил и код, и мерку успеха. Начнём не с терминов, а с небольшого инцидента."
-                >
-                  <div className="grid gap-4 xl:grid-cols-[0.9fr_1.1fr]">
-                    <div className="rounded-2xl border border-hairline bg-white/70 p-5">
-                      <Label>Тикет / 09:12</Label>
-                      <p className="mt-3 text-lg font-medium leading-snug">{INCIDENT.ticket}</p>
-                      <div className="mt-6 rounded-xl bg-ink p-4 text-sm text-ink-foreground">
-                        <span className="font-mono text-[10px] uppercase tracking-wide text-signal">Agent / 09:18</span>
-                        <p className="mt-2 leading-relaxed text-ink-muted">{INCIDENT.agentReport}</p>
-                      </div>
-                    </div>
-                    <div className="relative overflow-hidden rounded-2xl border border-accent-change/30 bg-accent-change/[0.06] p-5">
-                      <div className="absolute right-5 top-4 font-mono text-5xl text-accent-change/10">!</div>
-                      <Label tone="danger">Incident report / 09:31</Label>
-                      <ul className="mt-4 space-y-3 text-sm">
-                        {INCIDENT.damage.map((item, index) => (
-                          <li key={item} className="flex gap-3">
-                            <span className="font-mono text-xs text-accent-change">0{index + 1}</span>
-                            <span className="text-graphite-muted">{item}</span>
-                          </li>
-                        ))}
-                      </ul>
-                    </div>
-                  </div>
+      {state.step === 5 && (
+        <Lesson
+          headingRef={lessonHeading}
+          kicker="05 / Review gate"
+          title="Агент вернулся с планом. Что разрешаем?"
+          lead="Контракт не превращает инженера в наблюдателя. Он создаёт моменты, где решение снова принадлежит человеку — до необратимого действия, а не после."
+        >
+          <FileCard name="agent plan · waiting for approval" status="paused">
+            <ol className="pb-7 pr-6 sm:pr-8">
+              {AGENT_PLAN.map((item, index) => (
+                <li key={item} className="grid grid-cols-[36px_1fr] gap-x-3 border-t border-ink-line py-4 last:pb-0">
+                  <span className="font-mono text-[15px] text-system">0{index + 1}</span>
+                  <span className="leading-relaxed">{item}</span>
+                </li>
+              ))}
+            </ol>
+          </FileCard>
 
-                  <Question title="Где произошла главная ошибка?">
-                    {[
-                      { id: "tests" as const, label: "Нужно было написать больше тестов" },
-                      { id: "contract" as const, label: "До запуска не зафиксировали неизменяемый контракт" },
-                      { id: "model" as const, label: "Выбрали недостаточно сильную модель" },
-                    ].map((choice) => (
-                      <ChoiceButton
-                        key={choice.id}
-                        selected={state.incidentChoice === choice.id}
-                        onClick={() => setState((current) => ({ ...current, incidentChoice: choice.id }))}
-                      >
-                        {choice.label}
-                      </ChoiceButton>
-                    ))}
-                    {state.incidentChoice && (
-                      <Feedback good={state.incidentChoice === "contract"}>
-                        {state.incidentChoice === "contract"
-                          ? INCIDENT.lesson
-                          : "Это могло усилить защиту, но не устраняет первопричину: мерка успеха и неизменяемая граница задачи не были названы до старта."}
-                      </Feedback>
-                    )}
-                  </Question>
-                </Lesson>
-              )}
-
-              {state.step === 1 && (
-                <Lesson
-                  headingRef={lessonHeading}
-                  kicker="01 / Operating modes"
-                  title="Не каждую задачу стоит отдавать агенту"
-                  lead="Разница не в интерфейсе и не в названии продукта. Разница — в автономности, доступе к среде и цене ошибочного действия."
-                >
-                  <div className="grid gap-3 md:grid-cols-3">
-                    {WORK_MODES.map((mode, index) => (
-                      <article key={mode.id} className="rounded-2xl border border-hairline bg-white/60 p-5">
-                        <div className="flex items-center justify-between">
-                          <span className="font-mono text-[10px] text-graphite-muted">0{index + 1}</span>
-                          <span className={`h-2 w-2 rounded-full ${mode.id === "agent" ? "bg-signal" : mode.id === "copilot" ? "bg-system" : "bg-hairline"}`} />
-                        </div>
-                        <h3 className="mt-7 text-xl font-medium">{mode.title}</h3>
-                        <p className="mt-2 font-mono text-[11px] text-system">{mode.command}</p>
-                        <p className="mt-5 text-xs font-medium">{mode.autonomy}</p>
-                        <p className="mt-2 text-sm leading-relaxed text-graphite-muted">{mode.useWhen}</p>
-                      </article>
-                    ))}
-                  </div>
-
-                  <Question title="Какой режим нужен здесь?" description={MODE_SCENARIO}>
-                    <div className="grid gap-2 sm:grid-cols-3">
-                      {WORK_MODES.map((mode) => (
-                        <ChoiceButton
-                          key={mode.id}
-                          selected={state.modeChoice === mode.id}
-                          onClick={() => setState((current) => ({ ...current, modeChoice: mode.id }))}
-                        >
-                          {mode.title}
-                        </ChoiceButton>
-                      ))}
-                    </div>
-                    {state.modeChoice && (
-                      <Feedback good={state.modeChoice === "agent"}>
-                        {state.modeChoice === "agent"
-                          ? "Да. Это многошаговая работа в среде с проверяемым результатом. Но право записи отделено review gate — автономность не обязана быть безграничной."
-                          : "Здесь нужно исследовать несколько файлов и построить план изменений. Чат или copilot помогут частично, но не выполнят весь диагностический цикл как единую задачу."}
-                      </Feedback>
-                    )}
-                  </Question>
-                </Lesson>
-              )}
-
-              {state.step === 2 && (
-                <Lesson
-                  headingRef={lessonHeading}
-                  kicker="02 / Contract anatomy"
-                  title="Семь полей, которые возвращают контроль"
-                  lead="Хороший контракт не пытается предсказать каждый шаг агента. Он фиксирует цель, поверхность изменений и доказательство готовности. Открой все семь полей."
-                >
-                  <div className="grid gap-5 lg:grid-cols-[0.8fr_1.2fr]">
-                    <div className="space-y-2">
-                      {CONTRACT_FIELDS.map((field) => {
-                        const active = state.activeField === field.key;
-                        const seen = state.anatomySeen.includes(field.key);
-                        return (
-                          <button
-                            key={field.key}
-                            type="button"
-                            onClick={() => exploreField(field.key)}
-                            className={`flex w-full items-center gap-3 rounded-xl border p-3 text-left transition-colors ${active ? "border-system bg-system/[0.07]" : "border-hairline bg-white/50 hover:bg-white"}`}
-                          >
-                            <span className={`flex h-7 w-7 flex-none items-center justify-center rounded-full font-mono text-[10px] ${seen ? "bg-signal text-signal-ink" : "border border-hairline text-graphite-muted"}`}>
-                              {seen ? "✓" : field.number}
-                            </span>
-                            <span className="text-sm font-medium">{field.title}</span>
-                          </button>
-                        );
-                      })}
-                    </div>
-
-                    {CONTRACT_FIELDS.map((field) =>
-                      field.key === state.activeField ? (
-                        <div key={field.key} className="relative min-h-[360px] overflow-hidden rounded-2xl bg-ink p-6 text-ink-foreground sm:p-8">
-                          <div className="signal-field opacity-30" />
-                          <div className="relative">
-                            <span className="font-mono text-[10px] uppercase tracking-[0.2em] text-system">Поле {field.number}</span>
-                            <h3 className="mt-3 text-3xl font-medium">{field.title}</h3>
-                            <p className="mt-5 max-w-[45ch] text-base leading-relaxed text-ink-muted">{field.prompt}</p>
-                            <div className="mt-10 border-l border-accent-change pl-4">
-                              <span className="font-mono text-[10px] uppercase tracking-wide text-accent-change">Антипаттерн</span>
-                              <p className="mt-2 text-sm text-ink-muted">{field.antiPattern}</p>
-                            </div>
-                            <div className="mt-10 flex items-center gap-2 font-mono text-[10px] uppercase tracking-wide text-ink-muted">
-                              <span className="h-1.5 w-1.5 rounded-full bg-signal" />
-                              Изучено {state.anatomySeen.length} / {CONTRACT_FIELDS.length}
-                            </div>
-                          </div>
-                        </div>
-                      ) : null,
-                    )}
-                  </div>
-                </Lesson>
-              )}
-
-              {state.step === 3 && (
-                <Lesson
-                  headingRef={lessonHeading}
-                  kicker="03 / Contract lab"
-                  title="Теперь собери контракт сам"
-                  lead="Возьми свою задачу или загрузи учебный пример. Текст сохраняется только в этом браузере — можно вернуться и продолжить позже."
-                >
-                  <div className="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-system/25 bg-system/[0.05] p-4">
-                    <div>
-                      <p className="text-sm font-medium">Нужен быстрый старт?</p>
-                      <p className="mt-1 text-xs text-graphite-muted">Подставим кейс со скидками — каждое поле можно переписать.</p>
-                    </div>
-                    <button
-                      type="button"
-                      onClick={() => setState((current) => ({ ...current, contract: CONTRACT_TEMPLATE }))}
-                      className="rounded-lg bg-ink px-4 py-2 text-xs font-medium text-ink-foreground"
-                    >
-                      Загрузить учебный кейс
-                    </button>
-                  </div>
-
-                  <div className="mt-5 space-y-4">
-                    {CONTRACT_FIELDS.map((field) => {
-                      const value = state.contract[field.key];
-                      const ready = value.trim().length >= 12;
-                      return (
-                        <label key={field.key} className="block rounded-2xl border border-hairline bg-white/60 p-5 focus-within:border-system">
-                          <span className="flex items-center justify-between gap-4">
-                            <span className="text-sm font-medium">{field.number}. {field.title}</span>
-                            <span className={`font-mono text-[9px] uppercase tracking-wide ${ready ? "text-signal-ink" : "text-graphite-muted"}`}>
-                              {ready ? "готово" : "нужно заполнить"}
-                            </span>
-                          </span>
-                          <span className="mt-1 block text-xs text-graphite-muted">{field.prompt}</span>
-                          <textarea
-                            value={value}
-                            onChange={(event) => setContractField(field.key, event.target.value)}
-                            rows={3}
-                            className="mt-4 w-full resize-y rounded-xl border border-hairline bg-[#fbfcf8] px-4 py-3 text-sm leading-relaxed outline-none transition-colors placeholder:text-graphite-muted/50 focus:border-system"
-                            placeholder={`Напиши: ${field.prompt.toLowerCase()}`}
-                          />
-                        </label>
-                      );
-                    })}
-                  </div>
-
-                  <div className="mt-4 flex items-center justify-between rounded-xl bg-ink px-4 py-3 text-sm text-ink-foreground">
-                    <span>Контракт собран</span>
-                    <span className="font-mono text-signal">{completedFields} / {CONTRACT_FIELDS.length}</span>
-                  </div>
-                </Lesson>
-              )}
-
-              {state.step === 4 && (
-                <Lesson
-                  headingRef={lessonHeading}
-                  kicker="04 / Red team"
-                  title="А теперь попробуй сломать постановку"
-                  lead="Перед запуском полезно на минуту сменить роль: не улучшать промпт, а искать свободу, которой агент сможет воспользоваться не так, как ты ожидал."
-                >
-                  <div className="overflow-hidden rounded-2xl border border-hairline bg-white/70">
-                    <div className="flex items-center gap-2 border-b border-hairline px-4 py-3">
-                      <span className="h-2 w-2 rounded-full bg-accent-change" />
-                      <span className="h-2 w-2 rounded-full bg-[#e9c85d]" />
-                      <span className="h-2 w-2 rounded-full bg-signal" />
-                      <span className="ml-2 font-mono text-[10px] text-graphite-muted">task.md / weak</span>
-                    </div>
-                    <pre className="whitespace-pre-wrap p-6 font-mono text-sm leading-relaxed text-graphite">{WEAK_REQUEST}</pre>
-                  </div>
-
-                  <Question title="Какие риски здесь действительно есть?" description="Можно выбрать несколько вариантов.">
-                    <div className="space-y-2">
-                      {REVIEW_RISKS.map((risk) => (
-                        <label key={risk.id} className="flex cursor-pointer items-start gap-3 rounded-xl border border-hairline bg-white/60 p-4 hover:bg-white">
-                          <input
-                            type="checkbox"
-                            checked={state.reviewRisks.includes(risk.id)}
-                            onChange={() => toggleRisk(risk.id)}
-                            className="mt-0.5"
-                          />
-                          <span className="text-sm">{risk.label}</span>
-                        </label>
-                      ))}
-                    </div>
-                    <button
-                      type="button"
-                      disabled={state.reviewRisks.length === 0}
-                      onClick={() => setState((current) => ({ ...current, reviewSubmitted: true }))}
-                      className="mt-3 rounded-lg bg-ink px-4 py-2 text-sm font-medium text-ink-foreground disabled:opacity-40"
-                    >
-                      Проверить разбор
-                    </button>
-                    {state.reviewSubmitted && (
-                      <Feedback good={reviewScore === correctRiskIds.length && !selectedDecoy}>
-                        Ты нашёл {reviewScore} из {correctRiskIds.length} реальных рисков. Роль «senior» не создаёт границ и не заменяет проверяемый контракт — это декоративная уверенность, а не guardrail.
-                      </Feedback>
-                    )}
-                  </Question>
-                </Lesson>
-              )}
-
-              {state.step === 5 && (
-                <Lesson
-                  headingRef={lessonHeading}
-                  kicker="05 / Review gate"
-                  title="Агент вернулся с планом. Что разрешаем?"
-                  lead="Контракт не превращает инженера в наблюдателя. Он создаёт моменты, где решение снова принадлежит человеку — до необратимого действия, а не после."
-                >
-                  <div className="rounded-2xl bg-ink p-5 text-ink-foreground sm:p-7">
-                    <div className="flex items-center justify-between border-b border-hairline-ink pb-4">
-                      <Label tone="system">Agent plan / waiting for approval</Label>
-                      <span className="rounded-full border border-signal/40 px-2.5 py-1 font-mono text-[9px] uppercase text-signal">paused</span>
-                    </div>
-                    <ol className="mt-6 space-y-4">
-                      {AGENT_PLAN.map((item, index) => (
-                        <li key={item} className="flex gap-4 text-sm">
-                          <span className="font-mono text-[10px] text-system">0{index + 1}</span>
-                          <span className="text-ink-muted">{item}</span>
-                        </li>
-                      ))}
-                    </ol>
-                  </div>
-
-                  <Question title="Твоё решение">
-                    {[
-                      { id: "approve" as const, title: "Разрешить план", detail: "Он остаётся внутри scope и останавливается перед записью." },
-                      { id: "stop" as const, title: "Остановить задачу", detail: "Любая автономная работа здесь слишком рискованна." },
-                      { id: "expand" as const, title: "Сразу дать весь репозиторий", detail: "Так агент точно не упустит контекст." },
-                    ].map((choice) => (
-                      <button
-                        key={choice.id}
-                        type="button"
-                        onClick={() => setState((current) => ({ ...current, gateChoice: choice.id }))}
-                        className={`block w-full rounded-xl border p-4 text-left transition-colors ${state.gateChoice === choice.id ? "border-system bg-system/[0.07]" : "border-hairline bg-white/50 hover:bg-white"}`}
-                      >
-                        <span className="text-sm font-medium">{choice.title}</span>
-                        <span className="mt-1 block text-xs text-graphite-muted">{choice.detail}</span>
-                      </button>
-                    ))}
-                    {state.gateChoice && (
-                      <Feedback good={state.gateChoice === "approve"}>
-                        {state.gateChoice === "approve"
-                          ? "Верно. План соответствует контракту, а точка подтверждения стоит перед записью. Можно разрешить этот ограниченный следующий шаг."
-                          : "Это либо слишком жёстко, либо слишком широко. Хороший guardrail не запрещает работу — он ограничивает следующий рискованный переход."}
-                      </Feedback>
-                    )}
-                  </Question>
-                </Lesson>
-              )}
-
-              {state.step === 6 && (
-                <Lesson
-                  headingRef={lessonHeading}
-                  kicker="06 / Takeaway"
-                  title="Контракт готов. Теперь он должен попасть в работу."
-                  lead="Это не идеальный универсальный шаблон. Это минимальная инженерная память задачи: что хотим, чем рискуем и как узнаем, что действительно закончили."
-                >
-                  <div className="grid min-w-0 gap-5 xl:grid-cols-[1.15fr_0.85fr]">
-                    <div className="min-w-0 overflow-hidden rounded-2xl border border-hairline bg-ink text-ink-foreground">
-                      <div className="flex items-center justify-between border-b border-hairline-ink px-4 py-3">
-                        <span className="font-mono text-[10px] text-ink-muted">agent-task-contract.md</span>
-                        <span className="font-mono text-[9px] uppercase text-signal">ready</span>
-                      </div>
-                      <pre className="max-h-[540px] min-w-0 overflow-auto whitespace-pre-wrap break-all p-5 font-mono text-[11px] leading-relaxed text-ink-muted sm:p-6">{contractText}</pre>
-                    </div>
-
-                    <div className="space-y-4">
-                      <div className="rounded-2xl border border-hairline bg-white/60 p-5">
-                        <Label>Self-check / 6 критериев</Label>
-                        <ul className="mt-4 space-y-3">
-                          {RUBRIC.map((item) => (
-                            <li key={item} className="flex gap-3 text-xs leading-relaxed text-graphite-muted">
-                              <span className="mt-0.5 flex h-4 w-4 flex-none items-center justify-center rounded-full bg-signal text-[9px] text-signal-ink">✓</span>
-                              {item}
-                            </li>
-                          ))}
-                        </ul>
-                      </div>
-
-                      <label className="block rounded-2xl border border-hairline bg-white/60 p-5">
-                        <span className="text-sm font-medium">Одна мысль после модуля</span>
-                        <span className="mt-1 block text-xs text-graphite-muted">Что изменишь перед следующим запуском агента?</span>
-                        <textarea
-                          value={state.reflection}
-                          onChange={(event) => setState((current) => ({ ...current, reflection: event.target.value }))}
-                          rows={4}
-                          className="mt-4 w-full resize-y rounded-xl border border-hairline bg-[#fbfcf8] px-3 py-3 text-sm outline-none focus:border-system"
-                          placeholder="Перед запуском я…"
-                        />
-                      </label>
-
-                      <div className="grid gap-2 sm:grid-cols-2 xl:grid-cols-1">
-                        <button type="button" onClick={copyContract} className="rounded-xl bg-ink px-4 py-3 text-sm font-medium text-ink-foreground">
-                          {copyState === "copied" ? "Скопировано ✓" : copyState === "failed" ? "Не удалось скопировать" : "Скопировать контракт"}
-                        </button>
-                        <button type="button" onClick={downloadContract} className="rounded-xl border border-hairline bg-white/70 px-4 py-3 text-sm font-medium">
-                          Скачать .md
-                        </button>
-                      </div>
-
-                      {state.finished ? (
-                        <div className="rounded-2xl border border-signal/50 bg-signal/10 p-5">
-                          <span className="font-mono text-[10px] uppercase tracking-wide text-signal-ink">Модуль завершён</span>
-                          <p className="mt-2 text-sm text-graphite-muted">Артефакт сохранён в браузере. Следующий модуль — контекст, Skills и саб-агенты.</p>
-                        </div>
-                      ) : (
-                        <button
-                          type="button"
-                          onClick={() => setState((current) => ({ ...current, finished: true }))}
-                          className="w-full rounded-xl bg-signal px-4 py-3 text-sm font-medium text-signal-ink"
-                        >
-                          Завершить модуль
-                        </button>
-                      )}
-                    </div>
-                  </div>
-                </Lesson>
-              )}
-            </div>
-          </main>
-
-          <footer className="border-t border-hairline bg-white/40 px-5 py-4 sm:px-8">
-            <div className="mx-auto flex max-w-[920px] items-center justify-between gap-4">
-              <button
-                type="button"
-                onClick={back}
-                disabled={state.step === 0}
-                className="rounded-lg border border-hairline bg-white/60 px-4 py-2 text-sm text-graphite-muted disabled:opacity-30"
+          <Question title="Твоё решение">
+            {[
+              { id: "approve" as const, title: "Разрешить план", detail: "Он остаётся внутри scope и останавливается перед записью." },
+              { id: "stop" as const, title: "Остановить задачу", detail: "Любая автономная работа здесь слишком рискованна." },
+              { id: "expand" as const, title: "Сразу дать весь репозиторий", detail: "Так агент точно не упустит контекст." },
+            ].map((choice) => (
+              <ChoiceButton
+                key={choice.id}
+                selected={state.gateChoice === choice.id}
+                detail={choice.detail}
+                onClick={() => setState((current) => ({ ...current, gateChoice: choice.id }))}
               >
-                ← Назад
-              </button>
-              <span className="hidden font-mono text-[10px] uppercase tracking-wide text-graphite-muted sm:block">
-                {MODULE_STEPS[state.step].index} / 06
-              </span>
-              {state.step < LAST_STEP ? (
+                {choice.title}
+              </ChoiceButton>
+            ))}
+            {state.gateChoice && (
+              <Feedback good={state.gateChoice === "approve"}>
+                {state.gateChoice === "approve"
+                  ? "Верно. План соответствует контракту, а точка подтверждения стоит перед записью. Можно разрешить этот ограниченный следующий шаг."
+                  : "Это либо тормоз на ровном месте, либо открытая дверь во весь репозиторий. Хороший guardrail не мешает работе — он контролирует следующий рискованный переход."}
+              </Feedback>
+            )}
+          </Question>
+        </Lesson>
+      )}
+
+      {state.step === 6 && (
+        <Lesson
+          headingRef={lessonHeading}
+          kicker="06 / Takeaway"
+          title="Контракт готов. Пора столкнуть его с реальностью."
+          lead="Это не священный шаблон на все случаи. Это минимальная инженерная память задачи: чего хотим, где границы, чем рискуем и как докажем, что закончили."
+        >
+          <div className="grid min-w-0 gap-5 xl:grid-cols-[1.15fr_0.85fr]">
+            <FileCard name="agent-task-contract.md" status="ready" className="self-start">
+              <pre className="max-h-[540px] min-w-0 overflow-auto whitespace-pre-wrap break-words pb-7 pr-6 font-mono text-sm leading-relaxed text-ink-muted">{contractText}</pre>
+            </FileCard>
+
+            <div className="space-y-4">
+              <div className={CARD}>
+                <Label>Self-check · 6 критериев</Label>
+                <Checklist items={RUBRIC} />
+              </div>
+
+              <label className={`block ${CARD}`}>
+                <span className="text-lg font-bold tracking-[-0.01em]">Одна мысль после модуля</span>
+                <span className="mt-1.5 block text-[15px] text-graphite-soft">Что изменишь перед следующим запуском агента?</span>
+                <textarea
+                  value={state.reflection}
+                  onChange={(event) => setState((current) => ({ ...current, reflection: event.target.value }))}
+                  rows={4}
+                  className={`mt-4 ${FIELD}`}
+                  placeholder="Перед запуском я…"
+                />
+              </label>
+
+              <div className="grid gap-2.5 sm:grid-cols-2 xl:grid-cols-1">
+                <button type="button" onClick={copyContract} className={BTN.dark}>
+                  {copyState === "copied" ? "Скопировано ✓" : copyState === "failed" ? "Не удалось скопировать" : "Скопировать контракт"}
+                </button>
+                <button type="button" onClick={downloadContract} className={BTN.outline}>
+                  Скачать .md
+                </button>
+                {workspace && (
+                  <button type="button" onClick={() => sendArtifactToSubmission(contractText)} className={`${BTN.outline} sm:col-span-2 xl:col-span-1`}>
+                    Перенести в сдачу ↓
+                  </button>
+                )}
+              </div>
+
+              {state.finished ? (
+                <div className="kg-rise rounded-[24px] bg-sky-tint p-6" role="status">
+                  <Label tone="system">Модуль завершён</Label>
+                  <p className="mt-2 leading-relaxed">Артефакт сохранён. Следующий модуль — как давать модели достаточно контекста, не вываливая на неё цифровой чердак.</p>
+                  <div className="mt-5 flex flex-wrap items-center gap-x-5 gap-y-3">
+                    {nextHref && (
+                      <Link href={nextHref} className={BTN.small}>
+                        {nextLabel}
+                      </Link>
+                    )}
+                    <Link href={overviewHref} className="kg-link inline-flex min-h-11 items-center font-semibold">
+                      Вся программа
+                    </Link>
+                  </div>
+                </div>
+              ) : (
                 <button
                   type="button"
-                  onClick={next}
-                  disabled={!canAdvance}
-                  className="rounded-lg bg-ink px-5 py-2 text-sm font-medium text-ink-foreground transition-transform hover:scale-[1.02] disabled:cursor-not-allowed disabled:opacity-30 disabled:hover:scale-100"
+                  onClick={() => setState((current) => ({ ...current, finished: true }))}
+                  className={`w-full ${BTN.primary}`}
                 >
-                  Продолжить →
+                  Завершить модуль
                 </button>
-              ) : (
-                <span className="text-sm text-graphite-muted">Финал модуля</span>
               )}
             </div>
-          </footer>
-        </div>
-      </div>
-    </div>
-  );
-}
-
-function Lesson({
-  headingRef,
-  kicker,
-  title,
-  lead,
-  children,
-}: {
-  headingRef: React.RefObject<HTMLHeadingElement | null>;
-  kicker: string;
-  title: string;
-  lead: string;
-  children: React.ReactNode;
-}) {
-  return (
-    <section>
-      <span className="font-mono text-[10px] uppercase tracking-[0.2em] text-system">{kicker}</span>
-      <h2 ref={headingRef} tabIndex={-1} className="mt-3 max-w-[22ch] text-3xl font-semibold leading-[1.08] tracking-tight outline-none sm:text-[2.65rem]">
-        {title}
-      </h2>
-      <p className="mt-5 max-w-[68ch] text-base leading-relaxed text-graphite-muted">{lead}</p>
-      <div className="mt-9">{children}</div>
-    </section>
-  );
-}
-
-function Label({ children, tone = "muted" }: { children: React.ReactNode; tone?: "muted" | "danger" | "system" }) {
-  const color = tone === "danger" ? "text-accent-change" : tone === "system" ? "text-system" : "text-graphite-muted";
-  return <span className={`font-mono text-[10px] uppercase tracking-[0.18em] ${color}`}>{children}</span>;
-}
-
-function Question({ title, description, children }: { title: string; description?: string; children: React.ReactNode }) {
-  return (
-    <div className="mt-6 rounded-2xl border border-hairline bg-white/50 p-5 sm:p-6">
-      <span className="font-mono text-[10px] uppercase tracking-[0.18em] text-system">Твоя очередь</span>
-      <h3 className="mt-2 text-lg font-medium">{title}</h3>
-      {description && <p className="mt-2 text-sm leading-relaxed text-graphite-muted">{description}</p>}
-      <div className="mt-5 space-y-2">{children}</div>
-    </div>
-  );
-}
-
-function ChoiceButton({ selected, onClick, children }: { selected: boolean; onClick: () => void; children: React.ReactNode }) {
-  return (
-    <button
-      type="button"
-      onClick={onClick}
-      className={`block w-full rounded-xl border px-4 py-3 text-left text-sm transition-colors ${selected ? "border-system bg-system/[0.08]" : "border-hairline bg-white/60 hover:bg-white"}`}
-    >
-      <span className="flex items-center gap-3">
-        <span className={`h-2.5 w-2.5 flex-none rounded-full border ${selected ? "border-system bg-system" : "border-graphite-muted/40"}`} />
-        {children}
-      </span>
-    </button>
-  );
-}
-
-function Feedback({ good, children }: { good: boolean; children: React.ReactNode }) {
-  return (
-    <div className={`mt-4 rounded-xl border p-4 text-sm leading-relaxed ${good ? "border-signal/50 bg-signal/10 text-graphite" : "border-accent-change/40 bg-accent-change/[0.06] text-graphite-muted"}`}>
-      <span className={`mr-2 font-mono text-[10px] uppercase tracking-wide ${good ? "text-signal-ink" : "text-accent-change"}`}>
-        {good ? "Верно" : "Посмотри глубже"}
-      </span>
-      {children}
-    </div>
+          </div>
+        </Lesson>
+      )}
+    </FlowShell>
   );
 }

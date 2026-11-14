@@ -26,11 +26,11 @@ export default function GlobalError({
           textAlign: "center",
           fontFamily: "system-ui, sans-serif",
           background: "#f7f8f5",
-          color: "#131a25",
+          color: "#14171f",
         }}
       >
         <h1 style={{ fontSize: "1.5rem", fontWeight: 600, margin: 0 }}>Что-то пошло не так</h1>
-        <p style={{ color: "#5b6672", maxWidth: "28rem", margin: 0 }}>
+        <p style={{ color: "#4a5163", maxWidth: "28rem", margin: 0 }}>
           Приложение не загрузилось. Попробуй обновить страницу.
         </p>
         <button
@@ -38,8 +38,8 @@ export default function GlobalError({
           onClick={retry}
           style={{
             borderRadius: "0.5rem",
-            background: "#0a0f18",
-            color: "#f4f5f1",
+            background: "#14171f",
+            color: "#f6f4ef",
             padding: "0.625rem 1.25rem",
             fontSize: "0.875rem",
             fontWeight: 500,
@@ -50,7 +50,7 @@ export default function GlobalError({
           Попробовать снова
         </button>
         {error.digest && (
-          <p style={{ color: "#5b6672", fontSize: "0.75rem" }}>
+          <p style={{ color: "#4a5163", fontSize: "0.75rem" }}>
             Код ошибки: <span style={{ fontFamily: "monospace" }}>{error.digest}</span>
           </p>
         )}

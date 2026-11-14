@@ -5,7 +5,11 @@ import { revalidatePath } from "next/cache";
 import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
 import { clamp } from "@/lib/validation";
+import { MAX_SUBMISSION_CONTENT_LEN } from "@/lib/submission-limits";
 import { log, getOrCreateCorrelationId } from "@/lib/logger";
+import { isEmailProviderConfigured, notifyAdminEmail, resendCredentials, siteUrl } from "@/lib/env";
+import { sendNotifyEmail } from "@/lib/notify-email";
+import { buildSubmissionNotifyEmail } from "@/lib/notify-templates";
 
 export type DecisionBreakdown = {
   content: string;
@@ -18,7 +22,7 @@ export type DecisionBreakdown = {
   conditionsResponse: string;
 };
 
-const MAX_CONTENT_LEN = 4000;
+const MAX_CONTENT_LEN = MAX_SUBMISSION_CONTENT_LEN;
 const MAX_FIELD_LEN = 2000;
 const MAX_ANSWER_LEN = 2000;
 
@@ -61,7 +65,7 @@ export async function submitAssignment(
   const session = await auth();
   if (!session?.user) throw new Error("Not authenticated");
 
-  await requireOpenModuleMembership(moduleId, session.user.id);
+  const { mod } = await requireOpenModuleMembership(moduleId, session.user.id);
 
   const clean = sanitizeBreakdown(breakdown);
 
@@ -83,13 +87,32 @@ export async function submitAssignment(
   revalidatePath(`/modules/${moduleId}`);
   revalidatePath("/stream");
 
+  const correlationId = getOrCreateCorrelationId(await headers());
   log({
     level: "info",
     event: "submission_saved",
     operation: "modules.submitAssignment",
-    correlationId: getOrCreateCorrelationId(await headers()),
+    correlationId,
     meta: { moduleId, submissionId: submission.id, actorId: session.user.id, publishToCohort },
   });
+
+  // Best-effort: a reviewer notification is a convenience, not part of
+  // the submission's own success/failure — never let it throw from here.
+  const adminEmail = notifyAdminEmail();
+  if (adminEmail && isEmailProviderConfigured()) {
+    const { subject, text } = buildSubmissionNotifyEmail({
+      participantEmail: session.user.email ?? "unknown",
+      weekNumber: mod.weekNumber,
+      weekTitle: mod.title,
+      moduleId,
+      siteUrl: siteUrl(),
+    });
+    await sendNotifyEmail(
+      { to: adminEmail, subject, text, ...resendCredentials() },
+      correlationId,
+      "submission_notify_sent"
+    );
+  }
 }
 
 export async function submitFeedback(formId: string, answers: Record<string, string>) {

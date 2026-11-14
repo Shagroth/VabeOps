@@ -4,6 +4,7 @@ import { revalidatePath } from "next/cache";
 import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
 import { clamp } from "@/lib/validation";
+import { normalizeDisplayName } from "@/lib/display-name";
 
 const MAX_PROFILE_FIELD_LEN = 600;
 const MAX_COMMENT_LEN = 4000;
@@ -23,6 +24,11 @@ export async function updateMyProfile(cohortId: string, formData: FormData) {
   });
   if (!enrollment) throw new Error("Not enrolled in this cohort");
 
+  const name = normalizeDisplayName(formData.get("name"));
+  if (name) {
+    await prisma.user.update({ where: { id: session.user.id }, data: { name } });
+  }
+
   await prisma.enrollment.update({
     where: { id: enrollment.id },
     data: {
@@ -33,6 +39,7 @@ export async function updateMyProfile(cohortId: string, formData: FormData) {
   });
 
   revalidatePath("/stream");
+  revalidatePath("/");
 }
 
 export async function postComment(moduleId: string, content: string) {

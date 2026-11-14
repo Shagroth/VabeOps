@@ -4,16 +4,10 @@ import { prisma } from "@/lib/prisma";
 import { updateModule, setFeedbackQuestions, reviewSubmission } from "../../actions";
 import { SubmissionStatusBadge } from "@/components/SubmissionStatusBadge";
 import { WorkspaceShell } from "@/components/WorkspaceShell";
-
-const DECISION_FIELD_LABELS: Record<string, string> = {
-  task: "Задача",
-  approach: "Подход",
-  rejectedAlternative: "Отвергнутая альтернатива",
-  verification: "Проверка",
-  riskOrLimit: "Риск/ограничение",
-  revisitCondition: "Условие пересмотра",
-  conditionsResponse: "Ответ на «изменились условия»",
-};
+import { CourseModuleSelect } from "@/components/admin/CourseModuleSelect";
+import { ScoreInputs } from "@/components/admin/ScoreInputs";
+import { DECISION_FIELD_LABELS } from "@/lib/decision-field-labels";
+import { getCourse } from "@/content/course-catalog";
 
 export default async function EditModulePage({
   params,
@@ -26,6 +20,7 @@ export default async function EditModulePage({
   const mod = await prisma.module.findUnique({
     where: { id },
     include: {
+      cohort: { select: { course: true } },
       submissions: {
         include: {
           user: true,
@@ -39,13 +34,16 @@ export default async function EditModulePage({
   });
   if (!mod) notFound();
 
+  const course = getCourse(mod.cohort.course);
+  const rubricSize = course.scoring.length;
+
   const noviceForm = mod.feedbackForms.find((f) => f.level === "NOVICE");
   const strongForm = mod.feedbackForms.find((f) => f.level === "STRONG");
 
   const boundUpdate = updateModule.bind(null, mod.id);
 
   return (
-    <WorkspaceShell active="admin" email={session.user.email ?? ""} canAccessStudio>
+    <WorkspaceShell active="admin" email={session.user.email ?? ""} canAccessStudio canReviewSubmissions>
     <div className="mx-auto flex max-w-[860px] flex-col gap-10">
       <section>
         <h1 className="mb-6 text-2xl font-semibold">Неделя {mod.weekNumber} · {mod.title}</h1>
@@ -74,6 +72,7 @@ export default async function EditModulePage({
             <input type="checkbox" name="isOpen" defaultChecked={mod.isOpen} />
             Открыт для участников
           </label>
+          <CourseModuleSelect modules={course.modules} defaultValue={mod.courseModuleNumber} />
           <label className="flex flex-col gap-1 text-sm">
             R2 video key
             <input
@@ -197,8 +196,11 @@ export default async function EditModulePage({
                   action={async (fd) => {
                     "use server";
                     const comment = String(fd.get("comment") || "");
+                    const scoresRaw = Object.fromEntries(
+                      Array.from({ length: rubricSize }, (_, i) => [String(i), String(fd.get(`score-${i}`) || "")])
+                    );
                     const action = fd.get("intent") === "accept" ? accept : requestRevision;
-                    await action(comment);
+                    await action(comment, scoresRaw);
                   }}
                   className="flex flex-col gap-2"
                 >
@@ -208,6 +210,7 @@ export default async function EditModulePage({
                     rows={2}
                     className="rounded border border-black/15 p-2 text-sm"
                   />
+                  <ScoreInputs rubric={course.scoring} />
                   <div className="flex gap-2">
                     <button
                       type="submit"

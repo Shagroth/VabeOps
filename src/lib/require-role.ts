@@ -1,8 +1,8 @@
 import { redirect } from "next/navigation";
 import { auth } from "@/auth";
-import { canAccessStudio } from "@/lib/studio-permissions";
+import { canAccessStudio, canReviewSubmissions } from "@/lib/studio-permissions";
 
-export { canAccessStudio };
+export { canAccessStudio, canReviewSubmissions };
 
 // Mentor is intentionally not here — see canAccessStudio in
 // studio-permissions.ts for why.

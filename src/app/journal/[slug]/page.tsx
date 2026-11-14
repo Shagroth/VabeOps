@@ -4,7 +4,7 @@ import Link from "next/link";
 import { Header } from "@/components/landing/Header";
 import { Footer } from "@/components/landing/Footer";
 import { CoverArt } from "@/components/covers/CoverArt";
-import { JOURNAL, getJournalBySlug } from "@/content/journal";
+import { JOURNAL, JOURNAL_SOURCES_CHECKED, getJournalBySlug } from "@/content/journal";
 
 export function generateStaticParams() {
   return JOURNAL.map((j) => ({ slug: j.slug }));
@@ -96,10 +96,31 @@ export default async function JournalDetailPage({
             })}
           </div>
 
-          <p className="mt-10 border-t border-hairline pt-5 text-xs text-graphite-muted">
-            Демонстрационная статья для оценки дизайна журнала — автор ещё не публиковал
-            финальную редакцию на эту тему.
-          </p>
+          <section className="mt-12 border-t-[1.5px] border-graphite pt-6" aria-labelledby="sources-title">
+            <h2 id="sources-title" className="text-xl font-bold tracking-[-0.015em]">
+              Источники
+            </h2>
+            <ol className="mt-4 flex flex-col">
+              {entry.sources.map((source, i) => (
+                <li key={source.url} className="grid grid-cols-[36px_1fr] gap-x-2 border-b border-hairline py-3 text-[15px]">
+                  <span className="font-mono text-string">{String(i + 1).padStart(2, "0")}</span>
+                  <span>
+                    <a href={source.url} target="_blank" rel="noopener noreferrer" className="kg-link font-semibold">
+                      {source.title}
+                    </a>
+                    <span className="block text-graphite-muted">
+                      {source.publisher}
+                      {source.date ? ` · ${source.date}` : ""}
+                    </span>
+                  </span>
+                </li>
+              ))}
+            </ol>
+            <p className="mt-4 text-sm text-graphite-muted">
+              Источники открыты и прочитаны {JOURNAL_SOURCES_CHECKED}. Страницы документации обновляются, со
+              временем формулировки в них могут измениться.
+            </p>
+          </section>
         </article>
       </main>
       <Footer />

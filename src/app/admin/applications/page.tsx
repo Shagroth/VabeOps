@@ -2,6 +2,7 @@ import { requireAdmin } from "@/lib/require-admin";
 import { prisma } from "@/lib/prisma";
 import { WorkspaceShell } from "@/components/WorkspaceShell";
 import { setApplicationStatus } from "../actions";
+import { getCourse } from "@/content/course-catalog";
 
 const STATUS_LABEL: Record<string, string> = {
   PENDING: "Новая",
@@ -16,8 +17,17 @@ export default async function ApplicationsPage() {
     orderBy: { createdAt: "desc" },
   });
 
+  const usersWithEnrollment = await prisma.user.findMany({
+    where: {
+      email: { in: applications.map((a) => a.email) },
+      enrollments: { some: {} },
+    },
+    select: { email: true },
+  });
+  const hasAccess = new Set(usersWithEnrollment.map((u) => u.email));
+
   return (
-    <WorkspaceShell active="admin" email={session.user.email ?? ""} canAccessStudio>
+    <WorkspaceShell active="admin" email={session.user.email ?? ""} canAccessStudio canReviewSubmissions>
     <div className="mx-auto max-w-[860px]">
       <h1 className="mb-6 text-2xl font-semibold">Заявки</h1>
       <ul className="flex flex-col gap-4">
@@ -29,7 +39,8 @@ export default async function ApplicationsPage() {
               <div className="mb-2 flex items-center justify-between">
                 <div>
                   <span className="font-medium">{a.name}</span>{" "}
-                  <span className="text-sm text-black/50">{a.email}</span>
+                  <span className="text-sm text-black/50">{a.email}</span>{" "}
+                  <span className="rounded bg-black/5 px-1.5 py-0.5 text-xs">{getCourse(a.course).title}</span>
                 </div>
                 <span className="text-xs text-black/50">
                   {STATUS_LABEL[a.status]}
@@ -44,8 +55,20 @@ export default async function ApplicationsPage() {
                 {a.workGoal}
               </p>
               {a.status === "PENDING" && (
-                <div className="flex gap-2">
-                  <form action={accept}>
+                <div className="flex items-center gap-2">
+                  <form action={accept} className="flex items-center gap-2">
+                    <select
+                      name="level"
+                      required
+                      defaultValue=""
+                      className="rounded border border-black/15 px-2 py-1 text-sm"
+                    >
+                      <option value="" disabled>
+                        Уровень…
+                      </option>
+                      <option value="NOVICE">Новичок</option>
+                      <option value="STRONG">Уверенный</option>
+                    </select>
                     <button
                       type="submit"
                       className="rounded border border-black/15 px-3 py-1 text-sm"
@@ -61,6 +84,40 @@ export default async function ApplicationsPage() {
                       Отклонить
                     </button>
                   </form>
+                </div>
+              )}
+              {a.status === "ACCEPTED" && hasAccess.has(a.email) && (
+                <p className="text-xs text-black/50">
+                  Принят(а) — аккаунт и доступ к когорте созданы, письмо со ссылкой на вход
+                  отправлено.
+                </p>
+              )}
+              {a.status === "ACCEPTED" && !hasAccess.has(a.email) && (
+                <div className="flex items-center gap-2">
+                  <form action={accept} className="flex items-center gap-2">
+                    <select
+                      name="level"
+                      required
+                      defaultValue=""
+                      className="rounded border border-black/15 px-2 py-1 text-sm"
+                    >
+                      <option value="" disabled>
+                        Уровень…
+                      </option>
+                      <option value="NOVICE">Новичок</option>
+                      <option value="STRONG">Уверенный</option>
+                    </select>
+                    <button
+                      type="submit"
+                      className="rounded border border-amber-600/40 px-3 py-1 text-sm text-amber-700"
+                    >
+                      Выдать доступ
+                    </button>
+                  </form>
+                  <p className="text-xs text-black/50">
+                    Принят(а) раньше, но без аккаунта/когорты/письма — выбери уровень и выдай
+                    доступ.
+                  </p>
                 </div>
               )}
             </li>

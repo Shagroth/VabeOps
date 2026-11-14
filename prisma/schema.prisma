@@ -55,6 +55,13 @@ enum ApplicationStatus {
   REJECTED
 }
 
+// Which course a cohort runs. The program itself lives in
+// src/content/course-catalog.ts; values must match its CourseKey.
+enum CourseKey {
+  ENGINEERS
+  FIRST_FLIGHT
+}
+
 enum SubmissionStatus {
   SUBMITTED
   NEEDS_REVISION
@@ -255,6 +262,7 @@ model Cohort {
   id        String   @id @default(cuid())
   name      String
   startDate DateTime
+  course    CourseKey @default(ENGINEERS)
 
   modules      Module[]
   enrollments  Enrollment[]
@@ -291,6 +299,9 @@ model Module {
   assignmentMd       String  @db.Text
   isOpen             Boolean @default(true) // manual admin toggle, not a date lock
   conditionsChangedMd String? @db.Text // author-authored "conditions changed" follow-up prompt
+  // Which course module (1..5 in src/content/demo-course-program.ts) this
+  // week renders. Null = legacy week driven only by notesMd/assignmentMd.
+  courseModuleNumber Int?
 
   cohort       Cohort             @relation(fields: [cohortId], references: [id], onDelete: Cascade)
   submissions  Submission[]
@@ -358,6 +369,11 @@ model SubmissionFeedback {
   authorId     String
   content      String   @db.Text
   createdAt    DateTime @default(now())
+  // Rubric scores for this review, in HOMEWORK_SCORING order (src/content/
+  // demo-course-homework.ts) — a plain number[], index-matched to the
+  // rubric's criteria. Null = reviewer didn't score this review (scoring
+  // is optional, all-or-nothing when present — see lib/homework-scoring.ts).
+  scores       Json?
 
   submission Submission @relation(fields: [submissionId], references: [id], onDelete: Cascade)
   author     User       @relation(fields: [authorId], references: [id], onDelete: Cascade)
@@ -394,6 +410,9 @@ model Application {
   email      String
   experience String            @db.Text
   workGoal   String            @db.Text
+  // Which course the person applies to. Older rows predate the field and
+  // were all for the engineers' pilot.
+  course     CourseKey         @default(ENGINEERS)
   status     ApplicationStatus @default(PENDING)
   // Explicit consent checkbox on the public form — required at submit time
   // (see apply/actions.ts), stored so there's a record consent was given.
@@ -409,4 +428,19 @@ model LiveSession {
   link        String
 
   cohort Cohort @relation(fields: [cohortId], references: [id], onDelete: Cascade)
+}
+
+// Anonymous funnel counters for the public course modules: how many
+// browsers opened a module, reached the lab, reached the artifact, finished.
+// One row per day/course/module/event. No user, session, IP or cookie is
+// stored — see src/lib/funnel.ts.
+model FunnelCount {
+  id           String    @id @default(cuid())
+  day          DateTime  @db.Date
+  course       CourseKey
+  moduleNumber Int
+  event        String
+  count        Int       @default(0)
+
+  @@unique([day, course, moduleNumber, event])
 }

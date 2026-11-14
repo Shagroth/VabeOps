@@ -39,3 +39,14 @@ export function canPublishContent(role: StudioRole): boolean {
 export function canAccessStudio(role: StudioRole): boolean {
   return role === "ADMIN" || role === "EDITOR" || role === "AUTHOR";
 }
+
+/**
+ * Who sees the cross-cohort review queue (`/admin/review`) and the "На
+ * проверке" nav link. Mentor belongs here even though it's excluded from
+ * `canAccessStudio` above — reviewing cohort submissions is the one
+ * reviewer-style action Mentor does have (see admin/actions.ts
+ * reviewSubmission's own requireRole(["ADMIN","MENTOR"])).
+ */
+export function canReviewSubmissions(role: StudioRole): boolean {
+  return role === "ADMIN" || role === "MENTOR";
+}

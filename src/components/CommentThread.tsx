@@ -8,7 +8,8 @@ export function CommentThread({
   comments,
 }: {
   moduleId: string;
-  comments: { id: string; content: string; createdAt: Date; user: { email: string } }[];
+  /** `author` is a display name — never pass emails or full user rows to this client component. */
+  comments: { id: string; content: string; createdAt: Date; author: string }[];
 }) {
   const [content, setContent] = useState("");
   const [isPending, startTransition] = useTransition();
@@ -17,7 +18,7 @@ export function CommentThread({
     <div className="flex flex-col gap-3">
       {comments.map((c) => (
         <div key={c.id} className="text-sm">
-          <span className="text-black/50">{c.user.email}: </span>
+          <span className="text-black/50">{c.author}: </span>
           {c.content}
         </div>
       ))}
