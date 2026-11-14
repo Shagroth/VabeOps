@@ -14,24 +14,12 @@ import { ModuleHero } from "@/components/demo-course/ModuleHero";
 import { DemoCourseFlow } from "@/components/demo-course/DemoCourseFlow";
 import { PrototypeModuleFlow } from "@/components/demo-course/PrototypeModuleFlow";
 import { HomeworkAssignmentSection } from "@/components/demo-course/HomeworkAssignment";
-import { getHomeworkAssignment } from "@/content/demo-course-homework";
-import { MODULE_ONE_SUMMARY, getPrototypeModule } from "@/content/demo-course-program";
+import { getCourse } from "@/content/course-catalog";
 import { DECISION_FIELD_LABELS } from "@/lib/decision-field-labels";
-import { HOMEWORK_SCORING, HOMEWORK_PASS_SCORE } from "@/content/demo-course-homework";
 import { sumScores, totalMaxScore } from "@/lib/homework-scoring";
 
 const PROSE =
   "prose prose-sm max-w-none prose-headings:font-semibold prose-h1:text-xl prose-h2:text-lg prose-h3:text-base";
-
-/** Course content (lesson flow + homework brief) for a week linked to a program module. */
-function getCourseContent(courseModuleNumber: number | null) {
-  if (!courseModuleNumber) return null;
-  const homework = getHomeworkAssignment(courseModuleNumber);
-  if (courseModuleNumber === 1) return { summary: MODULE_ONE_SUMMARY, prototype: null, homework };
-  const prototype = getPrototypeModule(courseModuleNumber);
-  if (!prototype) return null;
-  return { summary: prototype, prototype, homework };
-}
 
 export default async function ModulePage({
   params,
@@ -42,7 +30,10 @@ export default async function ModulePage({
   const session = await auth();
   if (!session?.user) redirect("/");
 
-  const mod = await prisma.module.findUnique({ where: { id } });
+  const mod = await prisma.module.findUnique({
+    where: { id },
+    include: { cohort: { select: { course: true } } },
+  });
   if (!mod) notFound();
 
   // Membership is checked against the module's own cohort, not "the latest
@@ -105,7 +96,9 @@ export default async function ModulePage({
   const nextWeek = index >= 0 && index < cohortWeeks.length - 1 ? cohortWeeks[index + 1] : null;
   const nextOpenHref = nextWeek?.isOpen ? `/modules/${nextWeek.id}` : null;
 
-  const course = getCourseContent(mod.courseModuleNumber);
+  // Lesson flow, homework brief and rubric come from the cohort's course.
+  const courseDef = getCourse(mod.cohort.course);
+  const course = courseDef.getContent(mod.courseModuleNumber);
   const videoUrl = mod.videoKey ? await getVideoUrl(mod.videoKey) : null;
   const questions = (feedbackForm?.questions as string[] | undefined) ?? [];
   const initialAnswers =
@@ -171,7 +164,7 @@ export default async function ModulePage({
 
             {course.homework && (
               <div className="overflow-hidden rounded-[28px]">
-                <HomeworkAssignmentSection assignment={course.homework} />
+                <HomeworkAssignmentSection assignment={course.homework} scoring={courseDef.scoring} passScore={courseDef.passScore} scoringNote={courseDef.scoringNote} tasksTitle={courseDef.tasksTitle} />
               </div>
             )}
           </>
@@ -207,7 +200,7 @@ export default async function ModulePage({
               {submission && <SubmissionStatusBadge status={submission.status} />}
             </div>
             <p className="text-sm text-graphite-muted">
-              Приложи ссылку на репозиторий или PR и заполни разбор решения. Каждая отправка сохраняется
+              {courseDef.submissionHint} Каждая отправка сохраняется
               отдельной версией — предыдущие и фидбек к ним не пропадут.
             </p>
 
@@ -225,14 +218,14 @@ export default async function ModulePage({
                       {scores && (
                         <div className="mt-2 rounded border border-accent-change/20 bg-white/50 p-2 text-xs">
                           <div className="mb-1 font-medium text-graphite">
-                            Балл: {sumScores(scores)} из {totalMaxScore(HOMEWORK_SCORING)}{" "}
+                            Балл: {sumScores(scores)} из {totalMaxScore(courseDef.scoring)}{" "}
                             <span className="text-graphite-muted">
-                              (проходной — {HOMEWORK_PASS_SCORE}
-                              {sumScores(scores) >= HOMEWORK_PASS_SCORE ? ", пройдено ✓" : ""})
+                              (проходной — {courseDef.passScore}
+                              {sumScores(scores) >= courseDef.passScore ? ", пройдено ✓" : ""})
                             </span>
                           </div>
                           <ul className="flex flex-col gap-0.5 text-graphite-muted">
-                            {HOMEWORK_SCORING.map((c, i) => (
+                            {courseDef.scoring.map((c, i) => (
                               <li key={c.label}>
                                 {c.label}: {scores[i]} / {c.points}
                               </li>

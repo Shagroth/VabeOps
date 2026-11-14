@@ -2,6 +2,8 @@ import { requireAdmin } from "@/lib/require-admin";
 import { WorkspaceShell } from "@/components/WorkspaceShell";
 import { CourseModuleSelect } from "@/components/admin/CourseModuleSelect";
 import { createModule } from "../../actions";
+import { prisma } from "@/lib/prisma";
+import { getCourse } from "@/content/course-catalog";
 
 export default async function NewModulePage({
   searchParams,
@@ -10,6 +12,10 @@ export default async function NewModulePage({
 }) {
   const session = await requireAdmin();
   const { cohortId } = await searchParams;
+  const cohort = cohortId
+    ? await prisma.cohort.findUnique({ where: { id: cohortId }, select: { course: true } })
+    : null;
+  const course = getCourse(cohort?.course);
 
   return (
     <WorkspaceShell active="admin" email={session.user.email ?? ""} canAccessStudio canReviewSubmissions>
@@ -38,7 +44,7 @@ export default async function NewModulePage({
           <input type="checkbox" name="isOpen" defaultChecked />
           Открыт для участников
         </label>
-        <CourseModuleSelect />
+        <CourseModuleSelect modules={course.modules} />
         <label className="flex flex-col gap-1 text-sm">
           R2 video key (опционально)
           <input

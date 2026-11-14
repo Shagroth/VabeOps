@@ -55,6 +55,13 @@ enum ApplicationStatus {
   REJECTED
 }
 
+// Which course a cohort runs. The program itself lives in
+// src/content/course-catalog.ts; values must match its CourseKey.
+enum CourseKey {
+  ENGINEERS
+  FIRST_FLIGHT
+}
+
 enum SubmissionStatus {
   SUBMITTED
   NEEDS_REVISION
@@ -255,6 +262,7 @@ model Cohort {
   id        String   @id @default(cuid())
   name      String
   startDate DateTime
+  course    CourseKey @default(ENGINEERS)
 
   modules      Module[]
   enrollments  Enrollment[]

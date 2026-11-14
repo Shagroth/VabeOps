@@ -11,7 +11,7 @@ import {
   setModuleOpen,
   setUserRole,
 } from "./actions";
-import { PROGRAM_MODULES } from "@/content/demo-course-program";
+import { COURSE_KEYS, COURSES, getCourse } from "@/content/course-catalog";
 
 const LEVEL_LABEL: Record<string, string> = { NOVICE: "новичок", STRONG: "сильный" };
 
@@ -49,7 +49,7 @@ export default async function AdminPage() {
         <section key={cohort.id} className="flex flex-col gap-4">
           <div className="flex items-baseline justify-between">
             <h2 className="text-lg font-semibold">
-              {cohort.name} · {cohort.enrollments.length} участников
+              {cohort.name} · {getCourse(cohort.course).title} · {cohort.enrollments.length} участников
             </h2>
             <Link
               href={`/admin/modules/new?cohortId=${cohort.id}`}
@@ -95,7 +95,7 @@ export default async function AdminPage() {
             ))}
           </ul>
 
-          {cohort.modules.length < PROGRAM_MODULES.length && (
+          {cohort.modules.length < getCourse(cohort.course).modules.length && (
             <form action={createProgramWeeks} className="text-sm">
               <input type="hidden" name="cohortId" value={cohort.id} />
               <button type="submit" className="rounded-lg border border-black/15 px-3 py-2 hover:bg-black/5">
@@ -208,6 +208,13 @@ export default async function AdminPage() {
             required
             className="rounded border border-black/15 p-1"
           />
+          <select name="course" defaultValue="ENGINEERS" aria-label="Курс" className="rounded border border-black/15 p-1">
+            {COURSE_KEYS.map((key) => (
+              <option key={key} value={key}>
+                {COURSES[key].title} · {COURSES[key].audience}
+              </option>
+            ))}
+          </select>
           <input
             type="date"
             name="startDate"

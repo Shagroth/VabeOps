@@ -1,7 +1,8 @@
 import type { OverviewData } from "@/components/workspace/dashboard";
 import { MINI_COURSES } from "@/content/courses";
 import { getFeaturedJournal } from "@/content/journal";
-import { PILOT_COURSE_TITLE, PROGRAM_MODULES } from "@/content/demo-course-program";
+import { COURSES } from "@/content/course-catalog";
+import { PROGRAM_MODULES } from "@/content/demo-course-program";
 
 const featured = getFeaturedJournal();
 const STATUS: (string | null)[] = ["ACCEPTED", "NEEDS_REVISION", "SUBMITTED", null, null];
@@ -22,7 +23,21 @@ const weeks = PROGRAM_MODULES.map((m, i) => ({
 
 export const ENROLLED_OVERVIEW: OverviewData = {
   ...base,
-  courses: [{ id: "preview-cohort", courseTitle: PILOT_COURSE_TITLE, cohortName: "Demo Pilot", weeks }],
+  courses: [
+    { id: "preview-cohort", courseTitle: COURSES.ENGINEERS.title, cohortName: "Demo Pilot", weeks },
+    {
+      id: "preview-cohort-ff",
+      courseTitle: COURSES.FIRST_FLIGHT.title,
+      cohortName: "Demo First Flight",
+      weeks: COURSES.FIRST_FLIGHT.modules.map((m) => ({
+        id: `preview-ff-week-${m.number}`,
+        weekNumber: m.number,
+        title: m.shortTitle,
+        isOpen: true,
+        status: null,
+      })),
+    },
+  ],
   nextStep: { kind: "revision", week: weeks[1] },
   needsName: true,
   nextSession: { label: "Кикофф", when: "[ДАТА СОЗВОНА]", link: "#" },

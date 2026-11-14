@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useEffect, useMemo, useRef, useState } from "react";
 import type { PrototypeModule, PrototypeStep } from "@/content/demo-course-program";
 import { sendArtifactToSubmission, type WorkspaceFlowLinks } from "@/lib/artifact-bridge";
+import { LessonDiagramFigure } from "./LessonDiagram";
 import { BTN, CARD, Checklist, ChoiceButton, Feedback, FIELD, FileCard, FlowPlaceholder, FlowShell, LabField, LabProgress, Label, Lesson, Question, StarterCase } from "./flow-ui";
 
 type FlowState = {
@@ -14,6 +15,10 @@ type FlowState = {
   reflection: string;
   finished: boolean;
 };
+
+function storageKeyOf(module: PrototypeModule) {
+  return module.storageKey ?? `vabeops-module-${module.number}-v1`;
+}
 
 function initialState(module: PrototypeModule): FlowState {
   return {
@@ -30,7 +35,7 @@ function loadState(module: PrototypeModule): FlowState {
   const empty = initialState(module);
   if (typeof window === "undefined") return empty;
   try {
-    const raw = window.localStorage.getItem(`vabeops-module-${module.number}-v1`);
+    const raw = window.localStorage.getItem(storageKeyOf(module));
     if (!raw) return empty;
     const saved = JSON.parse(raw) as Partial<FlowState>;
     const safeStep = Number.isInteger(saved.step) && (saved.step ?? 0) >= 0 && (saved.step ?? 0) < module.steps.length ? saved.step! : 0;
@@ -64,8 +69,8 @@ export function PrototypeModuleFlow({ module, workspace }: { module: PrototypeMo
 
   useEffect(() => {
     if (!hydrated) return;
-    window.localStorage.setItem(`vabeops-module-${module.number}-v1`, JSON.stringify(state));
-  }, [hydrated, module.number, state]);
+    window.localStorage.setItem(storageKeyOf(module), JSON.stringify(state));
+  }, [hydrated, module, state]);
 
   useEffect(() => {
     if (!hydrated) return;
@@ -105,7 +110,7 @@ export function PrototypeModuleFlow({ module, workspace }: { module: PrototypeMo
   }
 
   function reset() {
-    window.localStorage.removeItem(`vabeops-module-${module.number}-v1`);
+    window.localStorage.removeItem(storageKeyOf(module));
     setState(initialState(module));
     setCopyState("idle");
   }
@@ -135,7 +140,7 @@ export function PrototypeModuleFlow({ module, workspace }: { module: PrototypeMo
     <FlowShell
       eyebrow={`Модуль 0${module.number}`}
       title={module.title}
-      note={`На выходе — ${module.artifactName}. Это не сувенир: он пойдёт прямо в работу.`}
+      note={module.flowNote ?? `На выходе — ${module.artifactName}. Это не сувенир: он пойдёт прямо в работу.`}
       steps={module.steps}
       step={state.step}
       maxStepReached={state.maxStepReached}
@@ -186,6 +191,14 @@ type HeadingRef = React.RefObject<HTMLHeadingElement | null>;
 function ConceptLesson({ step, headingRef, answer, onAnswer }: { step: PrototypeStep; headingRef: HeadingRef; answer?: string; onAnswer: (value: string) => void }) {
   return (
     <Lesson headingRef={headingRef} kicker={step.kicker} title={step.title} lead={step.lead}>
+      {step.theory && (
+        <div className="mb-8 max-w-[62ch] space-y-4 text-[17px] leading-[1.65]">
+          {step.theory.map((paragraph) => (
+            <p key={paragraph}>{paragraph}</p>
+          ))}
+        </div>
+      )}
+      {step.diagram && <LessonDiagramFigure diagram={step.diagram} />}
       <div className={`grid gap-4 ${step.notes.length >= 4 ? "md:grid-cols-2" : "md:grid-cols-3"}`}>
         {step.notes.map((note) => (
           <article key={`${step.id}-${note.number}`} className={CARD}>
@@ -233,7 +246,7 @@ function ConceptLesson({ step, headingRef, answer, onAnswer }: { step: Prototype
 
 function LabLesson({ module, headingRef, state, completed, onField, onExample }: { module: PrototypeModule; headingRef: HeadingRef; state: FlowState; completed: number; onField: (key: string, value: string) => void; onExample: () => void }) {
   return (
-    <Lesson headingRef={headingRef} kicker="05 / Field lab" title={module.labTitle} lead={module.labLead}>
+    <Lesson headingRef={headingRef} kicker={module.labKicker ?? "05 / Field lab"} title={module.labTitle} lead={module.labLead}>
       <StarterCase
         title="Нет подходящей задачи под рукой?"
         text="Подставим инженерный кейс. Разбери его, а потом перепиши под свою систему."
@@ -263,11 +276,12 @@ function LabLesson({ module, headingRef, state, completed, onField, onExample }:
 
 function ArtifactLesson({ module, headingRef, state, artifact, copyState, onReflection, onCopy, onDownload, onFinish, workspace }: { module: PrototypeModule; headingRef: HeadingRef; state: FlowState; artifact: string; copyState: "idle" | "copied" | "failed"; onReflection: (value: string) => void; onCopy: () => void; onDownload: () => void; onFinish: () => void; workspace?: WorkspaceFlowLinks }) {
   const next = module.number < 5 ? module.number + 1 : null;
-  const nextHref = workspace ? workspace.nextHref : next ? `/demo-course/${next}` : null;
+  const coursePath = module.coursePath ?? "/demo-course";
+  const nextHref = workspace ? workspace.nextHref : next ? `${coursePath}/${next}` : null;
   const nextLabel = workspace ? workspace.nextLabel ?? "К следующей неделе →" : `К модулю ${next} →`;
-  const overviewHref = workspace ? workspace.overviewHref : "/demo-course";
+  const overviewHref = workspace ? workspace.overviewHref : coursePath;
   return (
-    <Lesson headingRef={headingRef} kicker="06 / Takeaway" title={`${module.artifactName} готов`} lead="Не полируй его в вакууме. Версия 0.1 должна встретиться с настоящей задачей, получить по зубам и стать точнее — так и рождаются рабочие инструменты.">
+    <Lesson headingRef={headingRef} kicker={module.artifactKicker ?? "06 / Takeaway"} title={`${module.artifactName} готов`} lead={module.artifactLead ?? "Не полируй его в вакууме. Версия 0.1 должна встретиться с настоящей задачей, получить по зубам и стать точнее — так и рождаются рабочие инструменты."}>
       <div className="grid min-w-0 gap-5 xl:grid-cols-[1.15fr_0.85fr]">
         <FileCard name={module.artifactFile} status="ready" className="self-start">
           <pre className="max-h-[560px] min-w-0 overflow-auto whitespace-pre-wrap break-words pb-7 pr-6 font-mono text-sm leading-relaxed text-ink-muted">{artifact}</pre>

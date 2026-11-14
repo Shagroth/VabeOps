@@ -7,7 +7,7 @@ import { WorkspaceShell } from "@/components/WorkspaceShell";
 import { CourseModuleSelect } from "@/components/admin/CourseModuleSelect";
 import { ScoreInputs } from "@/components/admin/ScoreInputs";
 import { DECISION_FIELD_LABELS } from "@/lib/decision-field-labels";
-import { HOMEWORK_SCORING } from "@/content/demo-course-homework";
+import { getCourse } from "@/content/course-catalog";
 
 export default async function EditModulePage({
   params,
@@ -20,6 +20,7 @@ export default async function EditModulePage({
   const mod = await prisma.module.findUnique({
     where: { id },
     include: {
+      cohort: { select: { course: true } },
       submissions: {
         include: {
           user: true,
@@ -32,6 +33,9 @@ export default async function EditModulePage({
     },
   });
   if (!mod) notFound();
+
+  const course = getCourse(mod.cohort.course);
+  const rubricSize = course.scoring.length;
 
   const noviceForm = mod.feedbackForms.find((f) => f.level === "NOVICE");
   const strongForm = mod.feedbackForms.find((f) => f.level === "STRONG");
@@ -68,7 +72,7 @@ export default async function EditModulePage({
             <input type="checkbox" name="isOpen" defaultChecked={mod.isOpen} />
             Открыт для участников
           </label>
-          <CourseModuleSelect defaultValue={mod.courseModuleNumber} />
+          <CourseModuleSelect modules={course.modules} defaultValue={mod.courseModuleNumber} />
           <label className="flex flex-col gap-1 text-sm">
             R2 video key
             <input
@@ -193,7 +197,7 @@ export default async function EditModulePage({
                     "use server";
                     const comment = String(fd.get("comment") || "");
                     const scoresRaw = Object.fromEntries(
-                      HOMEWORK_SCORING.map((_, i) => [String(i), String(fd.get(`score-${i}`) || "")])
+                      Array.from({ length: rubricSize }, (_, i) => [String(i), String(fd.get(`score-${i}`) || "")])
                     );
                     const action = fd.get("intent") === "accept" ? accept : requestRevision;
                     await action(comment, scoresRaw);
@@ -206,7 +210,7 @@ export default async function EditModulePage({
                     rows={2}
                     className="rounded border border-black/15 p-2 text-sm"
                   />
-                  <ScoreInputs />
+                  <ScoreInputs rubric={course.scoring} />
                   <div className="flex gap-2">
                     <button
                       type="submit"

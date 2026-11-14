@@ -7,10 +7,13 @@ export function LockedModuleNotice({
   moduleNumber,
   artifactName,
   homeworkTitle,
+  openModuleHref = "/demo-course/1",
 }: {
   moduleNumber: number;
   artifactName: string;
   homeworkTitle: string;
+  /** First open module of the same course. */
+  openModuleHref?: string;
 }) {
   return (
     <section className="mx-auto max-w-[1280px] px-5 pb-20 sm:px-8 lg:pb-24">
@@ -40,7 +43,7 @@ export function LockedModuleNotice({
           >
             Я участник — открыть в рабочем пространстве
           </Link>
-          <Link href="/demo-course/1" className="kg-link inline-flex min-h-11 items-center self-center text-[15px] font-semibold">
+          <Link href={openModuleHref} className="kg-link inline-flex min-h-11 items-center self-center text-[15px] font-semibold">
             Пройти открытые модули 1–2
           </Link>
         </div>
