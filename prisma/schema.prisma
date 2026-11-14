@@ -410,6 +410,9 @@ model Application {
   email      String
   experience String            @db.Text
   workGoal   String            @db.Text
+  // Which course the person applies to. Older rows predate the field and
+  // were all for the engineers' pilot.
+  course     CourseKey         @default(ENGINEERS)
   status     ApplicationStatus @default(PENDING)
   // Explicit consent checkbox on the public form — required at submit time
   // (see apply/actions.ts), stored so there's a record consent was given.
@@ -425,4 +428,19 @@ model LiveSession {
   link        String
 
   cohort Cohort @relation(fields: [cohortId], references: [id], onDelete: Cascade)
+}
+
+// Anonymous funnel counters for the public course modules: how many
+// browsers opened a module, reached the lab, reached the artifact, finished.
+// One row per day/course/module/event. No user, session, IP or cookie is
+// stored — see src/lib/funnel.ts.
+model FunnelCount {
+  id           String    @id @default(cuid())
+  day          DateTime  @db.Date
+  course       CourseKey
+  moduleNumber Int
+  event        String
+  count        Int       @default(0)
+
+  @@unique([day, course, moduleNumber, event])
 }

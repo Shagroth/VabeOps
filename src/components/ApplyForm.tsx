@@ -3,6 +3,7 @@
 import { useState, useTransition } from "react";
 import Link from "next/link";
 import { submitApplication, type ApplyFieldErrors } from "@/app/apply/actions";
+import { COURSE_KEYS, COURSE_LIST, type CourseKey } from "@/content/course-list";
 
 const FIELD =
   "min-h-12 w-full rounded-[14px] border px-4 py-3 text-base font-normal outline-none transition-colors duration-200 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-signal";
@@ -12,6 +13,7 @@ const FIELD_STYLES = {
     label: "text-graphite",
     input: `${FIELD} border-hairline-strong bg-white text-graphite placeholder:text-graphite-muted hover:border-graphite-muted`,
     hint: "text-graphite-soft",
+    choice: "border-hairline-strong bg-white text-graphite hover:border-graphite-muted",
     button: "bg-ink text-ink-foreground hover:bg-signal",
     confirm: "border-hairline-strong bg-white text-graphite",
     confirmMuted: "text-graphite-soft",
@@ -21,6 +23,7 @@ const FIELD_STYLES = {
     label: "text-ink-foreground",
     input: `${FIELD} border-ink-line bg-ink-raised text-ink-foreground placeholder:text-ink-muted hover:border-ink-muted`,
     hint: "text-ink-muted",
+    choice: "border-ink-line bg-ink-raised text-ink-foreground hover:border-ink-muted",
     button: "bg-signal text-signal-ink hover:bg-paper hover:text-ink",
     confirm: "border-ink-line bg-ink-raised text-ink-foreground",
     confirmMuted: "text-ink-muted",
@@ -28,7 +31,14 @@ const FIELD_STYLES = {
   },
 } as const;
 
-export function ApplyForm({ variant = "light" }: { variant?: "light" | "dark" }) {
+export function ApplyForm({
+  variant = "light",
+  defaultCourse = "ENGINEERS",
+}: {
+  variant?: "light" | "dark";
+  /** Course preselected in the form; the visitor can change it. */
+  defaultCourse?: CourseKey;
+}) {
   const s = FIELD_STYLES[variant];
   const [submitted, setSubmitted] = useState(false);
   const [errors, setErrors] = useState<ApplyFieldErrors>({});
@@ -71,6 +81,24 @@ export function ApplyForm({ variant = "light" }: { variant?: "light" | "dark" })
         </label>
       </div>
 
+      <fieldset className="flex flex-col gap-2">
+        <legend className={`mb-2 text-[15px] font-semibold ${s.label}`}>На какой курс</legend>
+        <div className="grid gap-2 sm:grid-cols-2">
+          {COURSE_KEYS.map((key) => (
+            <label
+              key={key}
+              className={`flex min-h-14 cursor-pointer items-center gap-3 rounded-[14px] border px-4 py-2.5 transition-colors duration-200 has-[:checked]:border-signal has-[:checked]:bg-sky-tint has-[:checked]:text-graphite ${s.choice}`}
+            >
+              <input type="radio" name="course" value={key} defaultChecked={key === defaultCourse} className="h-5 w-5 flex-none accent-signal" />
+              <span>
+                <span className="block text-[15px] font-semibold leading-snug">{COURSE_LIST[key].title}</span>
+                <span className="block text-sm font-normal opacity-80">{COURSE_LIST[key].audience}</span>
+              </span>
+            </label>
+          ))}
+        </div>
+      </fieldset>
+
       <label className={`flex flex-col gap-2 text-[15px] font-semibold ${s.label}`}>
         Имя
         <input name="name" required maxLength={120} autoComplete="name" placeholder="Как к тебе обращаться" className={s.input} />
@@ -90,25 +118,25 @@ export function ApplyForm({ variant = "light" }: { variant?: "light" | "dark" })
         {errors.email && <span className={`text-sm font-normal ${s.error}`}>{errors.email}</span>}
       </label>
       <label className={`flex flex-col gap-2 text-[15px] font-semibold ${s.label}`}>
-        Опыт работы с AI-агентами
+        Опыт работы с ИИ
         <textarea
           name="experience"
           required
           rows={3}
           maxLength={2000}
-          placeholder="Что уже пробовал(а): Claude Code, Cursor, свои агенты…"
+          placeholder="Что уже пробовал(а): чат, Claude Code, Cursor, свои агенты… Если ничего — так и напиши"
           className={s.input}
         />
         {errors.experience && <span className={`text-sm font-normal ${s.error}`}>{errors.experience}</span>}
       </label>
       <label className={`flex flex-col gap-2 text-[15px] font-semibold ${s.label}`}>
-        Какую рабочую задачу хочешь решить
+        Какую задачу хочешь решить
         <textarea
           name="workGoal"
           required
           rows={3}
           maxLength={2000}
-          placeholder="Одна задача из твоей работы, на которой хочешь потренироваться"
+          placeholder="Одна задача из работы или учёбы, на которой хочешь потренироваться"
           className={s.input}
         />
         {errors.workGoal && <span className={`text-sm font-normal ${s.error}`}>{errors.workGoal}</span>}

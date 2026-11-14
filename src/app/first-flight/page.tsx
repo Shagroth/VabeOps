@@ -210,7 +210,7 @@ export default function FirstFlightPage() {
                 Начать с модуля 1 <span aria-hidden="true" className="kg-arrow">→</span>
               </Link>
               <Link
-                href="/#apply"
+                href="/apply?course=FIRST_FLIGHT"
                 className="kg-btn inline-flex min-h-14 items-center justify-center rounded-full border-[1.5px] border-ink-foreground px-7 font-semibold hover:bg-paper hover:text-ink"
               >
                 Узнать о старте потока

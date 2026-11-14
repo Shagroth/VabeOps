@@ -31,6 +31,7 @@ export async function processApplicationSubmission(
     experience: String(formData.get("experience") || ""),
     workGoal: String(formData.get("workGoal") || ""),
     consent: formData.get("consent") === "on",
+    course: formData.get("course"),
   });
 
   if (!result.ok) {

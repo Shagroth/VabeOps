@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useEffect, useMemo, useRef, useState } from "react";
 import type { PrototypeModule, PrototypeStep } from "@/content/demo-course-program";
 import { sendArtifactToSubmission, type WorkspaceFlowLinks } from "@/lib/artifact-bridge";
+import { useFunnel, type FunnelTarget } from "./useFunnel";
 import { LessonDiagramFigure } from "./LessonDiagram";
 import { BTN, CARD, Checklist, ChoiceButton, Feedback, FIELD, FileCard, FlowPlaceholder, FlowShell, LabField, LabProgress, Label, Lesson, Question, StarterCase } from "./flow-ui";
 
@@ -51,7 +52,8 @@ function formatArtifact(module: PrototypeModule, fields: Record<string, string>,
   return `# ${module.artifactName}\n\nМодуль ${String(module.number).padStart(2, "0")}: ${module.title}\n\n${sections}\n\n## Следующий шаг\n${reflection || "_Не заполнено_"}\n`;
 }
 
-export function PrototypeModuleFlow({ module, workspace }: { module: PrototypeModule; workspace?: WorkspaceFlowLinks }) {
+export function PrototypeModuleFlow({ module, workspace, track }: { module: PrototypeModule; workspace?: WorkspaceFlowLinks; track?: FunnelTarget }) {
+  const mark = useFunnel(track);
   const [state, setState] = useState(() => initialState(module));
   const [hydrated, setHydrated] = useState(false);
   const [copyState, setCopyState] = useState<"idle" | "copied" | "failed">("idle");
@@ -82,6 +84,14 @@ export function PrototypeModuleFlow({ module, workspace }: { module: PrototypeMo
     }
     heading.current?.focus();
   }, [hydrated, state.step]);
+
+  useEffect(() => {
+    if (!hydrated) return;
+    mark("open");
+    if (labIndex >= 0 && state.maxStepReached >= labIndex) mark("lab");
+    if (artifactIndex >= 0 && state.maxStepReached >= artifactIndex) mark("artifact");
+    if (state.finished) mark("finished");
+  }, [hydrated, mark, labIndex, artifactIndex, state.maxStepReached, state.finished]);
 
   const completedFields = module.labFields.filter((field) => (state.fields[field.key] ?? "").trim().length >= 12).length;
   const artifact = useMemo(() => formatArtifact(module, state.fields, state.reflection), [module, state.fields, state.reflection]);
@@ -119,6 +129,7 @@ export function PrototypeModuleFlow({ module, workspace }: { module: PrototypeMo
     try {
       await navigator.clipboard.writeText(artifact);
       setCopyState("copied");
+      mark("export");
     } catch {
       setCopyState("failed");
     }
@@ -131,6 +142,7 @@ export function PrototypeModuleFlow({ module, workspace }: { module: PrototypeMo
     anchor.href = href;
     anchor.download = module.artifactFile;
     anchor.click();
+    mark("export");
     URL.revokeObjectURL(href);
   }
 

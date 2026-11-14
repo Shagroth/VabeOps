@@ -5,7 +5,7 @@ import { RECORDINGS } from "@/content/recordings";
 import { JOURNAL } from "@/content/journal";
 import { getPublishedSignals } from "@/content/signals";
 import { EPISODE_1 } from "@/content/comics";
-import { AUTHORS } from "@/content/authors";
+import { AUTHORS, SHOW_AUTHORS } from "@/content/authors";
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://kitegrip.com";
 
@@ -21,7 +21,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     "/signals",
     "/comics",
     "/events",
-    "/authors",
+    ...(SHOW_AUTHORS ? ["/authors"] : []),
     "/apply",
   ];
 
@@ -32,7 +32,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     ...JOURNAL.map((j) => `/journal/${j.slug}`),
     ...getPublishedSignals().map((s) => `/signals/${s.slug}`),
     `/comics/${EPISODE_1.slug}`,
-    ...AUTHORS.map((a) => `/authors/${a.slug}`),
+    ...(SHOW_AUTHORS ? AUTHORS.map((a) => `/authors/${a.slug}`) : []),
   ];
 
   return [...staticPages, ...dynamic].map((path) => ({

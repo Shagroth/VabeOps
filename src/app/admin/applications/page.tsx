@@ -2,6 +2,7 @@ import { requireAdmin } from "@/lib/require-admin";
 import { prisma } from "@/lib/prisma";
 import { WorkspaceShell } from "@/components/WorkspaceShell";
 import { setApplicationStatus } from "../actions";
+import { getCourse } from "@/content/course-catalog";
 
 const STATUS_LABEL: Record<string, string> = {
   PENDING: "Новая",
@@ -38,7 +39,8 @@ export default async function ApplicationsPage() {
               <div className="mb-2 flex items-center justify-between">
                 <div>
                   <span className="font-medium">{a.name}</span>{" "}
-                  <span className="text-sm text-black/50">{a.email}</span>
+                  <span className="text-sm text-black/50">{a.email}</span>{" "}
+                  <span className="rounded bg-black/5 px-1.5 py-0.5 text-xs">{getCourse(a.course).title}</span>
                 </div>
                 <span className="text-xs text-black/50">
                   {STATUS_LABEL[a.status]}
