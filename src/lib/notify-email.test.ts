@@ -7,7 +7,7 @@ const PARAMS = {
   subject: "Новая сдача",
   text: "Участник сдал неделю 2.",
   apiKey: "re_test_key",
-  from: "VabeOps <no-reply@vabeops.example.com>",
+  from: "KiteGrip <no-reply@kitegrip.example.com>",
 };
 
 test("sendNotifyEmail resolves ok on a 200 response and sends the right body", async () => {

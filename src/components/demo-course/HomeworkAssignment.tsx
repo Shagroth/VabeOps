@@ -6,7 +6,7 @@ import {
 
 export function HomeworkAssignmentSection({ assignment }: { assignment: HomeworkAssignment }) {
   return (
-    <section id="homework" className="scroll-mt-24 border-t border-hairline bg-[#eef0ea]">
+    <section id="homework" className="scroll-mt-24 border-t border-hairline bg-[#edeae3]">
       <div className="mx-auto max-w-[1280px] px-4 py-14 sm:px-6 lg:px-10 lg:py-20">
         <header className="overflow-hidden rounded-[28px] bg-ink text-ink-foreground">
           <div className="grid gap-px bg-hairline-ink lg:grid-cols-[1fr_300px]">
@@ -61,7 +61,7 @@ export function HomeworkAssignmentSection({ assignment }: { assignment: Homework
             <SectionLabel>Обязательные проверки</SectionLabel>
             <div className="mt-5 grid gap-px overflow-hidden rounded-xl border border-hairline bg-hairline sm:grid-cols-2 lg:grid-cols-4">
               {assignment.validationScenarios.map((scenario, index) => (
-                <div key={scenario} className="bg-[#f8f9f5] p-4">
+                <div key={scenario} className="bg-[#faf8f4] p-4">
                   <span className="font-mono text-[9px] text-system">{String(index + 1).padStart(2, "0")}</span>
                   <p className="mt-2 text-xs leading-relaxed text-graphite-muted">{scenario}</p>
                 </div>
@@ -85,7 +85,7 @@ export function HomeworkAssignmentSection({ assignment }: { assignment: Homework
             <SectionLabel>Критерии приёмки</SectionLabel>
             <ul className="mt-5 grid gap-3 sm:grid-cols-2">
               {assignment.acceptance.map((criterion) => (
-                <li key={criterion} className="flex gap-3 rounded-xl border border-hairline bg-[#f8f9f5] p-4 text-xs leading-relaxed text-graphite-muted">
+                <li key={criterion} className="flex gap-3 rounded-xl border border-hairline bg-[#faf8f4] p-4 text-xs leading-relaxed text-graphite-muted">
                   <span className="flex h-5 w-5 flex-none items-center justify-center rounded-full bg-signal text-[10px] text-signal-ink">✓</span>
                   {criterion}
                 </li>
@@ -106,7 +106,7 @@ export function HomeworkAssignmentSection({ assignment }: { assignment: Homework
           </div>
           <div className="mt-6 grid gap-px overflow-hidden rounded-xl border border-hairline bg-hairline md:grid-cols-3">
             {HOMEWORK_SCORING.map((item) => (
-              <article key={item.label} className="bg-[#f8f9f5] p-4">
+              <article key={item.label} className="bg-[#faf8f4] p-4">
                 <span className="font-mono text-lg text-system">+{item.points}</span>
                 <h3 className="mt-2 text-sm font-medium">{item.label}</h3>
                 <p className="mt-2 text-xs leading-relaxed text-graphite-muted">{item.detail}</p>

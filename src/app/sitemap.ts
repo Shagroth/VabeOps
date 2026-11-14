@@ -7,7 +7,7 @@ import { getPublishedSignals } from "@/content/signals";
 import { EPISODE_1 } from "@/content/comics";
 import { AUTHORS } from "@/content/authors";
 
-const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://vabeops.example.com";
+const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://kitegrip.com";
 
 export default function sitemap(): MetadataRoute.Sitemap {
   const staticPages = [

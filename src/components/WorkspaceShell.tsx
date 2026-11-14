@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { KiteGripLogo } from "@/components/brand/KiteGripLogo";
 
 type NavKey = "overview" | "program" | "stream" | "admin";
 
@@ -68,12 +69,7 @@ export function WorkspaceShell({
       <aside className="sticky top-0 hidden h-screen w-[240px] flex-shrink-0 flex-col justify-between border-r border-hairline px-4 py-6 lg:flex">
         <div className="flex flex-col gap-6">
           <Link href="/" className="flex items-center gap-2 px-2">
-            <svg viewBox="0 0 24 24" className="h-5 w-5" aria-hidden="true">
-              <circle cx="5" cy="19" r="2" fill="var(--system)" />
-              <path d="M7 18 L17 7" stroke="var(--system)" strokeWidth="1.6" fill="none" />
-              <circle cx="19" cy="5" r="2" fill="var(--system)" />
-            </svg>
-            <span className="font-medium">VabeOps</span>
+            <KiteGripLogo size="sm" />
           </Link>
           <nav className="flex flex-col gap-1">
             {NAV.map((item) => (
@@ -129,12 +125,7 @@ export function WorkspaceShell({
       {/* Mobile top nav */}
       <div className="fixed inset-x-0 top-0 z-20 flex items-center justify-between border-b border-hairline bg-paper/95 px-4 py-3 backdrop-blur lg:hidden">
         <Link href="/" className="flex items-center gap-2">
-          <svg viewBox="0 0 24 24" className="h-5 w-5" aria-hidden="true">
-            <circle cx="5" cy="19" r="2" fill="var(--system)" />
-            <path d="M7 18 L17 7" stroke="var(--system)" strokeWidth="1.6" fill="none" />
-            <circle cx="19" cy="5" r="2" fill="var(--system)" />
-          </svg>
-          <span className="text-sm font-medium">VabeOps</span>
+          <KiteGripLogo size="sm" />
         </Link>
         <div className="flex items-center gap-1 text-xs">
           <nav className="flex gap-1">

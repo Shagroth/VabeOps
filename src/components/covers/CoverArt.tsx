@@ -19,7 +19,7 @@ export type CoverVariant =
 export type CoverTone = "ink" | "paper";
 
 const BG: Record<CoverTone, string> = {
-  ink: "#0a0f18",
+  ink: "#14171f",
   paper: "#f0f1ec",
 };
 
@@ -52,7 +52,7 @@ function ContextWindow({ tone }: { tone: CoverTone }) {
       <rect x="64" y="60" width="272" height="130" rx="10" fill="none" stroke={ink ? "#3a4350" : "#c6c8bf"} strokeWidth="2" />
       <rect x="88" y="84" width="224" height="82" rx="8" fill={ink ? "#121a28" : "#ffffff"} stroke="var(--system)" strokeWidth="2" />
       <text x="106" y="112" fontFamily="var(--font-mono)" fontSize="11" fill="var(--system)">repo + task</text>
-      <text x="106" y="130" fontFamily="var(--font-mono)" fontSize="11" fill={ink ? "#9aa3ad" : "#5b6672"}>+ constraints</text>
+      <text x="106" y="130" fontFamily="var(--font-mono)" fontSize="11" fill={ink ? "#a9b1c3" : "#4a5163"}>+ constraints</text>
       <text x="106" y="148" fontFamily="var(--font-mono)" fontSize="11" fill="var(--signal)">= минимальный контекст</text>
       <circle cx="320" cy="48" r="4" fill="var(--signal)" />
     </Frame>
@@ -67,12 +67,12 @@ function Branch({ tone }: { tone: CoverTone }) {
       <path d="M50 200 L160 125" stroke={muted} strokeWidth="2.5" fill="none" />
       <path d="M160 125 L300 60" stroke="var(--signal)" strokeWidth="3" fill="none" />
       <path d="M160 125 L300 170" stroke={muted} strokeWidth="2.5" strokeDasharray="5 6" fill="none" />
-      <circle cx="160" cy="125" r="7" fill={ink ? "#0a0f18" : "#f0f1ec"} stroke={ink ? "#9aa3ad" : "#5b6672"} strokeWidth="2" />
+      <circle cx="160" cy="125" r="7" fill={ink ? "#14171f" : "#f0f1ec"} stroke={ink ? "#a9b1c3" : "#4a5163"} strokeWidth="2" />
       <circle cx="300" cy="60" r="8" fill="var(--signal)" />
       <path d="M296 60 L299 64 L306 55" stroke="var(--signal-ink)" strokeWidth="2" fill="none" />
       <circle cx="300" cy="170" r="8" fill="none" stroke={muted} strokeWidth="2" />
       <path d="M296 166 L304 174 M304 166 L296 174" stroke={muted} strokeWidth="2" />
-      <circle cx="50" cy="200" r="6" fill={ink ? "#9aa3ad" : "#5b6672"} />
+      <circle cx="50" cy="200" r="6" fill={ink ? "#a9b1c3" : "#4a5163"} />
     </Frame>
   );
 }
@@ -82,8 +82,8 @@ function Gate({ tone }: { tone: CoverTone }) {
   return (
     <Frame tone={tone}>
       <rect x="150" y="50" width="100" height="120" rx="16" fill="none" stroke="var(--system)" strokeWidth="3" />
-      <circle cx="200" cy="100" r="16" fill="none" stroke={ink ? "#d8dad2" : "#131a25"} strokeWidth="3" />
-      <rect x="196" y="112" width="8" height="26" rx="3" fill={ink ? "#d8dad2" : "#131a25"} />
+      <circle cx="200" cy="100" r="16" fill="none" stroke={ink ? "#d8dad2" : "#14171f"} strokeWidth="3" />
+      <rect x="196" y="112" width="8" height="26" rx="3" fill={ink ? "#d8dad2" : "#14171f"} />
       {[
         { x: 40, y: 56, w: "read" },
         { x: 40, y: 92, w: "write" },
@@ -91,7 +91,7 @@ function Gate({ tone }: { tone: CoverTone }) {
       ].map((s) => (
         <g key={s.w}>
           <rect x={s.x} y={s.y} width="66" height="26" rx="13" fill="none" stroke={ink ? "#3a4350" : "#c6c8bf"} strokeWidth="1.5" />
-          <text x={s.x + 33} y={s.y + 17} textAnchor="middle" fontFamily="var(--font-mono)" fontSize="10" fill={ink ? "#9aa3ad" : "#5b6672"}>{s.w}</text>
+          <text x={s.x + 33} y={s.y + 17} textAnchor="middle" fontFamily="var(--font-mono)" fontSize="10" fill={ink ? "#a9b1c3" : "#4a5163"}>{s.w}</text>
         </g>
       ))}
       <rect x="294" y="80" width="66" height="26" rx="13" fill="var(--signal)" />
@@ -107,13 +107,13 @@ function Verify({ tone }: { tone: CoverTone }) {
     <Frame tone={tone}>
       <path d="M30 150 L110 150 L130 90 L160 190 L185 60 L210 150 L370 150" stroke="var(--system)" strokeWidth="2.5" fill="none" />
       {[110, 185, 370].map((x, i) => (
-        <circle key={x} cx={x} cy={150} r="6" fill={i === 1 ? "var(--signal)" : ink ? "#0a0f18" : "#f0f1ec"} stroke="var(--signal)" strokeWidth="2" />
+        <circle key={x} cx={x} cy={150} r="6" fill={i === 1 ? "var(--signal)" : ink ? "#14171f" : "#f0f1ec"} stroke="var(--signal)" strokeWidth="2" />
       ))}
       <g transform="translate(40,185)">
         {["контекст", "подход", "проверка"].map((t, i) => (
           <g key={t} transform={`translate(0 ${i * 16})`}>
             <path d="M0 4 L4 9 L12 -3" stroke="var(--signal)" strokeWidth="2" fill="none" />
-            <text x="20" y="8" fontFamily="var(--font-mono)" fontSize="10" fill={ink ? "#9aa3ad" : "#5b6672"}>{t}</text>
+            <text x="20" y="8" fontFamily="var(--font-mono)" fontSize="10" fill={ink ? "#a9b1c3" : "#4a5163"}>{t}</text>
           </g>
         ))}
       </g>
@@ -215,9 +215,9 @@ function SignalPath({ tone }: { tone: CoverTone }) {
         { x: 280, y: 190 },
         { x: 380, y: 90 },
       ].map((p, i) => (
-        <circle key={i} cx={p.x} cy={p.y} r={i === 1 ? 7 : 5} fill={i === 1 ? "var(--signal)" : ink ? "#0a0f18" : "#f0f1ec"} stroke="var(--system)" strokeWidth="2" />
+        <circle key={i} cx={p.x} cy={p.y} r={i === 1 ? 7 : 5} fill={i === 1 ? "var(--signal)" : ink ? "#14171f" : "#f0f1ec"} stroke="var(--system)" strokeWidth="2" />
       ))}
-      <text x="150" y="50" textAnchor="middle" fontFamily="var(--font-mono)" fontSize="10" fill={ink ? "#9aa3ad" : "#5b6672"}>decision</text>
+      <text x="150" y="50" textAnchor="middle" fontFamily="var(--font-mono)" fontSize="10" fill={ink ? "#a9b1c3" : "#4a5163"}>decision</text>
     </Frame>
   );
 }
@@ -233,7 +233,7 @@ function Broadcast({ tone }: { tone: CoverTone }) {
       <g transform="translate(230 70)">
         <rect width="134" height="28" rx="14" fill="none" stroke={ink ? "#3a4350" : "#c6c8bf"} strokeWidth="1.5" />
         <circle cx="18" cy="14" r="4" fill="var(--signal)" />
-        <text x="32" y="18" fontFamily="var(--font-mono)" fontSize="10" fill={ink ? "#d8dad2" : "#131a25"}>живой созвон</text>
+        <text x="32" y="18" fontFamily="var(--font-mono)" fontSize="10" fill={ink ? "#d8dad2" : "#14171f"}>живой созвон</text>
       </g>
       <g transform="translate(230 112)">
         <rect width="150" height="80" rx="10" fill="none" stroke={ink ? "#2a3240" : "#d8dad2"} strokeWidth="1.5" />
@@ -253,8 +253,8 @@ function Recording({ tone }: { tone: CoverTone }) {
       {Array.from({ length: 10 }).map((_, i) => (
         <line key={i} x1={30 + i * 34} y1="30" x2={10 + i * 34} y2="220" stroke={ink ? "#1b2432" : "#e4e6df"} strokeWidth="1" />
       ))}
-      <circle cx="200" cy="125" r="34" fill="none" stroke={ink ? "#5b6672" : "#9aa3ad"} strokeWidth="2.5" />
-      <path d="M190 108 L190 142 L218 125 Z" fill={ink ? "#5b6672" : "#9aa3ad"} />
+      <circle cx="200" cy="125" r="34" fill="none" stroke={ink ? "#4a5163" : "#a9b1c3"} strokeWidth="2.5" />
+      <path d="M190 108 L190 142 L218 125 Z" fill={ink ? "#4a5163" : "#a9b1c3"} />
       <line x1="178" y1="103" x2="222" y2="147" stroke="var(--warn)" strokeWidth="3" />
       <rect x="150" y="186" width="100" height="20" rx="10" fill={ink ? "#161e2a" : "#edeee8"} />
       <text x="200" y="200" textAnchor="middle" fontFamily="var(--font-mono)" fontSize="9" fill="var(--warn)">нет записи</text>

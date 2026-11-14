@@ -14,7 +14,7 @@ const TOTAL_MAX = PROGRAM_TOTALS.guidedMax + PROGRAM_TOTALS.practiceMax;
 export function CourseProgramOverview() {
   return (
     <>
-      <section className="border-b border-hairline bg-[#f3f4ef]">
+      <section className="border-b border-hairline bg-[#f1eee7]">
         <div className="mx-auto max-w-[1280px] px-6 py-14 lg:px-10 lg:py-20">
           <div className="grid gap-10 lg:grid-cols-[1.15fr_0.85fr] lg:items-end">
             <div>
@@ -86,7 +86,7 @@ export function CourseProgramOverview() {
             <li key={module.number}>
               <Link
                 href={`/demo-course/${module.number}`}
-                className="group grid overflow-hidden rounded-2xl border border-hairline bg-white/55 transition-all hover:-translate-y-0.5 hover:border-system/50 hover:shadow-[0_24px_60px_-45px_rgba(10,15,24,0.5)] lg:grid-cols-[110px_1.2fr_0.8fr_180px]"
+                className="group grid overflow-hidden rounded-2xl border border-hairline bg-white/55 transition-all hover:-translate-y-0.5 hover:border-system/50 lg:grid-cols-[110px_1.2fr_0.8fr_180px]"
               >
                 <div className="flex min-h-[104px] items-center justify-center border-b border-hairline bg-[#eceee7] font-mono text-3xl text-graphite-muted lg:border-b-0 lg:border-r">
                   0{module.number}
@@ -120,7 +120,7 @@ export function CourseProgramOverview() {
         </ol>
       </section>
 
-      <section className="border-y border-hairline bg-[#eef0ea]">
+      <section className="border-y border-hairline bg-[#edeae3]">
         <div className="mx-auto max-w-[1280px] px-6 py-14 lg:px-10 lg:py-20">
           <div className="flex flex-wrap items-end justify-between gap-5">
             <div>
@@ -170,7 +170,7 @@ export function CourseProgramOverview() {
 
       <section className="mx-auto max-w-[1280px] px-6 py-12 lg:px-10 lg:py-16">
         <div className="rounded-2xl border border-system/25 bg-system/[0.05] p-6 sm:p-8">
-          <span className="font-mono text-[10px] uppercase tracking-[0.18em] text-system">Подход VabeOps</span>
+          <span className="font-mono text-[10px] uppercase tracking-[0.18em] text-system">Подход KiteGrip</span>
           <div className="mt-5 grid gap-6 md:grid-cols-3">
             <Evaluation number="01" title="Сначала решение" body="ИИ должен двигать рабочую задачу, а не производить убедительный текст ради текста." />
             <Evaluation number="02" title="Потом свобода" body="Автономность выдаётся по мере доказанной надёжности. Не наоборот. Прод — плохое место для воспитательных экспериментов." />

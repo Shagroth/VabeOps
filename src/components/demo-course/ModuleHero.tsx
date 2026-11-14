@@ -41,7 +41,6 @@ export function ModuleHero({
   const accessTag = mode === "public" ? "без регистрации" : mode === "locked" ? "для участников пилота" : "твоя неделя";
   return (
     <section className="relative overflow-hidden bg-ink text-ink-foreground">
-      <div className="signal-field" />
       <div className="relative mx-auto max-w-[1280px] px-6 pt-6 lg:px-10">
         <div className="flex flex-wrap items-center justify-between gap-4 border-b border-hairline-ink pb-5">
           <Link href={overviewHref} className="font-mono text-[10px] uppercase tracking-[0.18em] text-ink-muted transition-colors hover:text-ink-foreground">{overviewLabel}</Link>

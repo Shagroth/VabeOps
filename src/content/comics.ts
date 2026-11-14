@@ -58,7 +58,7 @@ export type ComicEpisode = {
 
 export const COMIC_SERIES = {
   slug: "vabeops-cases",
-  title: "VabeOps Cases",
+  title: "KiteGrip Cases",
   description:
     "Короткие кейсы о том, где агентный workflow ломается на практике — и как это обычно читается уже после инцидента, а не до него. Три повторяющихся героя, один компетентный слепой пятно у каждого.",
 };

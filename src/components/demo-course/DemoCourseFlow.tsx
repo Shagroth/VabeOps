@@ -199,7 +199,7 @@ export function DemoCourseFlow({ workspace }: { workspace?: WorkspaceFlowLinks }
   const progress = state.finished ? 100 : Math.round(((state.maxStepReached + 1) / MODULE_STEPS.length) * 100);
 
   return (
-    <div className="overflow-hidden rounded-[28px] border border-hairline bg-[#f3f4ef] shadow-[0_30px_80px_-55px_rgba(10,15,24,0.55)]">
+    <div className="overflow-hidden rounded-[28px] border border-hairline bg-[#f1eee7]">
       <div className="grid min-h-[760px] min-w-0 lg:grid-cols-[286px_minmax(0,1fr)]">
         <aside className="min-w-0 border-b border-hairline bg-ink text-ink-foreground lg:border-b-0 lg:border-r lg:border-hairline-ink">
           <div className="lg:sticky lg:top-[73px]">
@@ -424,7 +424,6 @@ export function DemoCourseFlow({ workspace }: { workspace?: WorkspaceFlowLinks }
                     {CONTRACT_FIELDS.map((field) =>
                       field.key === state.activeField ? (
                         <div key={field.key} className="relative min-h-[360px] overflow-hidden rounded-2xl bg-ink p-6 text-ink-foreground sm:p-8">
-                          <div className="signal-field opacity-30" />
                           <div className="relative">
                             <span className="font-mono text-[10px] uppercase tracking-[0.2em] text-system">Поле {field.number}</span>
                             <h3 className="mt-3 text-3xl font-medium">{field.title}</h3>
@@ -483,7 +482,7 @@ export function DemoCourseFlow({ workspace }: { workspace?: WorkspaceFlowLinks }
                             value={value}
                             onChange={(event) => setContractField(field.key, event.target.value)}
                             rows={3}
-                            className="mt-4 w-full resize-y rounded-xl border border-hairline bg-[#fbfcf8] px-4 py-3 text-sm leading-relaxed outline-none transition-colors placeholder:text-graphite-muted/50 focus:border-system"
+                            className="mt-4 w-full resize-y rounded-xl border border-hairline bg-[#fbfaf6] px-4 py-3 text-sm leading-relaxed outline-none transition-colors placeholder:text-graphite-muted/50 focus:border-system"
                             placeholder={`Напиши: ${field.prompt.toLowerCase()}`}
                           />
                         </label>
@@ -631,7 +630,7 @@ export function DemoCourseFlow({ workspace }: { workspace?: WorkspaceFlowLinks }
                           value={state.reflection}
                           onChange={(event) => setState((current) => ({ ...current, reflection: event.target.value }))}
                           rows={4}
-                          className="mt-4 w-full resize-y rounded-xl border border-hairline bg-[#fbfcf8] px-3 py-3 text-sm outline-none focus:border-system"
+                          className="mt-4 w-full resize-y rounded-xl border border-hairline bg-[#fbfaf6] px-3 py-3 text-sm outline-none focus:border-system"
                           placeholder="Перед запуском я…"
                         />
                       </label>
