@@ -1,5 +1,9 @@
 import Link from "next/link";
+import type { CSSProperties } from "react";
+import { KiteGripMark } from "@/components/brand/KiteGripMark";
 import { PROGRAM_AUTHOR, formatMinutes } from "@/content/demo-course-program";
+
+const step = (i: number) => ({ "--i": i }) as CSSProperties;
 
 type ModuleHeroProps = {
   number: number;
@@ -39,35 +43,58 @@ export function ModuleHero({
   const prev = prevHref !== undefined ? prevHref : number > 1 ? `/demo-course/${number - 1}` : null;
   const next = nextHref !== undefined ? nextHref : number < 5 ? `/demo-course/${number + 1}` : null;
   const accessTag = mode === "public" ? "без регистрации" : mode === "locked" ? "для участников пилота" : "твоя неделя";
+  const pill = "kg-btn inline-flex min-h-11 items-center rounded-full border-[1.5px] border-graphite px-4 font-mono text-[13px] hover:bg-ink hover:text-ink-foreground";
+  const facts = [`${formatMinutes(guidedMinutes)} в интерфейсе`, `${formatMinutes(practiceMinutes)} практика`, accessTag];
   return (
-    <section className="relative overflow-hidden bg-ink text-ink-foreground">
-      <div className="relative mx-auto max-w-[1280px] px-6 pt-6 lg:px-10">
-        <div className="flex flex-wrap items-center justify-between gap-4 border-b border-hairline-ink pb-5">
-          <Link href={overviewHref} className="font-mono text-[10px] uppercase tracking-[0.18em] text-ink-muted transition-colors hover:text-ink-foreground">{overviewLabel}</Link>
+    <section className="bg-paper text-graphite">
+      <div className="mx-auto max-w-[1280px] px-5 sm:px-8">
+        <nav aria-label="Навигация по программе" className="flex flex-wrap items-center justify-between gap-4 pt-6">
+          <Link href={overviewHref} className="kg-link inline-flex min-h-11 items-center font-mono text-[13px] text-graphite-muted hover:text-graphite">
+            {overviewLabel}
+          </Link>
           <div className="flex gap-2">
-            {prev && <Link href={prev} className="rounded-full border border-hairline-ink px-3 py-1.5 font-mono text-[9px] uppercase text-ink-muted hover:text-ink-foreground">← 0{number - 1}</Link>}
-            {next && <Link href={next} className="rounded-full border border-hairline-ink px-3 py-1.5 font-mono text-[9px] uppercase text-ink-muted hover:text-ink-foreground">0{number + 1} →</Link>}
+            {prev && <Link href={prev} aria-label={`Предыдущий модуль, 0${number - 1}`} className={pill}>← 0{number - 1}</Link>}
+            {next && <Link href={next} aria-label={`Следующий модуль, 0${number + 1}`} className={pill}>0{number + 1} →</Link>}
           </div>
-        </div>
-      </div>
-      <div className="relative mx-auto grid max-w-[1280px] gap-12 px-6 py-14 lg:grid-cols-[1.2fr_0.8fr] lg:items-end lg:px-10 lg:py-20">
-        <div>
-          <span className="font-mono text-xs uppercase tracking-[0.22em] text-system">{eyebrow}</span>
-          <h1 className="mt-5 max-w-[17ch] text-[2.8rem] font-semibold leading-[1.02] tracking-tight sm:text-[4rem] lg:text-[4.6rem]">{title}</h1>
-          <p className="mt-6 max-w-[60ch] text-lg leading-relaxed text-ink-muted">{dek}</p>
-          <div className="mt-8 flex flex-wrap gap-2">
-            {[`${formatMinutes(guidedMinutes)} в интерфейсе`, `${formatMinutes(practiceMinutes)} практика`, accessTag].map((item) => <span key={item} className="rounded-full border border-hairline-ink px-3 py-1.5 font-mono text-[10px] uppercase tracking-wide text-ink-muted">{item}</span>)}
-            {mode !== "locked" && <a href="#homework" className="rounded-full border border-signal/45 bg-signal/10 px-3 py-1.5 font-mono text-[10px] uppercase tracking-wide text-signal transition-colors hover:bg-signal hover:text-signal-ink">Домашняя работа ↓</a>}
-          </div>
-        </div>
+        </nav>
 
-        <div className="rounded-2xl border border-hairline-ink bg-white/[0.035] p-6">
-          <div className="flex items-center gap-3">
-            <div className="flex h-10 w-10 items-center justify-center rounded-full border border-system/50 bg-system/10 font-mono text-xs text-system">{PROGRAM_AUTHOR.initials}</div>
-            <div><p className="text-sm font-medium">{PROGRAM_AUTHOR.name}</p><p className="text-xs text-ink-muted">{PROGRAM_AUTHOR.role}</p></div>
+        <div className="grid items-end gap-12 pb-14 pt-10 lg:grid-cols-[minmax(0,1.25fr)_minmax(0,0.85fr)] lg:pb-20 lg:pt-14">
+          <div className="flex flex-col gap-7">
+            <span className="kg-rise font-mono text-sm uppercase tracking-[0.1em] text-graphite-muted" style={step(0)}>{eyebrow}</span>
+            <h1 className="max-w-[14ch] text-[clamp(40px,5.8vw,80px)] font-extrabold leading-[0.97] tracking-[-0.04em]">
+              <span className="kg-line" style={step(0)}><span>{title}</span></span>
+            </h1>
+            <p className="kg-rise max-w-[34em] text-[19px] leading-[1.6] text-graphite-soft" style={step(2)}>{dek}</p>
+            <div className="kg-rise flex flex-wrap items-center gap-2" style={step(3)}>
+              <ul className="contents">
+                {facts.map((item) => (
+                  <li key={item} className="rounded-full border border-hairline-strong px-3.5 py-2 font-mono text-[13px] text-graphite-muted">{item}</li>
+                ))}
+              </ul>
+              {mode !== "locked" && (
+                <a href="#homework" className="kg-btn inline-flex min-h-11 items-center gap-2 rounded-full bg-signal px-5 text-[15px] font-semibold text-signal-ink hover:bg-sky-deep">
+                  Домашняя работа <span aria-hidden="true">↓</span>
+                </a>
+              )}
+            </div>
           </div>
-          <div className="mt-6 border-t border-hairline-ink pt-5"><span className="font-mono text-[10px] uppercase tracking-[0.18em] text-signal">Унесёшь с собой</span><p className="mt-2 text-sm leading-relaxed text-ink-muted">{result}.{mode === "locked" ? " Модуль открывается участникам пилота в рабочем пространстве." : " Скопируй в задачу, скачай как Markdown и проверь на живой работе."}</p></div>
-          <p className="mt-5 text-[11px] leading-relaxed text-ink-muted/70">Учебные кейсы вымышлены, инженерные проблемы — до обидного настоящие. Время уточним после пилота.</p>
+
+          <aside className="kg-rise relative overflow-hidden rounded-[32px] bg-sky-tint p-7 sm:p-9" style={step(2)}>
+            <KiteGripMark variant="compact" className="kg-float absolute right-7 top-7 h-24 w-auto sm:right-9" />
+            <span className="font-mono text-sm uppercase tracking-[0.1em] text-sky-deep">Унесёшь с собой</span>
+            <p className="mt-4 max-w-[18em] pr-12 text-[23px] font-bold leading-tight tracking-[-0.015em]">{result}.</p>
+            <p className="mt-4 max-w-[30em] text-[15px] leading-relaxed text-graphite-soft">
+              {mode === "locked" ? "Модуль открывается участникам пилота в рабочем пространстве." : "Скопируй в задачу, скачай как Markdown и проверь на живой работе."}
+            </p>
+            <div className="mt-7 flex items-center gap-3.5 border-t border-[#c9d6f4] pt-6">
+              <span aria-hidden="true" className="flex h-11 w-11 flex-none items-center justify-center rounded-full bg-ink font-mono text-[13px] text-ink-foreground">{PROGRAM_AUTHOR.initials}</span>
+              <div>
+                <p className="font-semibold leading-snug">{PROGRAM_AUTHOR.name}</p>
+                <p className="text-[15px] text-graphite-soft">{PROGRAM_AUTHOR.role}</p>
+              </div>
+            </div>
+            <p className="mt-5 text-[13px] leading-relaxed text-graphite-muted">Учебные кейсы вымышлены, инженерные проблемы — до обидного настоящие. Время уточним после пилота.</p>
+          </aside>
         </div>
       </div>
     </section>
