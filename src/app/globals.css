@@ -180,6 +180,12 @@ body {
   display: block;
 }
 
+/* Headings that receive focus from script (a lesson step change) are not
+   interactive: moving focus there is for screen readers, not a ring. */
+[tabindex="-1"]:focus-visible {
+  outline: none;
+}
+
 @media (prefers-reduced-motion: no-preference) {
   html {
     scroll-behavior: smooth;
@@ -234,6 +240,9 @@ body {
   .kg-gust {
     stroke-dasharray: 0.4 1.4;
     animation: kg-gust 7s linear infinite;
+  }
+  .kg-float {
+    animation: kg-bob 6s ease-in-out infinite;
   }
   .kg-chip {
     animation: kg-rise 800ms var(--ease-out) both, kg-bob 6s ease-in-out infinite;

@@ -13,34 +13,34 @@ export function LockedModuleNotice({
   homeworkTitle: string;
 }) {
   return (
-    <section className="mx-auto max-w-[1280px] px-4 py-12 sm:px-6 lg:px-10 lg:py-16">
-      <div className="grid gap-6 rounded-[28px] border border-hairline bg-white/60 p-6 sm:p-10 lg:grid-cols-[1.2fr_0.8fr] lg:items-center">
+    <section className="mx-auto max-w-[1280px] px-5 pb-20 sm:px-8 lg:pb-24">
+      <div className="grid gap-8 rounded-[28px] border border-hairline bg-white p-7 sm:p-10 lg:grid-cols-[1.2fr_0.8fr] lg:items-center">
         <div>
-          <span className="font-mono text-[10px] uppercase tracking-[0.2em] text-system">
-            Модуль 0{moduleNumber} · для участников пилота
+          <span className="font-mono text-[13px] uppercase tracking-[0.08em] text-graphite-muted">
+            <span className="mr-2 text-string">0{moduleNumber}</span>для участников пилота
           </span>
-          <h2 className="mt-4 max-w-[24ch] text-2xl font-semibold leading-tight tracking-tight sm:text-3xl">
+          <h2 className="mt-4 max-w-[22ch] text-[clamp(28px,3.2vw,40px)] font-extrabold leading-[1.05] tracking-[-0.03em]">
             Уроки, лаборатория и домашняя работа открываются в рабочем пространстве
           </h2>
-          <p className="mt-4 max-w-[62ch] text-sm leading-relaxed text-graphite-muted">
+          <p className="mt-5 max-w-[56ch] leading-relaxed text-graphite-soft">
             В открытом доступе — первые два модуля. Здесь участники собирают «{artifactName}», сдают домашнюю
             работу «{homeworkTitle}» и получают разбор от автора.
           </p>
         </div>
         <div className="flex flex-col gap-3">
           <Link
-            href="/modules"
-            className="rounded-xl bg-ink px-5 py-3 text-center text-sm font-medium text-ink-foreground transition-transform hover:scale-[1.02]"
+            href="/#apply"
+            className="kg-btn inline-flex min-h-14 items-center justify-center gap-2 rounded-full bg-signal px-7 text-center font-semibold text-signal-ink hover:bg-sky-deep"
           >
-            Я участник — открыть в рабочем пространстве →
+            Подать заявку на пилот <span aria-hidden="true" className="kg-arrow">→</span>
           </Link>
           <Link
-            href="/#apply"
-            className="rounded-xl border border-hairline px-5 py-3 text-center text-sm font-medium transition-colors hover:bg-white"
+            href="/modules"
+            className="kg-btn inline-flex min-h-14 items-center justify-center rounded-full border-[1.5px] border-graphite px-7 text-center font-semibold hover:bg-ink hover:text-ink-foreground"
           >
-            Подать заявку на пилот
+            Я участник — открыть в рабочем пространстве
           </Link>
-          <Link href="/demo-course/1" className="text-center text-xs text-graphite-muted underline underline-offset-4">
+          <Link href="/demo-course/1" className="kg-link inline-flex min-h-11 items-center self-center text-[15px] font-semibold">
             Пройти открытые модули 1–2
           </Link>
         </div>

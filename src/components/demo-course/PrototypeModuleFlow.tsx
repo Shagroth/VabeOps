@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useEffect, useMemo, useRef, useState } from "react";
 import type { PrototypeModule, PrototypeStep } from "@/content/demo-course-program";
 import { sendArtifactToSubmission, type WorkspaceFlowLinks } from "@/lib/artifact-bridge";
+import { BTN, CARD, Checklist, ChoiceButton, Feedback, FIELD, FileCard, FlowPlaceholder, FlowShell, LabField, LabProgress, Label, Lesson, Question, StarterCase } from "./flow-ui";
 
 type FlowState = {
   step: number;
@@ -50,6 +51,7 @@ export function PrototypeModuleFlow({ module, workspace }: { module: PrototypeMo
   const [hydrated, setHydrated] = useState(false);
   const [copyState, setCopyState] = useState<"idle" | "copied" | "failed">("idle");
   const heading = useRef<HTMLHeadingElement>(null);
+  const focusReady = useRef(false);
   const lastStep = module.steps.length - 1;
   const labIndex = module.steps.findIndex((step) => step.id === "lab");
   const artifactIndex = module.steps.findIndex((step) => step.id === "artifact");
@@ -66,7 +68,14 @@ export function PrototypeModuleFlow({ module, workspace }: { module: PrototypeMo
   }, [hydrated, module.number, state]);
 
   useEffect(() => {
-    if (hydrated) heading.current?.focus();
+    if (!hydrated) return;
+    // Skip the first run: focusing the heading on page load would scroll
+    // the visitor past the module hero. Later step changes do move focus.
+    if (!focusReady.current) {
+      focusReady.current = true;
+      return;
+    }
+    heading.current?.focus();
   }, [hydrated, state.step]);
 
   const completedFields = module.labFields.filter((field) => (state.fields[field.key] ?? "").trim().length >= 12).length;
@@ -80,7 +89,6 @@ export function PrototypeModuleFlow({ module, workspace }: { module: PrototypeMo
       : current.checkpoint
         ? Boolean(answer)
         : true;
-  const progress = state.finished ? 100 : Math.round(((state.maxStepReached + 1) / module.steps.length) * 100);
 
   function goTo(step: number) {
     if (step > state.maxStepReached) return;
@@ -121,116 +129,184 @@ export function PrototypeModuleFlow({ module, workspace }: { module: PrototypeMo
     URL.revokeObjectURL(href);
   }
 
-  if (!hydrated) return <div className="min-h-[720px] rounded-[28px] border border-hairline bg-white/30" />;
+  if (!hydrated) return <FlowPlaceholder />;
 
   return (
-    <div className="overflow-hidden rounded-[28px] border border-hairline bg-[#f1eee7]">
-      <div className="grid min-h-[760px] min-w-0 lg:grid-cols-[286px_minmax(0,1fr)]">
-        <aside className="min-w-0 border-b border-hairline bg-ink text-ink-foreground lg:border-b-0 lg:border-r lg:border-hairline-ink">
-          <div className="lg:sticky lg:top-[73px]">
-            <div className="border-b border-hairline-ink p-5 lg:p-6">
-              <div className="flex items-center justify-between gap-4">
-                <span className="font-mono text-[10px] uppercase tracking-[0.2em] text-system">Field course / 0{module.number}</span>
-                <span className="font-mono text-[10px] text-ink-muted">{progress}%</span>
-              </div>
-              <div className="mt-3 h-1 overflow-hidden rounded-full bg-white/10"><div className="h-full rounded-full bg-signal transition-[width] duration-500" style={{ width: `${progress}%` }} /></div>
-              <h2 className="mt-5 text-xl font-medium leading-tight">{module.title}</h2>
-              <p className="mt-2 text-xs leading-relaxed text-ink-muted">На выходе — {module.artifactName}. Это не сувенир: он пойдёт прямо в работу.</p>
-            </div>
-
-            <nav className="min-w-0 overflow-x-auto p-3 lg:max-h-[500px] lg:overflow-y-auto lg:p-4" aria-label="Навигация по модулю">
-              <ol className="flex min-w-max gap-2 lg:min-w-0 lg:flex-col">
-                {module.steps.map((step, index) => {
-                  const active = index === state.step;
-                  const reachable = index <= state.maxStepReached;
-                  const passed = index < state.maxStepReached || state.finished;
-                  return (
-                    <li key={step.id}>
-                      <button type="button" disabled={!reachable} onClick={() => goTo(index)} aria-current={active ? "step" : undefined} className={`group flex w-[210px] items-start gap-3 rounded-xl border px-3 py-3 text-left transition-colors lg:w-full ${active ? "border-system/60 bg-system/10" : reachable ? "border-transparent hover:border-hairline-ink hover:bg-white/[0.03]" : "border-transparent opacity-35"}`}>
-                        <span className={`mt-0.5 flex h-6 w-6 flex-none items-center justify-center rounded-full border font-mono text-[9px] ${passed ? "border-signal bg-signal text-signal-ink" : active ? "border-system text-system" : "border-hairline-ink text-ink-muted"}`}>{passed ? "✓" : step.index}</span>
-                        <span><span className="block text-xs font-medium text-ink-foreground">{step.label}</span><span className="mt-0.5 block text-[11px] leading-snug text-ink-muted">{step.short}</span></span>
-                      </button>
-                    </li>
-                  );
-                })}
-              </ol>
-            </nav>
-
-            <div className="hidden border-t border-hairline-ink p-6 lg:block"><button type="button" onClick={reset} className="font-mono text-[10px] uppercase tracking-wide text-ink-muted underline underline-offset-4 hover:text-ink-foreground">Сбросить прогресс</button></div>
-          </div>
-        </aside>
-
-        <div className="flex min-w-0 flex-col">
-          <div className="flex items-center justify-between border-b border-hairline px-5 py-3 sm:px-8">
-            <span className="font-mono text-[10px] uppercase tracking-[0.18em] text-graphite-muted">≈ {current.minutes} мин · прогресс хранится в браузере</span>
-            <button type="button" onClick={reset} className="text-xs text-graphite-muted underline underline-offset-4 lg:hidden">Сбросить</button>
-          </div>
-
-          <div className="flex-1 px-5 py-8 sm:px-8 sm:py-10 xl:px-12 xl:py-12">
-            <div className="mx-auto max-w-[920px]">
-              {state.step === labIndex ? (
-                <LabLesson module={module} headingRef={heading} state={state} completed={completedFields} onField={(key, value) => setState((currentState) => ({ ...currentState, fields: { ...currentState.fields, [key]: value } }))} onExample={() => setState((currentState) => ({ ...currentState, fields: Object.fromEntries(module.labFields.map((field) => [field.key, field.example])) }))} />
-              ) : state.step === artifactIndex ? (
-                <ArtifactLesson module={module} headingRef={heading} state={state} artifact={artifact} copyState={copyState} onReflection={(value) => setState((currentState) => ({ ...currentState, reflection: value }))} onCopy={copyArtifact} onDownload={downloadArtifact} onFinish={() => setState((currentState) => ({ ...currentState, finished: true }))} workspace={workspace} />
-              ) : (
-                <ConceptLesson step={current} headingRef={heading} answer={answer} onAnswer={(value) => setState((currentState) => ({ ...currentState, answers: { ...currentState.answers, [current.id]: value } }))} />
-              )}
-            </div>
-          </div>
-
-          <footer className="border-t border-hairline bg-white/40 px-5 py-4 sm:px-8">
-            <div className="mx-auto flex max-w-[920px] items-center justify-between gap-4">
-              <button type="button" onClick={back} disabled={state.step === 0} className="rounded-lg border border-hairline bg-white/60 px-4 py-2 text-sm text-graphite-muted disabled:opacity-30">← Назад</button>
-              <span className="hidden font-mono text-[10px] uppercase tracking-wide text-graphite-muted sm:block">{current.index} / 06</span>
-              {state.step < lastStep ? <button type="button" onClick={next} disabled={!canAdvance} className="rounded-lg bg-ink px-5 py-2 text-sm font-medium text-ink-foreground transition-transform hover:scale-[1.02] disabled:cursor-not-allowed disabled:opacity-30 disabled:hover:scale-100">Продолжить →</button> : <span className="text-sm text-graphite-muted">Финал модуля</span>}
-            </div>
-          </footer>
-        </div>
-      </div>
-    </div>
+    <FlowShell
+      eyebrow={`Модуль 0${module.number}`}
+      title={module.title}
+      note={`На выходе — ${module.artifactName}. Это не сувенир: он пойдёт прямо в работу.`}
+      steps={module.steps}
+      step={state.step}
+      maxStepReached={state.maxStepReached}
+      finished={state.finished}
+      topNote={`≈ ${current.minutes} мин · прогресс хранится в браузере`}
+      canAdvance={canAdvance}
+      onGoTo={goTo}
+      onBack={back}
+      onNext={next}
+      onReset={reset}
+    >
+      {state.step === labIndex ? (
+        <LabLesson
+          module={module}
+          headingRef={heading}
+          state={state}
+          completed={completedFields}
+          onField={(key, value) => setState((currentState) => ({ ...currentState, fields: { ...currentState.fields, [key]: value } }))}
+          onExample={() => setState((currentState) => ({ ...currentState, fields: Object.fromEntries(module.labFields.map((field) => [field.key, field.example])) }))}
+        />
+      ) : state.step === artifactIndex ? (
+        <ArtifactLesson
+          module={module}
+          headingRef={heading}
+          state={state}
+          artifact={artifact}
+          copyState={copyState}
+          onReflection={(value) => setState((currentState) => ({ ...currentState, reflection: value }))}
+          onCopy={copyArtifact}
+          onDownload={downloadArtifact}
+          onFinish={() => setState((currentState) => ({ ...currentState, finished: true }))}
+          workspace={workspace}
+        />
+      ) : (
+        <ConceptLesson
+          step={current}
+          headingRef={heading}
+          answer={answer}
+          onAnswer={(value) => setState((currentState) => ({ ...currentState, answers: { ...currentState.answers, [current.id]: value } }))}
+        />
+      )}
+    </FlowShell>
   );
 }
 
-function ConceptLesson({ step, headingRef, answer, onAnswer }: { step: PrototypeStep; headingRef: React.RefObject<HTMLHeadingElement | null>; answer?: string; onAnswer: (value: string) => void }) {
+type HeadingRef = React.RefObject<HTMLHeadingElement | null>;
+
+function ConceptLesson({ step, headingRef, answer, onAnswer }: { step: PrototypeStep; headingRef: HeadingRef; answer?: string; onAnswer: (value: string) => void }) {
   return (
     <Lesson headingRef={headingRef} kicker={step.kicker} title={step.title} lead={step.lead}>
-      <div className={`grid gap-3 ${step.notes.length >= 4 ? "md:grid-cols-2" : "md:grid-cols-3"}`}>
-        {step.notes.map((note) => <article key={`${step.id}-${note.number}`} className="relative overflow-hidden rounded-2xl border border-hairline bg-white/60 p-5"><span className="font-mono text-[10px] text-system">{note.number}</span>{note.signal && <span className="absolute right-4 top-4 rounded-full bg-[#eceee7] px-2 py-1 font-mono text-[8px] uppercase text-graphite-muted">{note.signal}</span>}<h3 className="mt-6 text-lg font-medium">{note.title}</h3><p className="mt-3 text-sm leading-relaxed text-graphite-muted">{note.body}</p></article>)}
+      <div className={`grid gap-4 ${step.notes.length >= 4 ? "md:grid-cols-2" : "md:grid-cols-3"}`}>
+        {step.notes.map((note) => (
+          <article key={`${step.id}-${note.number}`} className={CARD}>
+            <div className="flex items-center justify-between gap-3">
+              <span className="font-mono text-[15px] text-string">{note.number}</span>
+              {note.signal && <span className="rounded-full bg-paper-deep px-3 py-1 font-mono text-xs text-graphite-muted">{note.signal}</span>}
+            </div>
+            <h3 className="mt-6 text-[22px] font-bold leading-tight tracking-[-0.015em]">{note.title}</h3>
+            <p className="mt-3 text-[15px] leading-relaxed text-graphite-soft">{note.body}</p>
+          </article>
+        ))}
       </div>
 
-      {step.caseStudy && <div className="mt-5 rounded-2xl bg-ink p-6 text-ink-foreground sm:p-7"><span className="font-mono text-[10px] uppercase tracking-[0.18em] text-accent-change">{step.caseStudy.label}</span><h3 className="mt-3 text-2xl font-medium">{step.caseStudy.title}</h3><p className="mt-4 max-w-[65ch] text-sm leading-relaxed text-ink-muted">{step.caseStudy.body}</p><div className="mt-6 flex flex-wrap gap-2">{step.caseStudy.signals.map((signal) => <span key={signal} className="rounded-full border border-hairline-ink px-3 py-1.5 font-mono text-[9px] uppercase text-ink-muted">{signal}</span>)}</div></div>}
+      {step.caseStudy && (
+        <FileCard name={step.caseStudy.label} className="mt-5">
+          <div className="pb-8 pr-6 sm:pr-8">
+            <h3 className="text-[28px] font-extrabold leading-[1.05] tracking-[-0.03em]">{step.caseStudy.title}</h3>
+            <p className="mt-4 max-w-[65ch] leading-relaxed text-ink-muted">{step.caseStudy.body}</p>
+            <ul className="mt-6 flex flex-wrap gap-2">
+              {step.caseStudy.signals.map((signal) => (
+                <li key={signal} className="rounded-full border border-ink-line px-3.5 py-1.5 font-mono text-[13px] text-ink-muted">{signal}</li>
+              ))}
+            </ul>
+          </div>
+        </FileCard>
+      )}
 
-      {step.checkpoint && <div className="mt-6 rounded-2xl border border-hairline bg-white/50 p-5 sm:p-6"><span className="font-mono text-[10px] uppercase tracking-[0.18em] text-system">Точка решения</span><h3 className="mt-2 text-lg font-medium">{step.checkpoint.prompt}</h3>{step.checkpoint.context && <p className="mt-2 text-sm text-graphite-muted">{step.checkpoint.context}</p>}<div className="mt-5 space-y-2">{step.checkpoint.options.map((option) => <button key={option.id} type="button" onClick={() => onAnswer(option.id)} className={`block w-full rounded-xl border px-4 py-3 text-left text-sm transition-colors ${answer === option.id ? "border-system bg-system/[0.08]" : "border-hairline bg-white/60 hover:bg-white"}`}><span className="flex items-center gap-3"><span className={`h-2.5 w-2.5 flex-none rounded-full border ${answer === option.id ? "border-system bg-system" : "border-graphite-muted/40"}`} />{option.label}</span></button>)}</div>{answer && <div className={`mt-4 rounded-xl border p-4 text-sm leading-relaxed ${answer === step.checkpoint.correctId ? "border-signal/50 bg-signal/10" : "border-accent-change/40 bg-accent-change/[0.06] text-graphite-muted"}`}><span className={`mr-2 font-mono text-[10px] uppercase tracking-wide ${answer === step.checkpoint.correctId ? "text-signal-ink" : "text-accent-change"}`}>{answer === step.checkpoint.correctId ? "Точно" : "Есть подвох"}</span>{answer === step.checkpoint.correctId ? step.checkpoint.success : step.checkpoint.retry}</div>}</div>}
+      {step.checkpoint && (
+        <Question label="Точка решения" title={step.checkpoint.prompt} description={step.checkpoint.context}>
+          {step.checkpoint.options.map((option) => (
+            <ChoiceButton key={option.id} selected={answer === option.id} onClick={() => onAnswer(option.id)}>
+              {option.label}
+            </ChoiceButton>
+          ))}
+          {answer && (
+            <Feedback good={answer === step.checkpoint.correctId} goodLabel="Точно" retryLabel="Есть подвох">
+              {answer === step.checkpoint.correctId ? step.checkpoint.success : step.checkpoint.retry}
+            </Feedback>
+          )}
+        </Question>
+      )}
     </Lesson>
   );
 }
 
-function LabLesson({ module, headingRef, state, completed, onField, onExample }: { module: PrototypeModule; headingRef: React.RefObject<HTMLHeadingElement | null>; state: FlowState; completed: number; onField: (key: string, value: string) => void; onExample: () => void }) {
-  return <Lesson headingRef={headingRef} kicker="05 / Field lab" title={module.labTitle} lead={module.labLead}>
-    <div className="flex flex-wrap items-center justify-between gap-4 rounded-xl border border-system/25 bg-system/[0.05] p-4"><div><p className="text-sm font-medium">Нет подходящей задачи под рукой?</p><p className="mt-1 text-xs text-graphite-muted">Подставим инженерный кейс. Разбери его, а потом перепиши под свою систему.</p></div><button type="button" onClick={onExample} className="rounded-lg bg-ink px-4 py-2 text-xs font-medium text-ink-foreground">Взять учебный кейс</button></div>
-    <div className="mt-5 space-y-4">{module.labFields.map((field, index) => { const value = state.fields[field.key] ?? ""; const ready = value.trim().length >= 12; return <label key={field.key} className="block rounded-2xl border border-hairline bg-white/60 p-5 focus-within:border-system"><span className="flex items-center justify-between gap-4"><span className="text-sm font-medium">0{index + 1}. {field.label}</span><span className={`font-mono text-[9px] uppercase tracking-wide ${ready ? "text-signal-ink" : "text-graphite-muted"}`}>{ready ? "готово" : "нужно заполнить"}</span></span><span className="mt-1 block text-xs text-graphite-muted">{field.prompt}</span><textarea value={value} onChange={(event) => onField(field.key, event.target.value)} rows={3} className="mt-4 w-full resize-y rounded-xl border border-hairline bg-[#fbfaf6] px-4 py-3 text-sm leading-relaxed outline-none placeholder:text-graphite-muted/50 focus:border-system" placeholder={field.placeholder} /></label>; })}</div>
-    <div className="mt-4 flex items-center justify-between rounded-xl bg-ink px-4 py-3 text-sm text-ink-foreground"><span>Артефакт собран</span><span className="font-mono text-signal">{completed} / {module.labFields.length}</span></div>
-  </Lesson>;
+function LabLesson({ module, headingRef, state, completed, onField, onExample }: { module: PrototypeModule; headingRef: HeadingRef; state: FlowState; completed: number; onField: (key: string, value: string) => void; onExample: () => void }) {
+  return (
+    <Lesson headingRef={headingRef} kicker="05 / Field lab" title={module.labTitle} lead={module.labLead}>
+      <StarterCase
+        title="Нет подходящей задачи под рукой?"
+        text="Подставим инженерный кейс. Разбери его, а потом перепиши под свою систему."
+        action="Взять учебный кейс"
+        onClick={onExample}
+      />
+      <div className="mt-5 space-y-4">
+        {module.labFields.map((field, index) => {
+          const value = state.fields[field.key] ?? "";
+          return (
+            <LabField
+              key={field.key}
+              title={`0${index + 1}. ${field.label}`}
+              prompt={field.prompt}
+              value={value}
+              ready={value.trim().length >= 12}
+              placeholder={field.placeholder}
+              onChange={(next) => onField(field.key, next)}
+            />
+          );
+        })}
+      </div>
+      <LabProgress label="Артефакт собран" done={completed} total={module.labFields.length} />
+    </Lesson>
+  );
 }
 
-function ArtifactLesson({ module, headingRef, state, artifact, copyState, onReflection, onCopy, onDownload, onFinish, workspace }: { module: PrototypeModule; headingRef: React.RefObject<HTMLHeadingElement | null>; state: FlowState; artifact: string; copyState: "idle" | "copied" | "failed"; onReflection: (value: string) => void; onCopy: () => void; onDownload: () => void; onFinish: () => void; workspace?: WorkspaceFlowLinks }) {
+function ArtifactLesson({ module, headingRef, state, artifact, copyState, onReflection, onCopy, onDownload, onFinish, workspace }: { module: PrototypeModule; headingRef: HeadingRef; state: FlowState; artifact: string; copyState: "idle" | "copied" | "failed"; onReflection: (value: string) => void; onCopy: () => void; onDownload: () => void; onFinish: () => void; workspace?: WorkspaceFlowLinks }) {
   const next = module.number < 5 ? module.number + 1 : null;
   const nextHref = workspace ? workspace.nextHref : next ? `/demo-course/${next}` : null;
   const nextLabel = workspace ? workspace.nextLabel ?? "К следующей неделе →" : `К модулю ${next} →`;
   const overviewHref = workspace ? workspace.overviewHref : "/demo-course";
-  return <Lesson headingRef={headingRef} kicker="06 / Takeaway" title={`${module.artifactName} готов`} lead="Не полируй его в вакууме. Версия 0.1 должна встретиться с настоящей задачей, получить по зубам и стать точнее — так и рождаются рабочие инструменты.">
-    <div className="grid min-w-0 gap-5 xl:grid-cols-[1.15fr_0.85fr]">
-      <div className="min-w-0 overflow-hidden rounded-2xl border border-hairline bg-ink text-ink-foreground"><div className="flex items-center justify-between border-b border-hairline-ink px-4 py-3"><span className="font-mono text-[10px] text-ink-muted">{module.artifactFile}</span><span className="font-mono text-[9px] uppercase text-signal">ready</span></div><pre className="max-h-[560px] min-w-0 overflow-auto whitespace-pre-wrap break-words p-5 font-mono text-[11px] leading-relaxed text-ink-muted sm:p-6">{artifact}</pre></div>
-      <div className="space-y-4">
-        <div className="rounded-2xl border border-hairline bg-white/60 p-5"><span className="font-mono text-[10px] uppercase tracking-[0.18em] text-graphite-muted">Self-check / {module.rubric.length} критериев</span><ul className="mt-4 space-y-3">{module.rubric.map((item) => <li key={item} className="flex gap-3 text-xs leading-relaxed text-graphite-muted"><span className="mt-0.5 flex h-4 w-4 flex-none items-center justify-center rounded-full bg-signal text-[9px] text-signal-ink">✓</span>{item}</li>)}</ul></div>
-        <label className="block rounded-2xl border border-hairline bg-white/60 p-5"><span className="text-sm font-medium">Договор с собой</span><span className="mt-1 block text-xs text-graphite-muted">На какой задаче проверишь артефакт в течение недели?</span><textarea value={state.reflection} onChange={(event) => onReflection(event.target.value)} rows={3} className="mt-4 w-full resize-y rounded-xl border border-hairline bg-[#fbfaf6] px-3 py-3 text-sm outline-none focus:border-system" placeholder="На следующей задаче я…" /></label>
-        <div className="grid gap-2 sm:grid-cols-2 xl:grid-cols-1"><button type="button" onClick={onCopy} className="rounded-xl bg-ink px-4 py-3 text-sm font-medium text-ink-foreground">{copyState === "copied" ? "Скопировано ✓" : copyState === "failed" ? "Не удалось скопировать" : "Скопировать артефакт"}</button><button type="button" onClick={onDownload} className="rounded-xl border border-hairline bg-white/70 px-4 py-3 text-sm font-medium">Скачать .md</button>{workspace && <button type="button" onClick={() => sendArtifactToSubmission(artifact)} className="rounded-xl border border-system/40 bg-system/[0.06] px-4 py-3 text-sm font-medium sm:col-span-2 xl:col-span-1">Перенести в сдачу ↓</button>}</div>
-        {state.finished ? <div className="rounded-2xl border border-signal/50 bg-signal/10 p-5"><span className="font-mono text-[10px] uppercase tracking-wide text-signal-ink">Модуль завершён</span><p className="mt-2 text-sm text-graphite-muted">Прогресс и артефакт сохранены в этом браузере.</p><div className="mt-4 flex flex-wrap gap-3">{nextHref ? <Link href={nextHref} className="rounded-lg bg-ink px-4 py-2 text-xs font-medium text-ink-foreground">{nextLabel}</Link> : <Link href={overviewHref} className="rounded-lg bg-ink px-4 py-2 text-xs font-medium text-ink-foreground">К обзору курса →</Link>}<Link href={overviewHref} className="px-2 py-2 text-xs text-graphite-muted underline underline-offset-4">Вся программа</Link></div></div> : <button type="button" onClick={onFinish} className="w-full rounded-xl bg-signal px-4 py-3 text-sm font-medium text-signal-ink">Завершить модуль</button>}
+  return (
+    <Lesson headingRef={headingRef} kicker="06 / Takeaway" title={`${module.artifactName} готов`} lead="Не полируй его в вакууме. Версия 0.1 должна встретиться с настоящей задачей, получить по зубам и стать точнее — так и рождаются рабочие инструменты.">
+      <div className="grid min-w-0 gap-5 xl:grid-cols-[1.15fr_0.85fr]">
+        <FileCard name={module.artifactFile} status="ready" className="self-start">
+          <pre className="max-h-[560px] min-w-0 overflow-auto whitespace-pre-wrap break-words pb-7 pr-6 font-mono text-sm leading-relaxed text-ink-muted">{artifact}</pre>
+        </FileCard>
+        <div className="space-y-4">
+          <div className={CARD}>
+            <Label>Self-check · {module.rubric.length} критериев</Label>
+            <Checklist items={module.rubric} />
+          </div>
+          <label className={`block ${CARD}`}>
+            <span className="text-lg font-bold tracking-[-0.01em]">Договор с собой</span>
+            <span className="mt-1.5 block text-[15px] text-graphite-soft">На какой задаче проверишь артефакт в течение недели?</span>
+            <textarea value={state.reflection} onChange={(event) => onReflection(event.target.value)} rows={3} className={`mt-4 ${FIELD}`} placeholder="На следующей задаче я…" />
+          </label>
+          <div className="grid gap-2.5 sm:grid-cols-2 xl:grid-cols-1">
+            <button type="button" onClick={onCopy} className={BTN.dark}>
+              {copyState === "copied" ? "Скопировано ✓" : copyState === "failed" ? "Не удалось скопировать" : "Скопировать артефакт"}
+            </button>
+            <button type="button" onClick={onDownload} className={BTN.outline}>Скачать .md</button>
+            {workspace && (
+              <button type="button" onClick={() => sendArtifactToSubmission(artifact)} className={`${BTN.outline} sm:col-span-2 xl:col-span-1`}>
+                Перенести в сдачу ↓
+              </button>
+            )}
+          </div>
+          {state.finished ? (
+            <div className="kg-rise rounded-[24px] bg-sky-tint p-6" role="status">
+              <Label tone="system">Модуль завершён</Label>
+              <p className="mt-2 leading-relaxed">Прогресс и артефакт сохранены в этом браузере.</p>
+              <div className="mt-5 flex flex-wrap items-center gap-x-5 gap-y-3">
+                <Link href={nextHref ?? overviewHref} className={BTN.small}>{nextHref ? nextLabel : "К обзору курса →"}</Link>
+                <Link href={overviewHref} className="kg-link inline-flex min-h-11 items-center font-semibold">Вся программа</Link>
+              </div>
+            </div>
+          ) : (
+            <button type="button" onClick={onFinish} className={`w-full ${BTN.primary}`}>Завершить модуль</button>
+          )}
+        </div>
       </div>
-    </div>
-  </Lesson>;
-}
-
-function Lesson({ headingRef, kicker, title, lead, children }: { headingRef: React.RefObject<HTMLHeadingElement | null>; kicker: string; title: string; lead: string; children: React.ReactNode }) {
-  return <section><span className="font-mono text-[10px] uppercase tracking-[0.2em] text-system">{kicker}</span><h2 ref={headingRef} tabIndex={-1} className="mt-3 max-w-[22ch] text-3xl font-semibold leading-[1.08] tracking-tight outline-none sm:text-[2.65rem]">{title}</h2><p className="mt-5 max-w-[68ch] text-base leading-relaxed text-graphite-muted">{lead}</p><div className="mt-9">{children}</div></section>;
+    </Lesson>
+  );
 }

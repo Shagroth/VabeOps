@@ -46,11 +46,11 @@ export default async function DemoCourseModulePage({ params }: PageProps) {
 
   if (moduleNumber === 1) {
     return (
-      <div className="flex min-h-screen flex-col bg-paper text-graphite">
+      <div className="flex min-h-screen flex-col bg-paper text-[17px] text-graphite">
         <Header />
         <main id="main-content" className="flex-1">
           <ModuleHero number={MODULE_ONE_SUMMARY.number} eyebrow={MODULE_ONE_SUMMARY.eyebrow} title={MODULE_ONE_SUMMARY.title} dek={MODULE_ONE_SUMMARY.dek} result={MODULE_ONE_SUMMARY.result} guidedMinutes={MODULE_ONE_SUMMARY.guidedMinutes} practiceMinutes={MODULE_ONE_SUMMARY.practiceMinutes} />
-          <section className="mx-auto max-w-[1280px] px-4 py-8 sm:px-6 lg:px-10 lg:py-12"><DemoCourseFlow /></section>
+          <section className="mx-auto max-w-[1280px] px-3 pb-20 sm:px-8 lg:pb-24"><DemoCourseFlow /></section>
           <HomeworkAssignmentSection assignment={homework} />
         </main>
         <Footer />
@@ -66,7 +66,7 @@ export default async function DemoCourseModulePage({ params }: PageProps) {
   // the cohort workspace (/modules/[id]) to enrolled participants.
   if (!isPublicDemoModule(moduleNumber)) {
     return (
-      <div className="flex min-h-screen flex-col bg-paper text-graphite">
+      <div className="flex min-h-screen flex-col bg-paper text-[17px] text-graphite">
         <Header />
         <main id="main-content" className="flex-1">
           <ModuleHero mode="locked" number={courseModule.number} eyebrow={courseModule.eyebrow} title={courseModule.title} dek={courseModule.dek} result={courseModule.result} guidedMinutes={courseModule.guidedMinutes} practiceMinutes={courseModule.practiceMinutes} />
@@ -78,11 +78,11 @@ export default async function DemoCourseModulePage({ params }: PageProps) {
   }
 
   return (
-    <div className="flex min-h-screen flex-col bg-paper text-graphite">
+    <div className="flex min-h-screen flex-col bg-paper text-[17px] text-graphite">
       <Header />
       <main id="main-content" className="flex-1">
         <ModuleHero number={courseModule.number} eyebrow={courseModule.eyebrow} title={courseModule.title} dek={courseModule.dek} result={courseModule.result} guidedMinutes={courseModule.guidedMinutes} practiceMinutes={courseModule.practiceMinutes} />
-        <section className="mx-auto max-w-[1280px] px-4 py-8 sm:px-6 lg:px-10 lg:py-12">
+        <section className="mx-auto max-w-[1280px] px-3 pb-20 sm:px-8 lg:pb-24">
           <PrototypeModuleFlow module={courseModule} />
         </section>
         <HomeworkAssignmentSection assignment={homework} />
