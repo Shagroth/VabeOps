@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useEffect, useMemo, useRef, useState } from "react";
 import type { PrototypeModule, PrototypeStep } from "@/content/demo-course-program";
+import { ENGINEER_ROLE_LABEL } from "@/content/engineer-roles";
 import { sendArtifactToSubmission, type WorkspaceFlowLinks } from "@/lib/artifact-bridge";
 import { useFunnel, type FunnelTarget } from "./useFunnel";
 import { LessonDiagramFigure } from "./LessonDiagram";
@@ -236,6 +237,23 @@ function ConceptLesson({ step, headingRef, answer, onAnswer }: { step: Prototype
             </ul>
           </div>
         </FileCard>
+      )}
+
+      {step.roleTasks && (
+        <section className="mt-8" aria-label="Задачи по ролям">
+          <Label>Задачи по ролям</Label>
+          <p className="mt-2 max-w-[60ch] text-[15px] text-graphite-soft">
+            Выбери свою роль и реши задачу на своём стеке. Ответ пригодится в лаборатории и домашней работе.
+          </p>
+          <ul className="mt-4 grid gap-3 md:grid-cols-2">
+            {step.roleTasks.map((item) => (
+              <li key={item.role} className="rounded-[18px] border border-hairline-strong bg-white p-5">
+                <span className="font-mono text-[13px] uppercase tracking-[0.08em] text-system">{ENGINEER_ROLE_LABEL[item.role]}</span>
+                <p className="mt-2 text-[15px] leading-relaxed">{item.task}</p>
+              </li>
+            ))}
+          </ul>
+        </section>
       )}
 
       {step.checkpoint && (
