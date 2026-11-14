@@ -24,9 +24,9 @@ export default function SignalsPage() {
               Короткие сигналы из практики
             </h1>
             <p className="mt-4 max-w-[62ch] text-ink-muted">
-              Быстрее статьи, конкретнее новостной ленты: что произошло и почему это важно
-              инженеру, который работает с агентами. Оригинальные заметки и курируемые вручную
-              внешние материалы — без автоматической агрегации.
+              Что произошло и почему это важно инженеру, который работает с агентами. Каждый сигнал
+              ведёт на первоисточник: пост разработчика, спецификацию, changelog или бюллетень
+              безопасности. Отбираем вручную.
             </p>
           </div>
         </section>
@@ -40,14 +40,7 @@ export default function SignalsPage() {
                   className="card-hover block rounded-2xl border border-hairline bg-white/60 p-6"
                 >
                   <div className="flex flex-wrap items-center gap-2 font-mono text-[10px] uppercase tracking-wide text-graphite-muted">
-                    <span className={s.kind === "original" ? "text-copper" : "text-system"}>
-                      {s.kind === "original" ? "Оригинал" : "Внешний источник"}
-                    </span>
-                    {s.sourceIsPlaceholder && (
-                      <span className="rounded-full border border-warn/40 bg-warn/10 px-2 py-0.5 text-warn">
-                        Демо / плейсхолдер
-                      </span>
-                    )}
+                    <span className="text-system">{s.sourceName ?? "Заметка редакции"}</span>
                     <span>· {s.publishedAt}</span>
                     {s.tags.map((t) => (
                       <span key={t}>· {t}</span>
