@@ -170,7 +170,7 @@ export function CourseProgramOverview() {
 
       <section className="mx-auto max-w-[1280px] px-6 py-12 lg:px-10 lg:py-16">
         <div className="rounded-2xl border border-system/25 bg-system/[0.05] p-6 sm:p-8">
-          <span className="font-mono text-[10px] uppercase tracking-[0.18em] text-system">Подход VabeOps</span>
+          <span className="font-mono text-[10px] uppercase tracking-[0.18em] text-system">Подход KiteGrip</span>
           <div className="mt-5 grid gap-6 md:grid-cols-3">
             <Evaluation number="01" title="Сначала решение" body="ИИ должен двигать рабочую задачу, а не производить убедительный текст ради текста." />
             <Evaluation number="02" title="Потом свобода" body="Автономность выдаётся по мере доказанной надёжности. Не наоборот. Прод — плохое место для воспитательных экспериментов." />

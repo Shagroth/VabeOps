@@ -6,7 +6,7 @@ const PARAMS = {
   identifier: "person@example.com",
   url: "https://vabeops.example.com/api/auth/callback/resend?token=secret&callbackUrl=%2F",
   apiKey: "re_test_key",
-  from: "VabeOps <no-reply@vabeops.example.com>",
+  from: "KiteGrip <no-reply@kitegrip.example.com>",
 };
 
 test("sendMagicLinkEmail resolves on a 200 response", async () => {

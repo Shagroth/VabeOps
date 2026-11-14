@@ -6,7 +6,7 @@ import { AUTHORS } from "@/content/authors";
 
 export const metadata: Metadata = {
   title: "Авторы",
-  description: "Кто ведёт курсы и материалы VabeOps.",
+  description: "Кто ведёт курсы и материалы KiteGrip.",
   alternates: { canonical: "/authors" },
 };
 
@@ -19,10 +19,10 @@ export default function AuthorsPage() {
           <div className="mx-auto max-w-[1280px] px-6 lg:px-10">
             <span className="font-mono text-xs uppercase tracking-[0.2em] text-system">Авторы</span>
             <h1 className="mt-3 max-w-[32ch] text-[2.375rem] font-semibold tracking-tight sm:text-[3rem]">
-              Кто ведёт VabeOps
+              Кто ведёт KiteGrip
             </h1>
             <p className="mt-4 max-w-[62ch] text-ink-muted">
-              VabeOps задуман как платформа с несколькими авторами. Сейчас в системе один
+              KiteGrip задуман как платформа с несколькими авторами. Сейчас в системе один
               профиль — явно демонстрационный, см. пометку на карточке ниже.
             </p>
           </div>

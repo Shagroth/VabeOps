@@ -73,7 +73,7 @@ export function WorkspaceShell({
               <path d="M7 18 L17 7" stroke="var(--system)" strokeWidth="1.6" fill="none" />
               <circle cx="19" cy="5" r="2" fill="var(--system)" />
             </svg>
-            <span className="font-medium">VabeOps</span>
+            <span className="font-medium">KiteGrip</span>
           </Link>
           <nav className="flex flex-col gap-1">
             {NAV.map((item) => (
@@ -134,7 +134,7 @@ export function WorkspaceShell({
             <path d="M7 18 L17 7" stroke="var(--system)" strokeWidth="1.6" fill="none" />
             <circle cx="19" cy="5" r="2" fill="var(--system)" />
           </svg>
-          <span className="text-sm font-medium">VabeOps</span>
+          <span className="text-sm font-medium">KiteGrip</span>
         </Link>
         <div className="flex items-center gap-1 text-xs">
           <nav className="flex gap-1">

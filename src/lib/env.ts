@@ -49,7 +49,7 @@ export function requireR2Config() {
 }
 
 export function siteUrl(): string {
-  return process.env.NEXT_PUBLIC_SITE_URL || "https://vabeops.example.com";
+  return process.env.NEXT_PUBLIC_SITE_URL || "https://kitegrip.com";
 }
 
 /** Recipient for "new submission" notifications. Unset = quiet no-op, not a crash. */

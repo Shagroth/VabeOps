@@ -128,7 +128,7 @@ export function PublicLanding() {
           <div className="relative mx-auto grid max-w-[1280px] gap-14 px-6 py-20 lg:grid-cols-2 lg:items-center lg:px-10 lg:py-28">
             <div className="animate-hero-rise flex flex-col gap-7">
               <span className="font-mono text-xs uppercase tracking-[0.2em] text-system">
-                VabeOps / Field Notes from Agentic Engineering
+                KiteGrip / Field Notes from Agentic Engineering
               </span>
               <h1 className="text-[2.75rem] font-semibold leading-[1.08] tracking-tight sm:text-[3.5rem] lg:text-[4.25rem]">
                 Стань инженером, который не теряет форму.
@@ -199,7 +199,7 @@ export function PublicLanding() {
               </span>
             </div>
             <h2 className="mt-4 max-w-[30ch] text-[2.375rem] font-semibold tracking-tight sm:text-[3rem]">
-              VabeOps Cohort: работа с агентами целиком, от первой задачи до нескольких агентов сразу
+              KiteGrip for Engineers: работа с агентами целиком, от первой задачи до нескольких агентов сразу
             </h2>
 
             <div id="program" className="mt-12">

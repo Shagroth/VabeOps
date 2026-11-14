@@ -24,7 +24,7 @@ const NAV_GROUPS: NavGroupDef[] = [
     ],
   },
   {
-    label: "О VabeOps",
+    label: "О KiteGrip",
     items: [
       { href: "/authors", label: "Авторы" },
       { href: "/#about", label: "О пилоте" },
@@ -42,7 +42,7 @@ function Wordmark() {
         <path d="M7 18 L17 7" stroke="var(--signal)" strokeWidth="1.6" fill="none" />
         <circle cx="19" cy="5" r="2" fill="var(--signal)" />
       </svg>
-      <span className="font-medium text-ink-foreground">VabeOps</span>
+      <span className="font-medium text-ink-foreground">KiteGrip</span>
     </div>
   );
 }

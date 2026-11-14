@@ -5,7 +5,7 @@ import { CourseProgramOverview } from "@/components/demo-course/CourseProgramOve
 
 export const metadata: Metadata = {
   title: "Инженерная работа с ИИ — программа курса",
-  description: "Практический курс VabeOps с пятью инженерными домашними работами: агенты, контекст, Skills, MCP, guardrails и мультиагентные системы.",
+  description: "Практический курс KiteGrip с пятью инженерными домашними работами: агенты, контекст, Skills, MCP, guardrails и мультиагентные системы.",
   alternates: { canonical: "/demo-course" },
   openGraph: {
     title: "Инженерная работа с ИИ — программа курса",
