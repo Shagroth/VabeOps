@@ -6,7 +6,7 @@ import type { CharacterId } from "@/content/comics";
 
 const ACCENT_VAR: Record<CharacterId, string> = {
   dan: "var(--signal)",
-  rina: "var(--system)",
+  rina: "var(--ink)",
   viktor: "var(--copper)",
 };
 
@@ -27,7 +27,7 @@ export function CharacterAvatar({
 }) {
   const fill = ACCENT_VAR[id];
   return (
-    <svg viewBox="0 0 64 64" className={className} role="img" aria-label={`Силуэт персонажа`}>
+    <svg viewBox="0 0 64 64" className={className} role="img" aria-hidden="true">
       <Body fill={fill} />
       <Head fill={fill} />
       {id === "dan" && (
@@ -36,7 +36,7 @@ export function CharacterAvatar({
       )}
       {id === "rina" && (
         // shield/keyhole — thinks about access
-        <g fill="var(--ink)" opacity="0.85">
+        <g fill="var(--paper)">
           <path d="M32 12 L42 16 V26 C42 33 37 38 32 40 C27 38 22 33 22 26 V16 Z" />
           <circle cx="32" cy="23" r="3" fill={fill} />
         </g>

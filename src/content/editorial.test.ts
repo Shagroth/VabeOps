@@ -45,3 +45,15 @@ test("every mini-course is a finished short course", async () => {
     assert.ok(journal.some((j) => j.slug === course.relatedArticle), `${course.slug} related article`);
   }
 });
+
+test("the comic episode is a real multi-slide comic with described scenes", async () => {
+  const { EPISODE_1 } = await import("./comics.ts");
+  assert.ok(EPISODE_1.panels.length >= 6);
+  for (const panel of EPISODE_1.panels) {
+    assert.ok(panel.scene, panel.caption);
+    assert.ok(panel.sceneAlt.length > 20, `${panel.caption} needs a scene description`);
+    assert.ok(panel.lines.length >= 1 && panel.lines.length <= 3, `${panel.caption} lines`);
+  }
+  assert.equal(new Set(EPISODE_1.panels.map((p) => p.caption)).size, EPISODE_1.panels.length);
+  assert.ok(EPISODE_1.checklist.length >= 3);
+});
