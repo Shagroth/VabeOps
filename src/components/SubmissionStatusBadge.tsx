@@ -5,14 +5,14 @@ const LABEL: Record<string, string> = {
 };
 
 const STYLE: Record<string, string> = {
-  SUBMITTED: "bg-black/10",
-  NEEDS_REVISION: "bg-accent-change/15 text-accent-change",
-  ACCEPTED: "bg-signal/25 text-graphite",
+  SUBMITTED: "bg-paper-deep text-graphite",
+  NEEDS_REVISION: "bg-[#fbe4dc] text-danger",
+  ACCEPTED: "bg-sky-tint text-sky-deep",
 };
 
 export function SubmissionStatusBadge({ status }: { status: string }) {
   return (
-    <span className={`rounded px-1.5 py-0.5 text-xs ${STYLE[status] ?? STYLE.SUBMITTED}`}>
+    <span className={`whitespace-nowrap rounded-full px-3 py-1 font-mono text-xs ${STYLE[status] ?? STYLE.SUBMITTED}`}>
       {LABEL[status] ?? status}
     </span>
   );

@@ -15,10 +15,10 @@ test("parseCourseModuleNumber accepts only 1..5", () => {
 
 const PROGRAM = [1, 2, 3, 4, 5].map((n) => ({ number: n, shortTitle: `M${n}` }));
 
-test("planProgramWeeks creates all weeks, only week 1 open", () => {
+test("planProgramWeeks creates all weeks, all open", () => {
   const plan = planProgramWeeks(PROGRAM, []);
   assert.deepEqual(plan.map((w) => w.weekNumber), [1, 2, 3, 4, 5]);
-  assert.deepEqual(plan.map((w) => w.isOpen), [true, false, false, false, false]);
+  assert.deepEqual(plan.map((w) => w.isOpen), [true, true, true, true, true]);
   assert.ok(plan.every((w) => w.courseModuleNumber === w.weekNumber));
 });
 

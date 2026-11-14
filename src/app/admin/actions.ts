@@ -78,7 +78,16 @@ export async function createCohort(formData: FormData) {
   await requireAdmin();
   const name = String(formData.get("name"));
   const startDate = new Date(String(formData.get("startDate")));
-  await prisma.cohort.create({ data: { name, startDate } });
+  // A new cohort gets the whole course program at once, so an enrolled
+  // participant never lands in an empty workspace.
+  const weeks = planProgramWeeks(PROGRAM_MODULES, []);
+  await prisma.cohort.create({
+    data: {
+      name,
+      startDate,
+      modules: { create: weeks.map((w) => ({ ...w, notesMd: "", assignmentMd: "" })) },
+    },
+  });
   revalidatePath("/admin");
 }
 

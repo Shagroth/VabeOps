@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { KiteGripLogo } from "@/components/brand/KiteGripLogo";
+import { KiteGripMark } from "@/components/brand/KiteGripMark";
 
 type NavKey = "overview" | "program" | "stream" | "admin";
 
@@ -23,8 +24,8 @@ function NavLink({
       href={item.href}
       className={`${className} ${
         active
-          ? "bg-black/5 font-medium text-graphite"
-          : "text-graphite-muted hover:bg-black/5 hover:text-graphite"
+          ? "bg-ink font-semibold text-ink-foreground"
+          : "text-graphite-muted hover:bg-paper-deep hover:text-graphite"
       }`}
     >
       {item.label}
@@ -61,7 +62,7 @@ export function WorkspaceShell({
     <div className="mx-auto flex w-full max-w-[1400px] flex-1">
       <a
         href="#main-content"
-        className="absolute left-2 top-2 z-50 -translate-y-16 rounded-lg bg-signal px-4 py-2 text-sm font-medium text-signal-ink transition-transform duration-150 focus:translate-y-0"
+        className="absolute left-2 top-2 z-50 -translate-y-16 rounded-full bg-signal px-5 py-2.5 text-sm font-semibold text-signal-ink transition-transform duration-150 focus:translate-y-0"
       >
         Перейти к содержанию
       </a>
@@ -77,7 +78,7 @@ export function WorkspaceShell({
                 key={item.key}
                 item={item}
                 active={active === item.key}
-                className="rounded-lg px-3 py-2 text-sm transition-colors duration-150"
+                className="flex min-h-11 items-center rounded-full px-4 text-[15px] transition-colors duration-150"
               />
             ))}
           </nav>
@@ -125,7 +126,7 @@ export function WorkspaceShell({
       {/* Mobile top nav */}
       <div className="fixed inset-x-0 top-0 z-20 flex items-center justify-between border-b border-hairline bg-paper/95 px-4 py-3 backdrop-blur lg:hidden">
         <Link href="/" className="flex items-center gap-2">
-          <KiteGripLogo size="sm" />
+          <KiteGripMark variant="compact" label="KiteGrip" className="h-9 w-auto" />
         </Link>
         <div className="flex items-center gap-1 text-xs">
           <nav className="flex gap-1">
@@ -134,7 +135,7 @@ export function WorkspaceShell({
                 key={item.key}
                 item={item}
                 active={active === item.key}
-                className="rounded-md px-2.5 py-1.5 transition-colors duration-150"
+                className="flex min-h-9 items-center rounded-full px-3 transition-colors duration-150"
               />
             ))}
           </nav>
@@ -145,7 +146,7 @@ export function WorkspaceShell({
             <summary className="list-none rounded-md px-2.5 py-1.5 text-graphite-muted transition-colors duration-150 hover:bg-black/5 hover:text-graphite [&::-webkit-details-marker]:hidden">
               Ещё
             </summary>
-            <div className="absolute right-0 top-full z-30 mt-1 flex w-48 flex-col gap-1 rounded-lg border border-hairline bg-paper p-2 text-sm shadow-lg">
+            <div className="absolute right-0 top-full z-30 mt-1 flex w-48 flex-col gap-1 rounded-lg border border-hairline bg-paper p-2 text-sm">
               {canReviewSubmissions && (
                 <Link
                   href="/admin/review"
