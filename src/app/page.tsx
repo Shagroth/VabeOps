@@ -63,9 +63,9 @@ export default async function Home() {
             </svg>
             <h1 className="mt-4 text-2xl font-semibold">Пока нет активной когорты</h1>
             <p className="mx-auto mt-2 max-w-[48ch] text-graphite-muted">
-              Твой аккаунт подтверждён, но ты ещё не прикреплён(а) ни к одной когорте пилота.
-              Обычно это значит, что зачисление ещё в процессе — автор добавляет участников
-              вручную после рассмотрения заявки. Пока жди — можешь посмотреть, что уже есть в
+              Аккаунт подтверждён, но в когорту пилота тебя пока не добавили. Скорее всего,
+              зачисление ещё идёт: автор добавляет участников вручную, когда прочитает заявку.
+              А пока можно посмотреть, что лежит в
               открытом доступе.
             </p>
             {isAdmin && (
@@ -154,14 +154,14 @@ export default async function Home() {
           >
             <span className="font-medium">Представься группе.</span>{" "}
             <span className="text-graphite-muted">
-              Укажи имя и пару строк о себе в «Потоке» — так тебя увидят остальные участники (email им не показывается) →
+              Напиши в «Потоке» имя и пару строк о себе, чтобы остальные знали, кто ты. Email они не увидят →
             </span>
           </Link>
         )}
 
         {nextStep.kind === "no-open-weeks" ? (
           <p className="rounded-xl border border-hairline bg-white/40 p-6 text-sm text-graphite-muted">
-            Курс скоро начнётся — пока нет открытых недель.
+            Курс скоро стартует, открытых недель пока нет.
           </p>
         ) : nextStep.kind === "revision" ? (
           <Link
@@ -173,7 +173,7 @@ export default async function Home() {
               Неделя {nextStep.week.weekNumber} · {nextStep.week.title}
             </div>
             <div className="text-sm text-graphite-muted">
-              Автор оставил комментарий к твоей сдаче — загляни и отправь новую версию, когда будет время →
+              Автор прокомментировал твою сдачу. Посмотри и пришли новую версию, когда будет время →
             </div>
           </Link>
         ) : nextStep.kind === "start" ? (
