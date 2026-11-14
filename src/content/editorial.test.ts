@@ -27,3 +27,21 @@ test("every journal article cites at least three distinct primary sources", () =
     }
   }
 });
+
+test("every mini-course is a finished short course", async () => {
+  const { MINI_COURSES } = await import("./courses.ts");
+  const { JOURNAL: journal } = await import("./journal.ts");
+  assert.equal(MINI_COURSES.length, 6);
+  for (const course of MINI_COURSES) {
+    assert.equal(course.status, "available", course.slug);
+    assert.equal(course.lessons.length, 3, course.slug);
+    assert.equal(course.minutes, course.lessons.reduce((sum, l) => sum + l.minutes, 0));
+    for (const lesson of course.lessons) {
+      assert.ok(lesson.body.length >= 2, `${course.slug}: ${lesson.title}`);
+      assert.ok(lesson.practice.length > 20);
+      assert.ok(lesson.diagram || lesson.checklist, `${course.slug}: ${lesson.title} needs a scheme or a checklist`);
+    }
+    assert.ok(course.takeaway.length >= 4);
+    assert.ok(journal.some((j) => j.slug === course.relatedArticle), `${course.slug} related article`);
+  }
+});

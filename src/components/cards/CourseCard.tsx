@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { CoverArt } from "@/components/covers/CoverArt";
 import { StatusChip } from "@/components/StatusChip";
-import type { MiniCourse } from "@/content/courses";
+import { COURSE_LEVEL_LABEL, type MiniCourse } from "@/content/courses";
 
 export function CourseCard({ course }: { course: MiniCourse }) {
   return (
@@ -17,11 +17,11 @@ export function CourseCard({ course }: { course: MiniCourse }) {
           <span className="font-mono text-xs uppercase tracking-[0.08em] text-graphite-muted">
             {course.format}
           </span>
-          <StatusChip tone={course.status === "preview" ? "preview" : "in_preparation"} />
+          <StatusChip tone={course.status} label={course.status === "available" ? `${course.lessons.length} урока · ${course.minutes} мин` : undefined} />
         </div>
         <h3 className="text-[20px] font-bold leading-snug tracking-[-0.015em]">{course.title}</h3>
         <p className="text-[15px] leading-relaxed text-graphite-soft">{course.summary}</p>
-        <span className="mt-auto pt-2 font-mono text-xs text-graphite-muted">{course.level}</span>
+        <span className="mt-auto pt-2 font-mono text-xs text-graphite-muted">{COURSE_LEVEL_LABEL[course.level]}</span>
       </div>
     </Link>
   );

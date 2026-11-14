@@ -1,6 +1,7 @@
-export type ChipTone = "preview" | "in_preparation" | "planned" | "unavailable" | "accepted";
+export type ChipTone = "available" | "preview" | "in_preparation" | "planned" | "unavailable" | "accepted";
 
 const TONES: Record<ChipTone, string> = {
+  available: "border-transparent bg-sky-tint text-sky-deep",
   preview: "border-system/40 bg-system/10 text-system",
   in_preparation: "border-hairline text-graphite-muted",
   planned: "border-system/40 bg-system/10 text-system",
@@ -9,6 +10,7 @@ const TONES: Record<ChipTone, string> = {
 };
 
 const DEFAULT_LABEL: Record<ChipTone, string> = {
+  available: "Доступен",
   preview: "Превью",
   in_preparation: "В подготовке",
   planned: "Дата уточняется",
