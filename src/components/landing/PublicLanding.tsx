@@ -222,7 +222,7 @@ export function PublicLanding() {
                 <CardKite className="-bottom-10 -right-4 w-40 text-white/15" />
                 <div className="relative flex items-center justify-between gap-3">
                   <span className="font-mono text-[13px] text-sky-soft">01 · ENGINEERS</span>
-                  <Pill className="bg-white text-sky-deep">Пилот · декабрь 2026</Pill>
+                  <Pill className="bg-white text-sky-deep">Открыты модули 1–2</Pill>
                 </div>
                 <h3 className="relative text-[34px] font-extrabold leading-[1.02] tracking-[-0.03em]">
                   KiteGrip
@@ -233,13 +233,18 @@ export function PublicLanding() {
                   Агентная инженерия для тех, кто уже держит прод: контракт задачи, контекст, MCP, guardrails и
                   мультиагентные системы. С задачами для platform, DevOps, SRE и fullstack.
                 </p>
-                <p className="relative mt-auto font-mono text-[13px] text-sky-soft">5 модулей · 5–7 недель · 5 мест</p>
-                <Link
-                  href="#apply"
-                  className="kg-btn relative inline-flex min-h-11 items-center gap-2 self-start rounded-full bg-white px-5 font-semibold text-ink hover:bg-ink hover:text-ink-foreground"
-                >
-                  Подать заявку <Arrow />
-                </Link>
+                <p className="relative mt-auto font-mono text-[13px] text-sky-soft">5 модулей · задачи по ролям · пилот в декабре 2026</p>
+                <div className="relative flex flex-wrap items-center gap-x-5 gap-y-3">
+                  <Link
+                    href="/demo-course"
+                    className="kg-btn inline-flex min-h-11 items-center gap-2 rounded-full bg-white px-5 font-semibold text-ink hover:bg-ink hover:text-ink-foreground"
+                  >
+                    Начать с модуля 1 <Arrow />
+                  </Link>
+                  <Link href="#apply" className="inline-flex min-h-11 items-center font-semibold underline underline-offset-4">
+                    Подать заявку
+                  </Link>
+                </div>
               </article>
             </div>
 
