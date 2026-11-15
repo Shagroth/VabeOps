@@ -124,7 +124,16 @@ export default async function EditModulePage({
           const form = level === "NOVICE" ? noviceForm : strongForm;
           const action = setFeedbackQuestions.bind(null, mod.id, level);
           return (
-            <form key={level} action={async (fd) => action(String(fd.get("questions")))} className="flex flex-col gap-2">
+            <form
+              key={level}
+              action={async (fd) => {
+                // Without the directive this is a plain function, and React
+                // refuses to render the page: a form action must be a server action.
+                "use server";
+                await action(String(fd.get("questions")));
+              }}
+              className="flex flex-col gap-2"
+            >
               <span className="text-sm font-medium">{level === "NOVICE" ? "Новички" : "Сильные"}</span>
               <textarea
                 name="questions"
