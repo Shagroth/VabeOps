@@ -15,6 +15,7 @@ import { sendNotifyEmail } from "@/lib/notify-email";
 import { buildFeedbackNotifyEmail } from "@/lib/notify-templates";
 import { parseScores, totalMaxScore } from "@/lib/homework-scoring";
 import { signIn } from "@/auth";
+import { planAcceptance, type AcceptProblem } from "@/lib/application-accept";
 
 function readModuleFields(formData: FormData) {
   return {
@@ -232,48 +233,69 @@ export async function setApplicationStatus(
     where: { id: applicationId },
   });
 
-  await prisma.application.update({ where: { id: applicationId }, data: { status } });
+  // Expected problems go back to the page as a message. Throwing here would
+  // land the admin on the generic error screen with no hint what to do.
+  let problem: AcceptProblem | null = null;
 
-  if (status === "ACCEPTED") {
+  if (status === "REJECTED") {
+    await prisma.application.update({ where: { id: applicationId }, data: { status } });
+  } else {
     const existingUser = await prisma.user.findUnique({ where: { email: application.email } });
+    // Access is per course: being enrolled in another course's cohort does
+    // not count as having this one.
     const alreadyEnrolled = existingUser
-      ? await prisma.enrollment.findFirst({ where: { userId: existingUser.id } })
+      ? await prisma.enrollment.findFirst({
+          where: { userId: existingUser.id, cohort: { course: application.course } },
+        })
       : null;
 
-    if (!alreadyEnrolled) {
-      const level = String(formData?.get("level") ?? "");
-      if (level !== "NOVICE" && level !== "STRONG") {
-        throw new Error("Выбери уровень (новичок/уверенный) перед тем, как принять заявку.");
-      }
-
-      // The newest cohort of the course the person applied to. One cohort
-      // per course at a time is assumed; picking among several is a backlog
-      // item in docs/production-readiness.md.
-      const cohort = await prisma.cohort.findFirst({
+    if (alreadyEnrolled) {
+      await prisma.application.update({ where: { id: applicationId }, data: { status } });
+    } else {
+      const cohorts = await prisma.cohort.findMany({
         where: { course: application.course },
         orderBy: { startDate: "desc" },
+        select: { id: true },
       });
-      if (!cohort) {
-        throw new Error(
-          `Нет потока курса «${getCourse(application.course).title}» — сначала создай поток этого курса, потом принимай заявку.`,
-        );
+      const plan = planAcceptance(
+        String(formData?.get("level") ?? ""),
+        String(formData?.get("cohortId") ?? ""),
+        cohorts,
+      );
+
+      if (!plan.ok) {
+        // Status stays as it was: nothing is recorded until access can be given.
+        problem = plan.problem;
+      } else {
+        const user =
+          existingUser ??
+          (await prisma.user.create({ data: { email: application.email, role: "STUDENT" } }));
+
+        await prisma.enrollment.create({
+          data: { userId: user.id, cohortId: plan.cohortId, level: plan.level },
+        });
+        await prisma.application.update({ where: { id: applicationId }, data: { status } });
+
+        try {
+          // redirect: false — this is the ADMIN's own request; without it,
+          // signIn() would redirect the admin's browser to
+          // /auth/check-email, a page meant for the applicant, not them.
+          await signIn("resend", { email: application.email, redirect: false });
+        } catch (error) {
+          console.error("[admin] magic link was not sent after accepting an application", error);
+          problem = "mail";
+        }
       }
-
-      const user =
-        existingUser ??
-        (await prisma.user.create({ data: { email: application.email, role: "STUDENT" } }));
-
-      await prisma.enrollment.create({ data: { userId: user.id, cohortId: cohort.id, level } });
-
-      // redirect: false — this is the ADMIN's own request; without it,
-      // signIn() would redirect the admin's browser to
-      // /auth/check-email, a page meant for the applicant, not them.
-      await signIn("resend", { email: application.email, redirect: false });
     }
   }
 
   revalidatePath("/admin/applications");
   revalidatePath("/admin");
+
+  if (problem) {
+    redirect(`/admin/applications?problem=${problem}&application=${applicationId}`);
+  }
+  redirect("/admin/applications");
 }
 
 /**
