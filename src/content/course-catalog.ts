@@ -2,7 +2,6 @@
 // A cohort names its course (Cohort.course in schema.prisma); the keys here
 // must match that enum. No Prisma or Next imports: unit-testable.
 import {
-  MODULE_ONE_SUMMARY,
   PROGRAM_MODULES,
   getPrototypeModule,
   type PrototypeModule,
@@ -37,8 +36,7 @@ export type ScoringCriterion = { points: number; label: string; detail: string }
 
 export type CourseContent = {
   summary: CourseModuleSummary;
-  /** `null` only for the engineers' module 1, which has its own lesson flow. */
-  prototype: PrototypeModule | null;
+  prototype: PrototypeModule;
   homework: HomeworkAssignment | undefined;
 };
 
@@ -77,7 +75,6 @@ const engineers: CourseDefinition = {
   getContent(moduleNumber) {
     if (!moduleNumber) return null;
     const homework = getHomeworkAssignment(moduleNumber);
-    if (moduleNumber === 1) return { summary: MODULE_ONE_SUMMARY, prototype: null, homework };
     const prototype = getPrototypeModule(moduleNumber);
     return prototype ? { summary: prototype, prototype, homework } : null;
   },

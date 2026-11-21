@@ -48,7 +48,9 @@ export default async function ReviewQueuePage() {
         <ul className="flex flex-col gap-4">
           {submissions.map((s) => {
             const latest = s.versions[0];
-            const rubric = getCourse(s.module.cohort.course).scoring;
+            const course = getCourse(s.module.cohort.course);
+            const decisionReview = course.getContent(s.module.courseModuleNumber)?.homework?.reviewMode === "decision";
+            const rubric = decisionReview ? [] : course.scoring;
             const rubricSize = rubric.length;
             const accept = reviewSubmission.bind(null, s.id, "ACCEPTED");
             const requestRevision = reviewSubmission.bind(null, s.id, "NEEDS_REVISION");
@@ -122,7 +124,7 @@ export default async function ReviewQueuePage() {
                     rows={2}
                     className="rounded border border-hairline p-2 text-sm"
                   />
-                  <ScoreInputs rubric={rubric} />
+                  {!decisionReview && <ScoreInputs rubric={rubric} />}
                   <div className="flex gap-2">
                     <button
                       type="submit"

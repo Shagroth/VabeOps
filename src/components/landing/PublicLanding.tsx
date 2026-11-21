@@ -30,9 +30,9 @@ const PRINCIPLES = [
 const WEEKS = [
   {
     title: "Agentic mindset",
-    detail: "Чем агент отличается от чата, где он врёт и почему.",
-    outcome: "Видишь, какую задачу отдать чату, а какую агенту, и знаешь, где агент может соврать.",
-    assignment: "Взять свой рабочий кейс и решить: чат или агент. И объяснить почему.",
+    detail: "Спектр автономности, агентный цикл, цена тихой ошибки и независимая проверка.",
+    outcome: "Выбираешь минимально достаточный режим: скрипт, чат, workflow или агент.",
+    assignment: "Оформить agent-decision-record.md по своей задаче и разобрать два сценария ложной уверенности.",
   },
   {
     title: "Context engineering, skills и sub-agents",
@@ -230,7 +230,7 @@ export function PublicLanding() {
                   for Engineers
                 </h3>
                 <p className="relative text-base leading-[1.55] text-[#e8eeff]">
-                  Агентная инженерия для тех, кто уже держит прод: контракт задачи, контекст, MCP, guardrails и
+                  Агентная инженерия для тех, кто уже держит прод: выбор автономности, контекст, MCP, guardrails и
                   мультиагентные системы. С задачами для platform, DevOps, SRE и fullstack.
                 </p>
                 <p className="relative mt-auto font-mono text-[13px] text-sky-soft">5 модулей · задачи по ролям · пилот в декабре 2026</p>
@@ -359,7 +359,7 @@ export function PublicLanding() {
                 свой Agent Task Contract и заберёшь его в работу в Markdown.
               </p>
               <Link
-                href="/demo-course"
+                href="/demo-course/task-contract"
                 className="kg-btn inline-flex min-h-14 items-center gap-2 self-start rounded-full bg-paper px-[30px] font-semibold text-ink hover:bg-signal hover:text-signal-ink"
               >
                 Начать демо-модуль <Arrow />

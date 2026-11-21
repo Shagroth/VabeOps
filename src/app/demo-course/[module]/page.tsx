@@ -2,12 +2,11 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { Header } from "@/components/landing/Header";
 import { Footer } from "@/components/landing/Footer";
-import { DemoCourseFlow } from "@/components/demo-course/DemoCourseFlow";
 import { HomeworkAssignmentSection } from "@/components/demo-course/HomeworkAssignment";
 import { ModuleHero } from "@/components/demo-course/ModuleHero";
 import { PrototypeModuleFlow } from "@/components/demo-course/PrototypeModuleFlow";
 import { getHomeworkAssignment } from "@/content/demo-course-homework";
-import { MODULE_ONE_SUMMARY, PROGRAM_MODULES, getPrototypeModule } from "@/content/demo-course-program";
+import { PROGRAM_MODULES, getPrototypeModule } from "@/content/demo-course-program";
 import { isPublicDemoModule } from "@/content/demo-access";
 import { LockedModuleNotice } from "@/components/demo-course/LockedModuleNotice";
 
@@ -43,20 +42,6 @@ export default async function DemoCourseModulePage({ params }: PageProps) {
   if (!Number.isInteger(moduleNumber) || moduleNumber < 1 || moduleNumber > 5 || String(moduleNumber) !== rawModule) notFound();
   const homework = getHomeworkAssignment(moduleNumber);
   if (!homework) notFound();
-
-  if (moduleNumber === 1) {
-    return (
-      <div className="flex min-h-screen flex-col bg-paper text-[17px] text-graphite">
-        <Header />
-        <main id="main-content" className="flex-1">
-          <ModuleHero number={MODULE_ONE_SUMMARY.number} eyebrow={MODULE_ONE_SUMMARY.eyebrow} title={MODULE_ONE_SUMMARY.title} dek={MODULE_ONE_SUMMARY.dek} result={MODULE_ONE_SUMMARY.result} guidedMinutes={MODULE_ONE_SUMMARY.guidedMinutes} practiceMinutes={MODULE_ONE_SUMMARY.practiceMinutes} />
-          <section className="mx-auto max-w-[1280px] px-3 pb-20 sm:px-8 lg:pb-24"><DemoCourseFlow track={{ course: "ENGINEERS", moduleNumber: 1 }} /></section>
-          <HomeworkAssignmentSection assignment={homework} />
-        </main>
-        <Footer />
-      </div>
-    );
-  }
 
   const courseModule = getPrototypeModule(moduleNumber);
   if (!courseModule) notFound();

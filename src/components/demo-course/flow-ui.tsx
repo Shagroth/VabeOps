@@ -2,7 +2,7 @@ import type { CSSProperties, ReactNode, RefObject } from "react";
 
 /**
  * Shared layout and building blocks of the interactive module flows
- * (DemoCourseFlow for module 1, PrototypeModuleFlow for modules 2–5).
+ * (DemoCourseFlow for the introductory demo, PrototypeModuleFlow for course modules).
  * Presentation only: step state and persistence stay in the flows.
  *
  * The step rail is the brand's line made literal: steps hang on a thread,

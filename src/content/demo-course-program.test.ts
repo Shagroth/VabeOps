@@ -65,7 +65,7 @@ test("engineers' concept steps carry theory, a scheme, a scenario question and a
   }
 });
 
-test("module 1 lab and every homework offer a scenario per engineering role", async () => {
+test("the task contract demo and every homework offer a scenario per engineering role", async () => {
   const { ENGINEER_ROLES } = await import("./engineer-roles.ts");
   const { ROLE_CONTRACT_TEMPLATES, CONTRACT_FIELDS } = await import("./demo-course.ts");
   assert.deepEqual(ROLE_CONTRACT_TEMPLATES.map((t) => t.role), [...ENGINEER_ROLES]);
@@ -77,4 +77,15 @@ test("module 1 lab and every homework offer a scenario per engineering role", as
   for (const assignment of HOMEWORK_ASSIGNMENTS) {
     assert.deepEqual(assignment.tracks?.map((t) => t.role), [...ENGINEER_ROLES], `homework ${assignment.moduleNumber}`);
   }
+});
+
+test("module 01 produces a decision record with two failure scenarios and binary review", () => {
+  const firstModule = PROTOTYPE_MODULES[0];
+  assert.equal(firstModule.artifactFile, "agent-decision-record.md");
+  assert.deepEqual(firstModule.steps.slice(1, 5).map((step) => step.minutes), [12, 11, 15, 10]);
+  assert.equal(firstModule.steps.find((step) => step.id === "failure-modes")?.examples?.length, 5);
+  assert.ok(firstModule.labFields.some((field) => field.key === "alternatives"));
+  assert.deepEqual(firstModule.labFields.filter((field) => field.key.startsWith("failure")).map((field) => field.key), ["failureOne", "failureTwo"]);
+  assert.equal(HOMEWORK_ASSIGNMENTS[0].reviewMode, "decision");
+  assert.ok(HOMEWORK_ASSIGNMENTS[0].deliverables.tree.endsWith(firstModule.artifactFile));
 });

@@ -1,4 +1,5 @@
 import { ENGINEERING_DEPTH } from "./demo-course-depth.ts";
+import { AGENTIC_MINDSET } from "./agentic-mindset.ts";
 import type { RoleTask } from "./engineer-roles.ts";
 export type CheckpointOption = {
   id: string;
@@ -54,6 +55,8 @@ export type PrototypeStep = {
   diagram?: LessonDiagram;
   /** One task per engineering role; the participant picks their own. */
   roleTasks?: RoleTask[];
+  examples?: Array<{ label: string; code: string }>;
+  references?: Array<{ label: string; href: string }>;
   notes: Array<{
     number: string;
     title: string;
@@ -107,6 +110,7 @@ export type PrototypeModule = {
   labKicker?: string;
   artifactKicker?: string;
   artifactLead?: string;
+  reflectionPrompt?: string;
   /** Public base path of the module's course. Defaults to "/demo-course". */
   coursePath?: string;
   /** localStorage key for progress. Defaults to the engineers course key. */
@@ -364,26 +368,9 @@ function withDepth(module: PrototypeModule): PrototypeModule {
   };
 }
 
-export const PROTOTYPE_MODULES = [module2, module3, module4, module5].map(withDepth);
+export const PROTOTYPE_MODULES = [AGENTIC_MINDSET, ...[module2, module3, module4, module5].map(withDepth)];
 
-export const MODULE_ONE_SUMMARY = {
-  number: 1,
-  slug: "contract-before-agent",
-  eyebrow: "Модуль 01 · Agentic mindset",
-  title: "Сначала контракт. Потом — агент.",
-  shortTitle: "Agentic mindset",
-  dek: "Агент ускоряет всё — в том числе неверно понятую задачу. Зафиксируй цель, границы и доказательства готовности до того, как он начнёт действовать.",
-  result: "Agent Task Contract, который можно вставить в реальную задачу уже сегодня",
-  guidedMinutes: [45, 60] as [number, number],
-  practiceMinutes: [90, 150] as [number, number],
-  artifactName: "Agent Task Contract",
-  stepCount: 7,
-};
-
-export const PROGRAM_MODULES = [
-  MODULE_ONE_SUMMARY,
-  ...PROTOTYPE_MODULES.map((module) => ({ ...module, stepCount: module.steps.length })),
-];
+export const PROGRAM_MODULES = PROTOTYPE_MODULES.map((module) => ({ ...module, stepCount: module.steps.length }));
 
 export const PROGRAM_TOTALS = PROGRAM_MODULES.reduce(
   (total, module) => ({
