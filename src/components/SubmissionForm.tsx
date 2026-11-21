@@ -35,20 +35,23 @@ export function SubmissionForm({
   initial,
   conditionsChangedMd,
   initialPublished = false,
+  decisionRecord = false,
 }: {
   moduleId: string;
   initial: Partial<DecisionBreakdown>;
   conditionsChangedMd?: string | null;
   initialPublished?: boolean;
+  decisionRecord?: boolean;
 }) {
+  const breakdown: Partial<DecisionBreakdown> = decisionRecord ? {} : initial;
   const [values, setValues] = useState<DecisionBreakdown>({
     content: initial.content ?? "",
-    task: initial.task ?? "",
-    approach: initial.approach ?? "",
-    rejectedAlternative: initial.rejectedAlternative ?? "",
-    verification: initial.verification ?? "",
-    riskOrLimit: initial.riskOrLimit ?? "",
-    revisitCondition: initial.revisitCondition ?? "",
+    task: breakdown.task ?? "",
+    approach: breakdown.approach ?? "",
+    rejectedAlternative: breakdown.rejectedAlternative ?? "",
+    verification: breakdown.verification ?? "",
+    riskOrLimit: breakdown.riskOrLimit ?? "",
+    revisitCondition: breakdown.revisitCondition ?? "",
     conditionsResponse: initial.conditionsResponse ?? "",
   });
   const [publish, setPublish] = useState(initialPublished);
@@ -63,13 +66,13 @@ export function SubmissionForm({
       if (typeof artifact !== "string" || !artifact.trim()) return;
       setValues((prev) => ({
         ...prev,
-        content: mergeArtifactIntoContent(prev.content, artifact).slice(0, MAX_SUBMISSION_CONTENT_LEN),
+        content: (decisionRecord ? artifact.trim() : mergeArtifactIntoContent(prev.content, artifact)).slice(0, MAX_SUBMISSION_CONTENT_LEN),
       }));
       setSaved(false);
     }
     window.addEventListener(ARTIFACT_EVENT, onArtifact);
     return () => window.removeEventListener(ARTIFACT_EVENT, onArtifact);
-  }, []);
+  }, [decisionRecord]);
 
   function set<K extends keyof DecisionBreakdown>(key: K, value: string) {
     setValues((prev) => ({ ...prev, [key]: value }));
@@ -98,14 +101,14 @@ export function SubmissionForm({
         <textarea
           value={values.content}
           onChange={(e) => set("content", e.target.value)}
-          placeholder="Ссылка на репозиторий или PR, артефакт из лаборатории, короткое описание решения..."
+          placeholder={decisionRecord ? "Вставь текст agent-decision-record.md" : "Ссылка на репозиторий или PR, артефакт из лаборатории, короткое описание решения..."}
           rows={6}
           maxLength={MAX_SUBMISSION_CONTENT_LEN}
           className="w-full rounded-lg border border-hairline p-3"
         />
       </label>
 
-      <fieldset className="rounded-xl border border-hairline p-5">
+      {!decisionRecord && <fieldset className="rounded-xl border border-hairline p-5">
         <legend className="px-1 text-sm font-medium">Разбор решения</legend>
         <div className="flex flex-col">
           {STEPS.map((step, i) => {
@@ -136,7 +139,7 @@ export function SubmissionForm({
             );
           })}
         </div>
-      </fieldset>
+      </fieldset>}
 
       {conditionsChangedMd && (
         <label className="flex flex-col gap-1 rounded-lg border border-accent-change/40 p-4 text-sm">

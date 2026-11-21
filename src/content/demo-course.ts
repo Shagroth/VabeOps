@@ -1,11 +1,11 @@
 import type { EngineerRole } from "./engineer-roles.ts";
-// Module 01 is intentionally stored as reviewable data. The interactive client
+// The introductory demo is stored as reviewable data. The interactive client
 // renders it, but course editors can change the teaching copy without touching
 // state transitions or browser APIs.
 
 export const DEMO_COURSE_META = {
   slug: "contract-before-agent",
-  eyebrow: "Модуль 01 · Agentic mindset",
+  eyebrow: "Открытый демо-модуль · Постановка задачи",
   title: "Сначала контракт. Потом — агент.",
   dek: "Агент ускоряет всё — в том числе неверно понятую задачу. Зафиксируй цель, границы и доказательства готовности до того, как он начнёт действовать.",
   duration: "45–60 минут",

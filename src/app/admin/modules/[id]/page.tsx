@@ -35,7 +35,8 @@ export default async function EditModulePage({
   if (!mod) notFound();
 
   const course = getCourse(mod.cohort.course);
-  const rubricSize = course.scoring.length;
+  const decisionReview = course.getContent(mod.courseModuleNumber)?.homework?.reviewMode === "decision";
+  const rubricSize = decisionReview ? 0 : course.scoring.length;
 
   const noviceForm = mod.feedbackForms.find((f) => f.level === "NOVICE");
   const strongForm = mod.feedbackForms.find((f) => f.level === "STRONG");
@@ -219,7 +220,7 @@ export default async function EditModulePage({
                     rows={2}
                     className="rounded border border-black/15 p-2 text-sm"
                   />
-                  <ScoreInputs rubric={course.scoring} />
+                  {!decisionReview && <ScoreInputs rubric={course.scoring} />}
                   <div className="flex gap-2">
                     <button
                       type="submit"

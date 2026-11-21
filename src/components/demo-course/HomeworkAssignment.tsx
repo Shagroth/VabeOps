@@ -9,7 +9,7 @@ import {
 import type { ScoringCriterion } from "@/content/course-catalog";
 import { ENGINEER_ROLE_LABEL } from "@/content/engineer-roles";
 import { Reveal } from "@/components/motion/Reveal";
-import { CARD, Checklist, FileCard, Label } from "./flow-ui";
+import { BTN, CARD, Checklist, FileCard, Label } from "./flow-ui";
 
 const H3 = "text-[23px] font-bold leading-tight tracking-[-0.015em]";
 
@@ -30,6 +30,7 @@ export function HomeworkAssignmentSection({
   tasksTitle?: string;
 }) {
   const maxScore = scoring.reduce((sum, item) => sum + item.points, 0);
+  const decisionReview = assignment.reviewMode === "decision";
   return (
     <section id="homework" className="kg-anchor border-t border-hairline bg-white">
       <div className="mx-auto flex max-w-[1280px] flex-col gap-14 px-5 py-20 sm:px-8 lg:py-24">
@@ -37,7 +38,7 @@ export function HomeworkAssignmentSection({
           <div>
             <div className="flex flex-wrap items-center gap-3">
               <Label number={`0${assignment.moduleNumber}`}>Домашняя работа</Label>
-              <span className="rounded-full bg-paper-deep px-3 py-1 font-mono text-xs text-graphite">сквозной проект</span>
+              {!decisionReview && <span className="rounded-full bg-paper-deep px-3 py-1 font-mono text-xs text-graphite">сквозной проект</span>}
             </div>
             <h2 className="mt-5 max-w-[16ch] text-[clamp(36px,4.4vw,60px)] font-extrabold leading-none tracking-[-0.035em]">
               {assignment.title}
@@ -48,7 +49,9 @@ export function HomeworkAssignmentSection({
           <div className="rounded-[28px] bg-ink p-7 text-ink-foreground sm:p-8">
             <dl className="grid grid-cols-2 gap-6">
               <Metric label="Оценка времени" value={formatHomeworkTime(assignment.estimatedMinutes)} />
-              <Metric label="Максимум" value={`${maxScore} баллов`} />
+              {decisionReview
+                ? <Metric label="Ревью" value="Принято / На доработку" />
+                : <Metric label="Максимум" value={`${maxScore} баллов`} />}
             </dl>
             <div className="mt-7 border-t border-ink-line pt-6">
               <span className="font-mono text-[13px] uppercase tracking-[0.08em] text-system">На выходе</span>
@@ -130,6 +133,9 @@ export function HomeworkAssignmentSection({
                 ))}
               </ul>
             )}
+            {assignment.templateHref && (
+              <a href={assignment.templateHref} download className={`${BTN.small} mb-6`}>Скачать шаблон .md</a>
+            )}
           </FileCard>
 
           <div className={CARD}>
@@ -138,7 +144,7 @@ export function HomeworkAssignmentSection({
           </div>
         </Reveal>
 
-        {assignment.tracks && (
+        {assignment.tracks && !decisionReview && (
           <Reveal as="div" className="rounded-[28px] bg-ink p-7 text-ink-foreground sm:p-9">
             <span className="font-mono text-[13px] uppercase tracking-[0.08em] text-system">Планка для всех сценариев</span>
             <ol className="mt-4">
@@ -154,7 +160,7 @@ export function HomeworkAssignmentSection({
 
         {assignment.comparisonRows && <ComparisonTable rows={assignment.comparisonRows} />}
 
-        <Reveal mode="children">
+        {!decisionReview && <Reveal mode="children">
           <div className="flex flex-wrap items-end justify-between gap-4">
             <div>
               <h3 className={H3}>Как считаются {maxScore} баллов</h3>
@@ -174,7 +180,7 @@ export function HomeworkAssignmentSection({
               </article>
             ))}
           </div>
-        </Reveal>
+        </Reveal>}
 
         <Reveal as="div" className="rounded-[28px] bg-sky-tint p-7 sm:p-9">
           <span className="font-mono text-[13px] uppercase tracking-[0.08em] text-sky-deep">Усложнение · необязательно</span>

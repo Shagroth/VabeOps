@@ -98,8 +98,8 @@ function loadState(): CourseState {
 
 export function DemoCourseFlow({ workspace, track }: { workspace?: WorkspaceFlowLinks; track?: FunnelTarget } = {}) {
   const mark = useFunnel(track);
-  const nextHref = workspace ? workspace.nextHref : "/demo-course/2";
-  const nextLabel = workspace ? workspace.nextLabel ?? "К следующей неделе →" : "К модулю 2 →";
+  const nextHref = workspace ? workspace.nextHref : "/demo-course/1";
+  const nextLabel = workspace ? workspace.nextLabel ?? "К следующей неделе →" : "К модулю 01 →";
   const overviewHref = workspace ? workspace.overviewHref : "/demo-course";
   const [state, setState] = useState<CourseState>(INITIAL_STATE);
   const [hydrated, setHydrated] = useState(false);
@@ -234,7 +234,7 @@ export function DemoCourseFlow({ workspace, track }: { workspace?: WorkspaceFlow
 
   return (
     <FlowShell
-      eyebrow="Модуль 01"
+      eyebrow="Открытый демо-модуль"
       title={DEMO_COURSE_META.title}
       note="На выходе — контракт для живой задачи. Сертификат прод не спасает."
       steps={MODULE_STEPS}
@@ -585,7 +585,7 @@ export function DemoCourseFlow({ workspace, track }: { workspace?: WorkspaceFlow
               {state.finished ? (
                 <div className="kg-rise rounded-[24px] bg-sky-tint p-6" role="status">
                   <Label tone="system">Модуль завершён</Label>
-                  <p className="mt-2 leading-relaxed">Артефакт сохранён. Следующий модуль — как давать модели достаточно контекста, не вываливая на неё цифровой чердак.</p>
+                  <p className="mt-2 leading-relaxed">Артефакт сохранён. В модуле 01 выберешь, сколько автономности дать модели на своей рабочей задаче.</p>
                   <div className="mt-5 flex flex-wrap items-center gap-x-5 gap-y-3">
                     {nextHref && (
                       <Link href={nextHref} className={BTN.small}>

@@ -239,6 +239,18 @@ function ConceptLesson({ step, headingRef, answer, onAnswer }: { step: Prototype
         </FileCard>
       )}
 
+      {step.examples && (
+        <div className="mt-5 grid min-w-0 gap-4">
+          {step.examples.map((example) => (
+            <FileCard key={example.label} name={example.label}>
+              <pre className="overflow-x-auto pb-7 pr-6 font-mono text-sm leading-relaxed text-ink-muted">
+                <code>{example.code}</code>
+              </pre>
+            </FileCard>
+          ))}
+        </div>
+      )}
+
       {step.roleTasks && (
         <section className="mt-8" aria-label="Задачи по ролям">
           <Label>Задачи по ролям</Label>
@@ -269,6 +281,16 @@ function ConceptLesson({ step, headingRef, answer, onAnswer }: { step: Prototype
             </Feedback>
           )}
         </Question>
+      )}
+      {step.references && (
+        <section aria-label="Дополнительное чтение" className="mt-8">
+          <Label>Дополнительное чтение</Label>
+          <ul className="mt-2 space-y-2">
+            {step.references.map((reference) => (
+              <li key={reference.href}><a className="kg-link" href={reference.href}>{reference.label}</a></li>
+            ))}
+          </ul>
+        </section>
       )}
     </Lesson>
   );
@@ -322,8 +344,8 @@ function ArtifactLesson({ module, headingRef, state, artifact, copyState, onRefl
             <Checklist items={module.rubric} />
           </div>
           <label className={`block ${CARD}`}>
-            <span className="text-lg font-bold tracking-[-0.01em]">Договор с собой</span>
-            <span className="mt-1.5 block text-[15px] text-graphite-soft">На какой задаче проверишь артефакт в течение недели?</span>
+            <span className="text-lg font-bold tracking-[-0.01em]">{module.reflectionPrompt ? "Следующий шаг" : "Договор с собой"}</span>
+            <span className="mt-1.5 block text-[15px] text-graphite-soft">{module.reflectionPrompt ?? "На какой задаче проверишь артефакт в течение недели?"}</span>
             <textarea value={state.reflection} onChange={(event) => onReflection(event.target.value)} rows={3} className={`mt-4 ${FIELD}`} placeholder="На следующей задаче я…" />
           </label>
           <div className="grid gap-2.5 sm:grid-cols-2 xl:grid-cols-1">

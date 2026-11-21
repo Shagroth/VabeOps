@@ -11,7 +11,6 @@ import { WorkspaceShell } from "@/components/WorkspaceShell";
 import { canAccessStudio, canReviewSubmissions } from "@/lib/require-role";
 import { displayName } from "@/lib/display-name";
 import { ModuleHero } from "@/components/demo-course/ModuleHero";
-import { DemoCourseFlow } from "@/components/demo-course/DemoCourseFlow";
 import { PrototypeModuleFlow } from "@/components/demo-course/PrototypeModuleFlow";
 import { HomeworkAssignmentSection } from "@/components/demo-course/HomeworkAssignment";
 import { getCourse } from "@/content/course-catalog";
@@ -155,11 +154,7 @@ export default async function ModulePage({
             {videoUrl && <video controls className="w-full rounded-lg" src={videoUrl} />}
 
             <section aria-label="Урок">
-              {course.prototype ? (
-                <PrototypeModuleFlow module={course.prototype} workspace={flowLinks} />
-              ) : (
-                <DemoCourseFlow workspace={flowLinks} />
-              )}
+              <PrototypeModuleFlow module={course.prototype} workspace={flowLinks} />
             </section>
 
             {course.homework && (
@@ -200,7 +195,7 @@ export default async function ModulePage({
               {submission && <SubmissionStatusBadge status={submission.status} />}
             </div>
             <p className="text-sm text-graphite-muted">
-              {courseDef.submissionHint} Каждая отправка сохраняется
+              {course?.homework?.submissionHint ?? courseDef.submissionHint} Каждая отправка сохраняется
               отдельной версией — предыдущие и фидбек к ним не пропадут.
             </p>
 
@@ -244,6 +239,7 @@ export default async function ModulePage({
               initial={initialBreakdown}
               conditionsChangedMd={mod.conditionsChangedMd}
               initialPublished={submission?.publishedToCohort ?? false}
+              decisionRecord={course?.homework?.reviewMode === "decision"}
             />
 
             {olderVersions.length > 0 && (
